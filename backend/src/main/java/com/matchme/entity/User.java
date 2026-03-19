@@ -23,5 +23,6 @@ public class User {
 
     private String location;
 
-
+    @OneToOne(mappedBy = "user")
+    private Profile profile;
 }
