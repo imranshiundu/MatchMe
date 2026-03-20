@@ -1,6 +1,6 @@
 package com.backend.matchme.controller;
 
-import com.backend.matchme.dto.UserPatchDTO;
+import com.backend.matchme.dto.UserPostDTO;
 import com.backend.matchme.dto.UserResponseDTO;
 import com.backend.matchme.service.UserService;
 import jakarta.validation.Valid;
@@ -29,7 +29,7 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/users")
-    public UserResponseDTO createUser(@RequestBody @Valid UserPatchDTO userPatchDTO) {
-        return userService.createNewUser(userPatchDTO);
+    public UserResponseDTO createUser(@RequestBody @Valid UserPostDTO userPostDTO) {
+        return userService.createNewUser(userPostDTO);
     }
 }
