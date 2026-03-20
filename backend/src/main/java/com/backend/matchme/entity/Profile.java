@@ -17,11 +17,11 @@ public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @NotNull
+    @Column(nullable = false)
     private String firstName;
-    @NotNull
+    @Column(nullable = false)
     private String lastName;
-    @NotNull
+    @Column(nullable = false)
     private String interest;
 
     @OneToOne

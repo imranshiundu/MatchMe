@@ -4,9 +4,8 @@ import com.backend.matchme.dto.ProfilePostDTO;
 import com.backend.matchme.dto.ProfileResponseDTO;
 import com.backend.matchme.repository.ProfileRepository;
 import com.backend.matchme.service.ProfileService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,8 +23,14 @@ public class ProfileController {
         return profileService.findAll();
     }
 
+    @GetMapping("/profile/{id}")
+    public ProfileResponseDTO getProfile(@PathVariable long id) {
+        return profileService.findById(id);
+    }
+
+
     @PostMapping("/profile")
-    public ProfilePostDTO createProfile(ProfilePostDTO profilePostDTO) {
-        return profileService.createProfile(profilePostDTO);
+    public ProfileResponseDTO createNewProfile(@Valid @RequestBody ProfilePostDTO profilePostDTO) {
+        return profileService.createNewProfile(profilePostDTO);
     }
 }

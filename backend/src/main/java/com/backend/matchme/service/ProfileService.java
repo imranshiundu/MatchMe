@@ -23,17 +23,19 @@ public class ProfileService {
 
     }
 
-    public ProfileResponseDTO findById(Long id) {
-        Profile profile = profileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Can't find profile with id " + id));
-        return new ProfileResponseDTO(profile.getId(), profile.getFirstName(), profile.getLastName(), profile.getInterest());
-    }
-
-    public ProfilePostDTO createProfile(ProfilePostDTO profilePostDTO) {
+    public ProfileResponseDTO createNewProfile(ProfilePostDTO profilePostDTO) {
         Profile profile = new Profile();
         profile.setFirstName(profilePostDTO.firstName());
         profile.setLastName(profilePostDTO.lastName());
         profile.setInterest(profilePostDTO.interest());
         Profile savedProfile = profileRepository.save(profile);
-        return new ProfilePostDTO(savedProfile.getFirstName(), savedProfile.getLastName(), savedProfile.getInterest());
+        return new ProfileResponseDTO(savedProfile.getId(), savedProfile.getFirstName(), savedProfile.getLastName(), savedProfile.getInterest());
     }
+
+    public ProfileResponseDTO findById(Long id) {
+        Profile profile = profileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Can't find profile with id " + id));
+        return new ProfileResponseDTO(profile.getId(), profile.getFirstName(), profile.getLastName(), profile.getInterest());
+    }
+
+
 }
