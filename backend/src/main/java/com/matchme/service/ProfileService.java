@@ -15,6 +15,8 @@ public class ProfileService {
     }
 
     public List<Profile> findAll(){
+        System.out.println(profileRepository.findAll());
         return profileRepository.findAll();
+
     }
 }
