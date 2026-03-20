@@ -1,13 +1,12 @@
-package com.matchme.service;
+package com.backend.service;
 
-import com.matchme.dto.UserPatchDTO;
-import com.matchme.dto.UserResponseDTO;
-import com.matchme.entity.User;
-import com.matchme.repository.UserRepository;
+import com.backend.dto.UserPatchDTO;
+import com.backend.dto.UserResponseDTO;
+import com.backend.entity.User;
+import com.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 public class UserService {

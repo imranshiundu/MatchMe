@@ -1,10 +1,10 @@
-package com.matchme.backend;
+package com.backend.matchme;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BackendApplicationTests {
+class MatchMeApplicationTests {
 
     @Test
     void contextLoads() {

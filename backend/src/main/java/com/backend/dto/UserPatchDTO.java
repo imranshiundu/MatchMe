@@ -1,8 +1,7 @@
-package com.matchme.dto;
+package com.backend.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record UserPatchDTO(@NotBlank(message = "E-mail cannot be blank") @Email String email,

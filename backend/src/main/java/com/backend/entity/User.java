@@ -1,4 +1,4 @@
-package com.matchme.entity;
+package com.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
