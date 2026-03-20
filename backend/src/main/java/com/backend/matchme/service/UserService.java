@@ -1,6 +1,6 @@
 package com.backend.matchme.service;
 
-import com.backend.matchme.dto.UserPatchDTO;
+import com.backend.matchme.dto.UserPostDTO;
 import com.backend.matchme.dto.UserResponseDTO;
 import com.backend.matchme.entity.User;
 import com.backend.matchme.exception.ResourceNotFoundException;
@@ -22,10 +22,10 @@ public class UserService {
         return userRepository.findAll().stream().map(user -> new UserResponseDTO(user.getId(), user.getEmail(), user.getLocation())).toList();
     }
 
-    public UserResponseDTO createNewUser(UserPatchDTO userPatchDTO) {
+    public UserResponseDTO createNewUser(UserPostDTO userPostDTO) {
         User user = new User();
-        user.setEmail(userPatchDTO.email());
-        user.setPassword(userPatchDTO.password());
+        user.setEmail(userPostDTO.email());
+        user.setPassword(userPostDTO.password());
         User savedUser = userRepository.save(user);
         return new UserResponseDTO(savedUser.getId(), savedUser.getEmail(), savedUser.getLocation());
     }
