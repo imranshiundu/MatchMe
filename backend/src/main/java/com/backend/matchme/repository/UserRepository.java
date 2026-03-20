@@ -1,6 +1,6 @@
-package com.backend.repository;
+package com.backend.matchme.repository;
 
-import com.backend.entity.User;
+import com.backend.matchme.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User,Long> {

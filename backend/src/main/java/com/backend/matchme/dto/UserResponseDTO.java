@@ -1,4 +1,4 @@
-package com.backend.dto;
+package com.backend.matchme.dto;
 
 public record UserResponseDTO(Long id,
                               String email,

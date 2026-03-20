@@ -1,4 +1,4 @@
-package com.backend.dto;
+package com.backend.matchme.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -1,4 +1,4 @@
-package com.backend.entity;
+package com.backend.matchme.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

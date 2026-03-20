@@ -1,9 +1,9 @@
-package com.backend.service;
+package com.backend.matchme.service;
 
-import com.backend.dto.UserPatchDTO;
-import com.backend.dto.UserResponseDTO;
-import com.backend.entity.User;
-import com.backend.repository.UserRepository;
+import com.backend.matchme.dto.UserPatchDTO;
+import com.backend.matchme.dto.UserResponseDTO;
+import com.backend.matchme.entity.User;
+import com.backend.matchme.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

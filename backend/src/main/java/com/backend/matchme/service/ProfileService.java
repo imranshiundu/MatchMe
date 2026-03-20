@@ -1,7 +1,7 @@
-package com.backend.service;
+package com.backend.matchme.service;
 
-import com.backend.dto.ProfileResponseDTO;
-import com.backend.repository.ProfileRepository;
+import com.backend.matchme.dto.ProfileResponseDTO;
+import com.backend.matchme.repository.ProfileRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

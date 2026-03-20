@@ -1,4 +1,4 @@
-package com.backend.entity;
+package com.backend.matchme.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -12,6 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 
 @Entity
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
