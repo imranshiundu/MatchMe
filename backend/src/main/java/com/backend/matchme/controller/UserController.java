@@ -30,7 +30,7 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/users")
-    public UserResponseDTO createUser(@RequestBody @Valid UserPostDTO userPostDTO) throws BadRequestException {
+    public UserResponseDTO createUser(@RequestBody @Valid UserPostDTO userPostDTO){
         return userService.createNewUser(userPostDTO);
     }
 }

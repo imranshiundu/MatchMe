@@ -25,13 +25,13 @@ public class UserService {
         return userRepository.findAll().stream().map(user -> new UserResponseDTO(user.getId(), user.getEmail(), user.getLocation())).toList();
     }
 
-    public UserResponseDTO createNewUser(UserPostDTO userPostDTO) throws BadRequestException {
+    public UserResponseDTO createNewUser(UserPostDTO userPostDTO) {
 
 
-        if (userRepository.existsByEmail(userPostDTO.email())) {; //check if entered email already exists.
+        if (userRepository.existsByEmail(userPostDTO.email())) { //check if entered email already exists.
             throw new EmailAlreadyExistsException("Email " + userPostDTO.email() + " already exists");
         }
-        if(!userPostDTO.password().equals(userPostDTO.repeatPassword())) {
+        if (!userPostDTO.password().equals(userPostDTO.repeatPassword())) {
             throw new PasswordMismatchException("Passwords don't match");
         }
 
@@ -45,10 +45,10 @@ public class UserService {
 
     public UserResponseDTO getUser(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
-        return  new UserResponseDTO(user.getId(), user.getEmail(), user.getLocation());
+        return new UserResponseDTO(user.getId(), user.getEmail(), user.getLocation());
     }
 
-    public UserResponseDTO register(){
+    public UserResponseDTO register() {
         return null;
     }
 }
