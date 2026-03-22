@@ -4,6 +4,7 @@ import com.backend.matchme.dto.UserPostDTO;
 import com.backend.matchme.dto.UserResponseDTO;
 import com.backend.matchme.service.UserService;
 import jakarta.validation.Valid;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 

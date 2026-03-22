@@ -25,7 +25,7 @@ public class Profile {
     private String interest;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(nullable = false)
     private User user;
 
 }
