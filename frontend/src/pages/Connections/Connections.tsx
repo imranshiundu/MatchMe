@@ -1,4 +1,4 @@
-function Messages() {
+function Connections() {
     return (
         <div className='grid place-items-center'>
             <p>Will have a list of chats</p>
@@ -6,4 +6,4 @@ function Messages() {
     )
 }
 
-export default Messages;
+export default Connections;

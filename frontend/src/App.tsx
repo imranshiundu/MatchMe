@@ -5,8 +5,9 @@ import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
 import Dashboard from "./pages/Dashboard/Dashboard.tsx";
 import Profile from "./pages/Profile/Profile.tsx";
 import Layout from "./components/layout/Layout.tsx";
-import Messages from "./pages/Messages/Messages.tsx";
+import Connections from "./pages/Connections/Connections.tsx";
 import Login from "./pages/Auth/Login.tsx";
+import Chat from "./pages/Messages/Chat.tsx";
 
 // app
 function App() {
@@ -17,7 +18,8 @@ function App() {
                     <Route path="/" element={<Navigate to="/dashboard" replace/>}/>
                     <Route path="/dashboard" element={<Dashboard/>}/>
                     <Route path="/profile" element={<Profile/>}/>
-                    <Route path="/messages" element={<Messages/>}/>
+                    <Route path="/messages" element={<Connections/>}/>
+                    <Route path="/chat" element={<Chat/>}/>
                     <Route path="/login" element={<Login/>}/>
                 </Route>
             </Routes>
