@@ -8,6 +8,7 @@ import com.backend.matchme.exception.PasswordMismatchException;
 import com.backend.matchme.exception.ResourceNotFoundException;
 import com.backend.matchme.repository.UserRepository;
 import org.apache.coyote.BadRequestException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,9 +16,11 @@ import java.util.List;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     public List<UserResponseDTO> findAll() {
@@ -27,18 +30,19 @@ public class UserService {
 
     public UserResponseDTO createNewUser(UserPostDTO userPostDTO) {
 
-
+//TODO: check if email has @, maybe apply some rules for email and password.
         if (userRepository.existsByEmail(userPostDTO.email())) { //check if entered email already exists.
             throw new EmailAlreadyExistsException("Email " + userPostDTO.email() + " already exists");
         }
-        if (!userPostDTO.password().equals(userPostDTO.repeatPassword())) {
+        if (!userPostDTO.password().equals(userPostDTO.repeatPassword())) { //check for password mismatching.
             throw new PasswordMismatchException("Passwords don't match");
         }
 
         User user = new User();
         user.setEmail(userPostDTO.email());
-        user.setPassword(userPostDTO.password());
-        User savedUser = userRepository.save(user);
+        String hashedPassword = bCryptPasswordEncoder.encode(userPostDTO.password()); //we encrypt password and never save the plain password.
+        user.setPassword(hashedPassword);
+        User savedUser = userRepository.save(user); //save email and hashed password to database.
 
         return new UserResponseDTO(savedUser.getId(), savedUser.getEmail(), savedUser.getLocation());
     }
