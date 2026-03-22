@@ -31,4 +31,16 @@ public class GlobalExceptionHandler extends RuntimeException {
         log.error("Unhandled exception", ex);
         return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred. Please try again later.");
     }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponseDTO> handleEmailAlreadyExists(RuntimeException ex) {
+        log.error("Unhandled exception", ex);
+        return createErrorResponse(HttpStatus.CONFLICT, "Email already exists.");
+    }
+
+    @ExceptionHandler(PasswordMismatchException.class)
+    public ResponseEntity<ErrorResponseDTO> handlePasswordMismatch(RuntimeException ex) {
+        log.error("Unhandled exception", ex);
+        return createErrorResponse(HttpStatus.BAD_REQUEST, "Password mismatch.");
+    }
 }
