@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -40,6 +42,27 @@ public class GlobalExceptionHandler {
         log.info("Password mismatch: {}", ex.getMessage());
         return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
+    //400 Bad Request for password too short
+    @ExceptionHandler(PasswordTooShortException.class)
+    public ResponseEntity<ErrorResponseDTO> handlePasswordTooShort(PasswordTooShortException ex) {
+        log.info("Password too short: {}", ex.getMessage());
+        return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    // 400 Bad Request for validation errors which catches @NotNull, @Email, @NotBlank, @Size etc.
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponseDTO> handleValidation(MethodArgumentNotValidException ex) {
+        // Get first validation error message
+        String errorMessage = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .findFirst()
+                .map(FieldError::getDefaultMessage)
+                .orElse("Validation error");
+
+        log.info("Validation failed: {}", errorMessage);
+        return createErrorResponse(HttpStatus.BAD_REQUEST, errorMessage);
+    }
 
     // Catch-all for unexpected exceptions
     @ExceptionHandler(Exception.class)
@@ -48,4 +71,6 @@ public class GlobalExceptionHandler {
         return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
                 "An unexpected error occurred. Please try again later or contact support.");
     }
+
+
 }

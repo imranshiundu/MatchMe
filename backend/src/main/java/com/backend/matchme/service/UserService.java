@@ -5,6 +5,7 @@ import com.backend.matchme.dto.UserResponseDTO;
 import com.backend.matchme.entity.User;
 import com.backend.matchme.exception.EmailAlreadyExistsException;
 import com.backend.matchme.exception.PasswordMismatchException;
+import com.backend.matchme.exception.PasswordTooShortException;
 import com.backend.matchme.exception.ResourceNotFoundException;
 import com.backend.matchme.repository.UserRepository;
 import org.apache.coyote.BadRequestException;
@@ -36,6 +37,9 @@ public class UserService {
         }
         if (!userPostDTO.password().equals(userPostDTO.repeatPassword())) { //check for password mismatching.
             throw new PasswordMismatchException("Passwords don't match");
+        }
+        if(userPostDTO.password().length() < 3){ //check for password length, we want to have at least 3 characters in password.
+            throw new PasswordTooShortException("Password must be at least 3 characters long");
         }
 
         User user = new User();

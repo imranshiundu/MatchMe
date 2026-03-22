@@ -22,7 +22,8 @@ public class SecurityConfig {
 
 
     //disable security features:
-
+//permitAll lets you hit any hitpoint without auth
+    //csrf.disable makes it possible to send POST/PUT without csrf token
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
