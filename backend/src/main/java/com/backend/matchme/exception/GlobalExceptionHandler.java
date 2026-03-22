@@ -42,6 +42,7 @@ public class GlobalExceptionHandler {
         log.info("Password mismatch: {}", ex.getMessage());
         return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
+
     //400 Bad Request for password too short
     @ExceptionHandler(PasswordTooShortException.class)
     public ResponseEntity<ErrorResponseDTO> handlePasswordTooShort(PasswordTooShortException ex) {
@@ -62,6 +63,12 @@ public class GlobalExceptionHandler {
 
         log.info("Validation failed: {}", errorMessage);
         return createErrorResponse(HttpStatus.BAD_REQUEST, errorMessage);
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ErrorResponseDTO> handleInvalidCredentials(InvalidCredentialsException ex) {
+        log.info("Invalid credentials: {}", ex.getMessage());
+        return createErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
     // Catch-all for unexpected exceptions
