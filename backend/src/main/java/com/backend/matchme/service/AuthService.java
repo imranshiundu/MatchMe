@@ -41,8 +41,7 @@ public class AuthService {
         }
         User user = userRepository.findByEmail(email).orElseThrow(() -> new InvalidCredentialsException("User not found")); // we need user entity to set claims and later send DTO.
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", user.getId());
-        claims.put("email", user.getEmail());
+        claims.put("userId", user.getId());//claim is a sealed data inside token
         Date now = new Date(); //we calculate expiration.
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
         SecretKey secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes()); //create secretKey
