@@ -1,4 +1,6 @@
 package com.backend.matchme.security;
 
-public class JwtAuthenticationFilter {
+import org.springframework.web.filter.OncePerRequestFilter;
+
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 }
