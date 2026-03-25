@@ -8,21 +8,20 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.util.Map;
+import java.util.Collections;
+import java.util.function.Function;
 /* What happens at runtime
  * Request comes in
  * Spring Security hits your filter
  * Your method runs
-     * YOU  read JWT
-     *      validate
-     *      set authentication
+ * YOU  read JWT
+ *      validate
+ *      set authentication
  * Pass request forward
  * */
 
@@ -39,15 +38,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //runs only 
             filterChain.doFilter(request, response); //Not all endpoints require login so we skip JWT logic.
             return;
         }
-        String token = header.substring(7); //we remove Bearer from our token (Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)
-        Claims claims = extractAllClaims(token);
-        String userId = claims.getId();
-        SecurityContext securityContext = SecurityContextHolder.setContext().
+        final String token = header.substring(7); //we remove Bearer from our token (Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)
+        final Claims claims = extractAllClaims(token);
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(claims.getId(), null, Collections.emptyList()); //we create new AuthToken which we later set in securityContextHolder so we can use it anywhere else in Spring system
+        SecurityContextHolder.getContext().setAuthentication(authToken);
 
-
-
-
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(request, response);// we pass this onto another filter in Spring Security system.
 
     }
 
@@ -72,6 +68,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //runs only 
             System.out.println("JWT claims string is empty");
         }
         return null;
+    }
+
+    public String extractUsername(String token) { //Helper to get username from token.
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
     }
 }
 
