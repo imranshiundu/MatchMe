@@ -8,6 +8,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.crypto.SecretKey;
@@ -17,9 +20,9 @@ import java.util.Map;
  * Request comes in
  * Spring Security hits your filter
  * Your method runs
- * YOU  read JWT
- *      validate
- *      set authentication
+     * YOU  read JWT
+     *      validate
+     *      set authentication
  * Pass request forward
  * */
 
@@ -37,8 +40,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //runs only 
             return;
         }
         String token = header.substring(7); //we remove Bearer from our token (Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)
-        extractAllClaims(token);
+        Claims claims = extractAllClaims(token);
+        String userId = claims.getId();
+        SecurityContext securityContext = SecurityContextHolder.setContext();
+
+
+
+
         filterChain.doFilter(request, response);
+
     }
 
     private Claims extractAllClaims(String token) {
@@ -48,6 +58,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //runs only 
             Jws<Claims> jwsClaims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
 
             return jwsClaims.getBody();
+
+            //TODO: add 401 Unauthorized instead of print.
         } catch (SignatureException e) {
             System.out.println("Invalid JWT signature");
         } catch (MalformedJwtException e) {
