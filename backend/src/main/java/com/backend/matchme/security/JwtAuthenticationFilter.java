@@ -42,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //runs only 
         String token = header.substring(7); //we remove Bearer from our token (Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)
         Claims claims = extractAllClaims(token);
         String userId = claims.getId();
-        SecurityContext securityContext = SecurityContextHolder.setContext();
+        SecurityContext securityContext = SecurityContextHolder.setContext().
 
 
 
