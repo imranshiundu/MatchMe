@@ -22,15 +22,21 @@ public class SecurityConfig {
 
 
     //disable security features:
-//permitAll lets you hit any hitpoint without auth
+    //permitAll lets you hit any hitpoint without auth
     //csrf.disable makes it possible to send POST/PUT without csrf token
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)        // disable CSRF
-                .headers(headers -> headers.frameOptions().disable()) // allow H2 console frames
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+                .headers(headers -> headers.disable()) // allow H2 console frames
+                .authorizeHttpRequests(auth -> auth.
+                        requestMatchers("/login", "/register", "/dashboard") //these endpoints are allowed without authentication
+                        .permitAll()
+                        .anyRequest()//anything that comes after those, needs authentication token.
+                        .authenticated());
+
         return http.build();
     }
+
 
 }
