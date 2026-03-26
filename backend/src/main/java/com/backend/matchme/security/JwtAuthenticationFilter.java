@@ -40,6 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //runs only 
         }
         final String token = header.substring(7); //we remove Bearer from our token (Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)
         final Claims claims = extractAllClaims(token);
+        //TODO: query the user again to check if user status is banned or something else before setting user Authentication as Authorized.
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(claims.getId(), null, Collections.emptyList()); //we create new AuthToken which we later set in securityContextHolder so we can use it anywhere else in Spring system
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
