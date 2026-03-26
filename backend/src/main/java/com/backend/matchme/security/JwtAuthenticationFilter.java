@@ -11,18 +11,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.function.Function;
-/* What happens at runtime
- * Request comes in
- * Spring Security hits your filter
- * Your method runs
- * YOU  read JWT
- *      validate
- *      set authentication
- * Pass request forward
+/* Spring Security expects an Authentication in its context
+Many parts of Spring (method-level security, @PreAuthorize, @Secured, filters, etc.) check the SecurityContextHolder.
+By creating a UsernamePasswordAuthenticationToken and setting it in the SecurityContext, you standardize how the app sees the user:
+getPrincipal() → your user ID
+getAuthorities() → user roles/permissions
+JWT handles proof of identity (stateless, externalized).
+Authentication handles identity within Spring Security (stateful per request).
  * */
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter { //runs only once per EVERY http request to intercept request before controller
@@ -40,6 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //runs only 
         }
         final String token = header.substring(7); //we remove Bearer from our token (Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)
         final Claims claims = extractAllClaims(token);
+        //TODO: query the user again to check if user status is banned or something else before setting user Authentication as Authorized.
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(claims.getId(), null, Collections.emptyList()); //we create new AuthToken which we later set in securityContextHolder so we can use it anywhere else in Spring system
         SecurityContextHolder.getContext().setAuthentication(authToken);
 

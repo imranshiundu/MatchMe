@@ -1,10 +1,9 @@
 package com.backend.matchme.controller;
 
-import com.backend.matchme.dto.UserPostDTO;
+import com.backend.matchme.dto.registerRequestDTO;
 import com.backend.matchme.dto.UserResponseDTO;
 import com.backend.matchme.service.UserService;
 import jakarta.validation.Valid;
-import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,8 +28,8 @@ public class UserController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/users")
-    public UserResponseDTO createUser(@RequestBody @Valid UserPostDTO userPostDTO) {
-        return userService.createNewUser(userPostDTO);
+    @PostMapping("/register")
+    public UserResponseDTO createUser(@RequestBody @Valid registerRequestDTO registerRequestDTO) {
+        return userService.createNewUser(registerRequestDTO);
     }
 }
