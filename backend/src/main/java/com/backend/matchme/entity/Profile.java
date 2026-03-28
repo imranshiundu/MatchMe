@@ -1,7 +1,6 @@
 package com.backend.matchme.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +14,6 @@ import lombok.Setter;
 public class Profile {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private long id;
     @Column(nullable = false)
@@ -29,7 +27,9 @@ public class Profile {
     private String gender;
     private String lookingFor;
 
-    @OneToOne(mappedBy = "profile")
+    @OneToOne
+    @MapsId //use user ID
+    @JoinColumn(name = "user_id")
     private User user;
 
 }

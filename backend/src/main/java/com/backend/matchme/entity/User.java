@@ -15,6 +15,7 @@ import lombok.Setter;
 @Table(name = "users")
 public class User {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
     @Column(unique = true, nullable = false)
@@ -24,7 +25,7 @@ public class User {
 
     private String location;
 
-    @OneToOne(mappedBy = "profile")
-    @JoinColumn(name = "user_profile", nullable = false)
+    @OneToOne(mappedBy = "user")
+    @PrimaryKeyJoinColumn
     private Profile profile;
 }
