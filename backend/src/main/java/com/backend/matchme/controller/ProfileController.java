@@ -28,9 +28,4 @@ public class ProfileController {
         return profileService.findById(id);
     }
 
-
-    @PostMapping("/profile")
-    public ProfileResponseDTO createNewProfile(@Valid @RequestBody ProfilePostDTO profilePostDTO) {
-        return profileService.createNewProfile(profilePostDTO);
-    }
 }
