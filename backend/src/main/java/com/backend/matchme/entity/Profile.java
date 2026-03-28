@@ -16,6 +16,7 @@ public class Profile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private long id;
     @Column(nullable = false)
     private String firstName;
@@ -23,9 +24,12 @@ public class Profile {
     private String lastName;
     @Column(nullable = false)
     private String interest;
+    private String bio;
+    private String age;
+    private String gender;
+    private String lookingFor;
 
-    @OneToOne
-    @JoinColumn(nullable = false)
+    @OneToOne(mappedBy = "profile")
     private User user;
 
 }
