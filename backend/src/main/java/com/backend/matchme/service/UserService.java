@@ -2,11 +2,13 @@ package com.backend.matchme.service;
 
 import com.backend.matchme.dto.registerRequestDTO;
 import com.backend.matchme.dto.UserResponseDTO;
+import com.backend.matchme.entity.Profile;
 import com.backend.matchme.entity.User;
 import com.backend.matchme.exception.EmailAlreadyExistsException;
 import com.backend.matchme.exception.PasswordMismatchException;
 import com.backend.matchme.exception.PasswordTooShortException;
 import com.backend.matchme.exception.ResourceNotFoundException;
+import com.backend.matchme.repository.ProfileRepository;
 import com.backend.matchme.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,10 +19,12 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final ProfileRepository profileRepository;
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, ProfileRepository profileRepository) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.profileRepository = profileRepository;
     }
 
     public List<UserResponseDTO> findAll() {
@@ -46,6 +50,9 @@ public class UserService {
         String hashedPassword = bCryptPasswordEncoder.encode(registerRequestDTO.password()); //we encrypt password and never save the plain password.
         user.setPassword(hashedPassword);
         User savedUser = userRepository.save(user); //save email and hashed password to database.
+        Profile profile = new Profile();
+        profile.setUser(savedUser);
+        profileRepository.save(profile);
 
         return new UserResponseDTO(savedUser.getId(), savedUser.getEmail(), savedUser.getLocation());
     }

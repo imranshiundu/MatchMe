@@ -23,7 +23,7 @@ public class Profile {
     @Column(nullable = false)
     private String interest;
     private String bio;
-    private String age;
+    private Integer age;
     private String gender;
     private String lookingFor;
 
