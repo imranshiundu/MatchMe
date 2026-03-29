@@ -1,14 +1,11 @@
 package com.backend.matchme.service;
 
+import com.backend.matchme.dto.ChangePasswordDTO;
 import com.backend.matchme.dto.registerRequestDTO;
 import com.backend.matchme.dto.UserResponseDTO;
 import com.backend.matchme.entity.Profile;
 import com.backend.matchme.entity.User;
-import com.backend.matchme.exception.EmailAlreadyExistsException;
-import com.backend.matchme.exception.PasswordMismatchException;
-import com.backend.matchme.exception.PasswordTooShortException;
-import com.backend.matchme.exception.ResourceNotFoundException;
-import com.backend.matchme.repository.ProfileRepository;
+import com.backend.matchme.exception.*;
 import com.backend.matchme.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,21 +23,46 @@ public class UserService {
     }
 
     public List<UserResponseDTO> findAll() {
-        System.out.println("Finding all users...(" + userRepository.findAll() + ")");
         return userRepository.findAll().stream().map(user -> new UserResponseDTO(user.getId(), user.getEmail(), user.getLocation())).toList();
+    }
+
+    public void deleteUser(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id: " + id + " not found."));
+        userRepository.delete(user);
+    }
+
+    public void changePassword(Long id, ChangePasswordDTO passDTO) {
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id: " + id + " not found."));
+        if (passDTO.newPassword().length() < 3) { //check for password length, we want to have at least 3 characters in password.
+            throw new PasswordTooShortException("Password must be at least 3 characters long.");
+        }
+        if (!passDTO.newPassword().equals(passDTO.newRepeatPassword())) { //check for password mismatching.
+            throw new PasswordMismatchException("Passwords don't match.");
+        }
+        if (!bCryptPasswordEncoder.matches(passDTO.newPassword(), user.getPassword())) {
+            throw new PasswordReuseException("New password must be different from the old password.");
+        }
+        if(!bCryptPasswordEncoder.matches(passDTO.oldPassword(), user.getPassword())) {
+            throw new InvalidPasswordException("Current password does not match the database.");
+        }
+        user.setPassword(bCryptPasswordEncoder.encode(passDTO.newPassword()));
+        userRepository.save(user);
+
+        //TODO: add DTO to set response to frontend maybe.
+        System.out.println("New password set successfully.");
     }
 
     public UserResponseDTO createNewUser(registerRequestDTO registerRequestDTO) {
 
-//TODO: check if email has @, maybe apply some rules for email and password.
+        //TODO: check if email has @, maybe apply some rules for email and password.
         if (userRepository.existsByEmail(registerRequestDTO.email())) { //check if entered email already exists.
-            throw new EmailAlreadyExistsException("Email " + registerRequestDTO.email() + " already exists");
+            throw new EmailAlreadyExistsException("Email " + registerRequestDTO.email() + " already exists.");
         }
         if (!registerRequestDTO.password().equals(registerRequestDTO.repeatPassword())) { //check for password mismatching.
-            throw new PasswordMismatchException("Passwords don't match");
+            throw new PasswordMismatchException("Passwords don't match.");
         }
         if (registerRequestDTO.password().length() < 3) { //check for password length, we want to have at least 3 characters in password.
-            throw new PasswordTooShortException("Password must be at least 3 characters long");
+            throw new PasswordTooShortException("Password must be at least 3 characters long.");
         }
 
         User user = new User();
@@ -58,7 +80,7 @@ public class UserService {
     }
 
     public UserResponseDTO getUser(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found."));
         return new UserResponseDTO(user.getId(), user.getEmail(), user.getLocation());
     }
 

@@ -71,6 +71,17 @@ public class GlobalExceptionHandler {
         return createErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
+    @ExceptionHandler(PasswordReuseException.class)
+    public ResponseEntity<ErrorResponseDTO> handlePasswordInUse(PasswordReuseException ex) {
+        log.info("Password already in use: {}", ex.getMessage());
+        return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<ErrorResponseDTO> handleInvalidOldPassword(InvalidPasswordException ex) {
+        log.info("Current password mismatch: {}", ex.getMessage());
+        return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
     // Catch-all for unexpected exceptions
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleAll(Exception ex) {
