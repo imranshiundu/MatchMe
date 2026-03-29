@@ -31,7 +31,7 @@ public class Profile {
     private String lookingFor;
 
     @OneToOne
-    @MapsId //use user ID
+    @MapsId //use user ID and profile doesn't have its own id.
     @JoinColumn(name = "user_id")
     private User user;
 
