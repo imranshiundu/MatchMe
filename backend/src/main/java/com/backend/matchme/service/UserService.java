@@ -41,12 +41,13 @@ public class UserService {
         if (!passDTO.newPassword().equals(passDTO.newRepeatPassword())) { //check for password mismatching.
             throw new PasswordMismatchException("Passwords don't match.");
         }
-        if (!bCryptPasswordEncoder.matches(passDTO.newPassword(), user.getPassword())) {
-            throw new PasswordReuseException("New password must be different from the old password.");
-        }
         if (!bCryptPasswordEncoder.matches(passDTO.oldPassword(), user.getPassword())) {
             throw new InvalidPasswordException("Current password does not match the database.");
         }
+        if (bCryptPasswordEncoder.matches(passDTO.newPassword(), user.getPassword())) {
+            throw new PasswordReuseException("New password must be different from the old password.");
+        }
+
         user.setPassword(bCryptPasswordEncoder.encode(passDTO.newPassword()));
         userRepository.save(user);
 
