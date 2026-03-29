@@ -1,5 +1,6 @@
 package com.backend.matchme.service;
 
+import com.backend.matchme.dto.ChangeEmailDTO;
 import com.backend.matchme.dto.ChangePasswordDTO;
 import com.backend.matchme.dto.registerRequestDTO;
 import com.backend.matchme.dto.UserResponseDTO;
@@ -22,17 +23,18 @@ public class UserService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
+    //TODO: debugger method for now, delete for prod.
     public List<UserResponseDTO> findAll() {
         return userRepository.findAll().stream().map(user -> new UserResponseDTO(user.getId(), user.getEmail(), user.getLocation())).toList();
     }
 
     public void deleteUser(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id: " + id + " not found."));
+        User user = findUserById(id);
         userRepository.delete(user);
     }
 
     public void changePassword(Long id, ChangePasswordDTO passDTO) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id: " + id + " not found."));
+        User user = findUserById(id);
         if (passDTO.newPassword().length() < 3) { //check for password length, we want to have at least 3 characters in password.
             throw new PasswordTooShortException("Password must be at least 3 characters long.");
         }
@@ -42,7 +44,7 @@ public class UserService {
         if (!bCryptPasswordEncoder.matches(passDTO.newPassword(), user.getPassword())) {
             throw new PasswordReuseException("New password must be different from the old password.");
         }
-        if(!bCryptPasswordEncoder.matches(passDTO.oldPassword(), user.getPassword())) {
+        if (!bCryptPasswordEncoder.matches(passDTO.oldPassword(), user.getPassword())) {
             throw new InvalidPasswordException("Current password does not match the database.");
         }
         user.setPassword(bCryptPasswordEncoder.encode(passDTO.newPassword()));
@@ -50,6 +52,24 @@ public class UserService {
 
         //TODO: add DTO to set response to frontend maybe.
         System.out.println("New password set successfully.");
+    }
+
+    public void changeEmail(Long id, ChangeEmailDTO changeEmail) {
+        User user = findUserById(id);
+        if (changeEmail.newEmail().equals(user.getEmail())) { //check if entered email already exists.
+            throw new EmailAlreadyExistsException("Email " + changeEmail.newEmail() + " is the same as current one");
+        }
+        if (!bCryptPasswordEncoder.matches(changeEmail.currentPassword(), user.getPassword())) {
+            throw new InvalidPasswordException("Current password is invalid.");
+        }
+        if (userRepository.existsByEmail(changeEmail.newEmail())) {
+            throw new EmailAlreadyExistsException("Email already in use by another account.");
+        }
+        user.setEmail(changeEmail.newEmail());
+        userRepository.save(user);
+        //TODO: add DTO to set response to frontend maybe.
+        System.out.println("Email changed successfully!");
+
     }
 
     public UserResponseDTO createNewUser(registerRequestDTO registerRequestDTO) {
@@ -80,8 +100,14 @@ public class UserService {
     }
 
     public UserResponseDTO getUser(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found."));
+        User user = findUserById(id);
         return new UserResponseDTO(user.getId(), user.getEmail(), user.getLocation());
+    }
+
+    //helper method to reduce boilerplate
+    private User findUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id: " + id + " not found."));
     }
 
 }
