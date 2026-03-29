@@ -41,7 +41,7 @@ public class UserService {
         if (!registerRequestDTO.password().equals(registerRequestDTO.repeatPassword())) { //check for password mismatching.
             throw new PasswordMismatchException("Passwords don't match");
         }
-        if(registerRequestDTO.password().length() < 3){ //check for password length, we want to have at least 3 characters in password.
+        if (registerRequestDTO.password().length() < 3) { //check for password length, we want to have at least 3 characters in password.
             throw new PasswordTooShortException("Password must be at least 3 characters long");
         }
 
@@ -49,10 +49,12 @@ public class UserService {
         user.setEmail(registerRequestDTO.email());
         String hashedPassword = bCryptPasswordEncoder.encode(registerRequestDTO.password()); //we encrypt password and never save the plain password.
         user.setPassword(hashedPassword);
-        User savedUser = userRepository.save(user); //save email and hashed password to database.
         Profile profile = new Profile();
-        profile.setUser(savedUser);
-        profileRepository.save(profile);
+        profile.setUser(user); // link user
+        user.setProfile(profile); // set profile (important!)
+
+        User savedUser = userRepository.save(user); //save email and hashed password to database.
+
 
         return new UserResponseDTO(savedUser.getId(), savedUser.getEmail(), savedUser.getLocation());
     }

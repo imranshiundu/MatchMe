@@ -27,10 +27,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)        // disable CSRF
-                .headers(headers -> headers.disable()) // allow H2 console frames
+                .csrf(AbstractHttpConfigurer::disable)        // disable CSRF = Cross-Site Request Forgery. not needed when we use JWT because we are stateless.
                 .authorizeHttpRequests(auth -> auth.
-                        requestMatchers("/login", "/register", "/dashboard") //these endpoints are allowed without authentication
+                        requestMatchers("/login", "/register", "/users") //these endpoints are allowed without authentication
                         .permitAll()
                         .anyRequest()//anything that comes after those, needs authentication token.
                         .authenticated());

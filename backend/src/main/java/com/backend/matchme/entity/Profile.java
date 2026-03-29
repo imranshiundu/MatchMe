@@ -15,16 +15,19 @@ public class Profile {
 
     @Id
     @Column(name = "user_id")
-    private long id;
-    @Column(nullable = false)
+    private Long id;
     private String firstName;
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String lastName;
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String interest;
+    @Column(nullable = true)
     private String bio;
+    @Column(nullable = true)
     private Integer age;
+    @Column(nullable = true)
     private String gender;
+    @Column(nullable = true)
     private String lookingFor;
 
     @OneToOne
