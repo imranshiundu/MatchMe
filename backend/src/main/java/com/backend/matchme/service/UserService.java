@@ -19,12 +19,10 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final ProfileRepository profileRepository;
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, ProfileRepository profileRepository) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.profileRepository = profileRepository;
     }
 
     public List<UserResponseDTO> findAll() {
@@ -64,7 +62,4 @@ public class UserService {
         return new UserResponseDTO(user.getId(), user.getEmail(), user.getLocation());
     }
 
-    public UserResponseDTO register() {
-        return null;
-    }
 }
