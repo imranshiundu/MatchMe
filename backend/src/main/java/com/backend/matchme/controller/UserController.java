@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RequestMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -27,19 +28,19 @@ public class UserController {
     }
 
 
-    @PutMapping("/change-email/{id}")
-    public void changeEmail(@PathVariable Long id, @RequestBody ChangeEmailDTO changeEmail) {
-        userService.changeEmail(id, changeEmail);
+    @PutMapping("/change-email")
+    public void changeEmail(@RequestBody ChangeEmailDTO changeEmail) throws AccessDeniedException {
+        userService.changeEmail(changeEmail);
     }
 
-    @PutMapping("/change-password/{id}")
-    public void changePassword(@PathVariable Long id, @RequestBody ChangePasswordDTO changePw) {
-        userService.changePassword(id, changePw);
+    @PutMapping("/change-password")
+    public void changePassword( @RequestBody ChangePasswordDTO changePw) throws AccessDeniedException {
+        userService.changePassword(changePw);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public void deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
+    @DeleteMapping("/delete")
+    public void deleteUser() throws AccessDeniedException {
+        userService.deleteUser();
     }
 
     @ResponseStatus(HttpStatus.CREATED)

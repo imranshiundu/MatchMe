@@ -44,6 +44,7 @@ public class AuthService {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new InvalidCredentialsException("User not found")); // we need user entity to set claims and later send DTO.
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getId());//claim is a sealed data inside token
+
         Date now = new Date(); //we calculate expiration.
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
         SecretKey secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes()); //create secretKey
@@ -53,6 +54,7 @@ public class AuthService {
                 .setExpiration(expiryDate)
                 .signWith(secretKey, HS256)
                 .compact();
+
         return new LoginResponseDTO(token, user.getEmail(), user.getId());
     }
 
@@ -61,6 +63,7 @@ public class AuthService {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isPresent()) {
             if (bCryptPasswordEncoder.matches(password, user.get().getPassword())) {
+                System.out.println("Successfully logged in: " + email);
                 return true;
             } else {
                 throw new InvalidCredentialsException("Invalid password");

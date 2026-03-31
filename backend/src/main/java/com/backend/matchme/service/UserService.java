@@ -8,13 +8,19 @@ import com.backend.matchme.entity.Profile;
 import com.backend.matchme.entity.User;
 import com.backend.matchme.exception.*;
 import com.backend.matchme.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @Service
 public class UserService {
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -28,13 +34,13 @@ public class UserService {
         return userRepository.findAll().stream().map(user -> new UserResponseDTO(user.getId(), user.getEmail(), user.getLocation())).toList();
     }
 
-    public void deleteUser(Long id) {
-        User user = findUserById(id);
+    public void deleteUser() throws AccessDeniedException {
+        User user = findUserById();
         userRepository.delete(user);
     }
 
-    public void changePassword(Long id, ChangePasswordDTO passDTO) {
-        User user = findUserById(id);
+    public void changePassword(ChangePasswordDTO passDTO) throws AccessDeniedException {
+        User user = findUserById();
         if (passDTO.newPassword().length() < 3) { //check for password length, we want to have at least 3 characters in password.
             throw new PasswordTooShortException("Password must be at least 3 characters long.");
         }
@@ -55,8 +61,8 @@ public class UserService {
         System.out.println("New password set successfully.");
     }
 
-    public void changeEmail(Long id, ChangeEmailDTO changeEmail) {
-        User user = findUserById(id);
+    public void changeEmail(ChangeEmailDTO changeEmail) throws AccessDeniedException {
+        User user = findUserById();
         if (changeEmail.newEmail().equals(user.getEmail())) { //check if entered email already exists.
             throw new EmailAlreadyExistsException("Email " + changeEmail.newEmail() + " is the same as current one");
         }
@@ -100,15 +106,27 @@ public class UserService {
         return new UserResponseDTO(savedUser.getId(), savedUser.getEmail(), savedUser.getLocation());
     }
 
-    public UserResponseDTO getUser(Long id) {
-        User user = findUserById(id);
+    public UserResponseDTO getUser() throws AccessDeniedException {
+        User user = findUserById();
         return new UserResponseDTO(user.getId(), user.getEmail(), user.getLocation());
     }
 
     //helper method to reduce boilerplate
-    private User findUserById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User with id: " + id + " not found."));
+    private User findUserById() throws AccessDeniedException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || auth.getPrincipal() == null
+                || auth.getPrincipal().equals("anonymousUser")) {
+            log.info("Authentication object: {}", auth);
+            log.info("Principal: {}", auth != null ? auth.getPrincipal() : null);
+            log.info("Authenticated: {}", auth != null && auth.isAuthenticated());
+            throw new AccessDeniedException("User not authenticated");
+        }
+
+        Long userId = (Long) auth.getPrincipal();
+
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id: " + userId + " not found."));
     }
 
 }
