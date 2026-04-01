@@ -23,9 +23,19 @@ public class ProfileController {
         return profileService.findAll();
     }
 
+    //TODO: placeholders below.
     @GetMapping("/profile/{id}")
     public ProfileResponseDTO getProfile(@PathVariable long id) {
         return profileService.findById(id);
     }
 
+    @GetMapping("/me/profile")
+    public ProfileResponseDTO getProfile(@PathVariable long id) {
+        return profileService.findById(id);
+    }
+
+    @GetMapping("/me/bio")
+    public ProfileResponseDTO getProfile(@PathVariable long id) {
+        return profileService.findById(id);
+    }
 }

@@ -1,9 +1,6 @@
 package com.backend.matchme.controller;
 
-import com.backend.matchme.dto.ChangeEmailDTO;
-import com.backend.matchme.dto.ChangePasswordDTO;
-import com.backend.matchme.dto.registerRequestDTO;
-import com.backend.matchme.dto.UserResponseDTO;
+import com.backend.matchme.dto.*;
 import com.backend.matchme.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -27,6 +24,21 @@ public class UserController {
         return userService.findAll();
     }
 
+    //TODO: placeholders below.
+    @GetMapping("/users/{id}")
+    public List<UserResponseDTO> getUsers(@PathVariable Long id) {
+        return userService.findAll();
+    }
+
+    @GetMapping("/users/{id}/profile")
+    public List<UserResponseDTO> getUsers(@PathVariable Long id) {
+        return userService.findAll();
+    }
+
+    @GetMapping("/users/{id}/bio")
+    public List<UserResponseDTO> getUsers(@PathVariable Long id) {
+        return userService.findAll();
+    }
 
     @PutMapping("/change-email")
     public void changeEmail(@RequestBody ChangeEmailDTO changeEmail) throws AccessDeniedException {
@@ -34,7 +46,7 @@ public class UserController {
     }
 
     @PutMapping("/change-password")
-    public void changePassword( @RequestBody ChangePasswordDTO changePw) throws AccessDeniedException {
+    public void changePassword(@RequestBody ChangePasswordDTO changePw) throws AccessDeniedException {
         userService.changePassword(changePw);
     }
 
