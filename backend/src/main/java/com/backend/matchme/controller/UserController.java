@@ -25,7 +25,7 @@ public class UserController {
     }
 
     //TODO: placeholders below.
-    @GetMapping("/users/{id}")
+    /*@GetMapping("/users/{id}")
     public List<UserResponseDTO> getUsers(@PathVariable Long id) {
         return userService.findAll();
     }
@@ -38,7 +38,7 @@ public class UserController {
     @GetMapping("/users/{id}/bio")
     public List<UserResponseDTO> getUsers(@PathVariable Long id) {
         return userService.findAll();
-    }
+    }*/
 
     @PutMapping("/change-email")
     public void changeEmail(@RequestBody ChangeEmailDTO changeEmail) throws AccessDeniedException {

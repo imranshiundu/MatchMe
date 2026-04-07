@@ -7,6 +7,7 @@ import com.backend.matchme.dto.UserResponseDTO;
 import com.backend.matchme.entity.Profile;
 import com.backend.matchme.entity.User;
 import com.backend.matchme.exception.*;
+import com.backend.matchme.repository.ProfileRepository;
 import com.backend.matchme.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +24,12 @@ public class UserService {
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final ProfileRepository profileRepository;
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, ProfileRepository profileRepository) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.profileRepository = profileRepository;
     }
 
     //TODO: debugger method for now, delete for prod.
@@ -98,9 +101,8 @@ public class UserService {
         user.setPassword(hashedPassword);
         Profile profile = new Profile();
         profile.setUser(user); // link user
-        user.setProfile(profile); // set profile (important!)
-
         User savedUser = userRepository.save(user); //save email and hashed password to database.
+        Profile savedProfile = profileRepository.save(profile);
 
 
         return new UserResponseDTO(savedUser.getId(), savedUser.getEmail(), savedUser.getLocation());

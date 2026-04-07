@@ -25,7 +25,4 @@ public class User {
 
     private String location;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) //orphanRemoval removes profile is user entity is deleted from db.
-    @PrimaryKeyJoinColumn
-    private Profile profile;
 }

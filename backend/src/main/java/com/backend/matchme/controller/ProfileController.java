@@ -3,6 +3,7 @@ package com.backend.matchme.controller;
 import com.backend.matchme.dto.ProfilePostDTO;
 import com.backend.matchme.dto.ProfileResponseDTO;
 import com.backend.matchme.repository.ProfileRepository;
+import com.backend.matchme.service.ProfileAuthorizationService;
 import com.backend.matchme.service.ProfileService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -24,9 +25,9 @@ public class ProfileController {
     }
 
     //TODO: placeholders below.
-    @GetMapping("/profile/{id}")
+    /*@GetMapping("/profile/{id}")
     public ProfileResponseDTO getProfile(@PathVariable long id) {
-        return profileService.findById(id);
+        return ProfileAuthorizationService
     }
 
     @GetMapping("/me/profile")
@@ -37,5 +38,5 @@ public class ProfileController {
     @GetMapping("/me/bio")
     public ProfileResponseDTO getProfile(@PathVariable long id) {
         return profileService.findById(id);
-    }
+    }*/
 }
