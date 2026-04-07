@@ -1,6 +1,6 @@
-import LoginForm from "../../components/auth/LoginForm.tsx";
+import LoginForm from "../components/auth/LoginForm.tsx";
 import {useState} from "react";
-import RegistrationForm from "../../components/auth/RegistrationForm.tsx";
+import RegistrationForm from "../components/auth/RegistrationForm.tsx";
 
 function Auth() {
     const [login, setLogin] = useState<boolean>(true)

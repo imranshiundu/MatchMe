@@ -2,12 +2,12 @@ import './App.css'
 import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
 
 // page imports
-import Dashboard from "./pages/Dashboard/Dashboard.tsx";
-import Profile from "./pages/Profile/Profile.tsx";
+import Dashboard from "./pages/Dashboard.tsx";
+import Profile from "./pages/Profile.tsx";
 import Layout from "./components/layout/Layout.tsx";
-import Connections from "./pages/Connections/Connections.tsx";
-import Auth from "./pages/Auth/Auth.tsx";
-import Chat from "./pages/Messages/Chat.tsx";
+import Connections from "./pages/Connections.tsx";
+import Auth from "./pages/Auth.tsx";
+import Chat from "./pages/Chat.tsx";
 
 // app
 function App() {

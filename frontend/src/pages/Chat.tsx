@@ -1,4 +1,4 @@
-import ChatMessageInput from "../../components/chat/ChatMessageInput.tsx";
+import ChatMessageInput from "../components/chat/ChatMessageInput.tsx";
 
 function Chat() {
     return (
