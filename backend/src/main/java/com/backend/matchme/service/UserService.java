@@ -114,7 +114,7 @@ public class UserService {
     }
 
     //helper method to reduce boilerplate
-    private User findUserById() throws AccessDeniedException {
+    public User findUserById() throws AccessDeniedException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth == null || !auth.isAuthenticated() || auth.getPrincipal() == null

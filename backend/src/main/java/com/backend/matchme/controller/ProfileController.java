@@ -8,6 +8,7 @@ import com.backend.matchme.service.ProfileService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestController
@@ -19,9 +20,9 @@ public class ProfileController {
 
     }
 
-    @GetMapping("/profile")
-    public List<ProfileResponseDTO> getProfile() {
-        return profileService.findAll();
+    @GetMapping({"/me", "/me/profile", "/me/bio"}) //gets your own authorized profile
+    public ProfileResponseDTO getProfile() throws AccessDeniedException {
+        return profileService.getProfile();
     }
 
     //TODO: placeholders below.
