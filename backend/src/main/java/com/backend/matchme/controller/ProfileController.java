@@ -19,25 +19,16 @@ public class ProfileController {
         this.profileService = profileService;
 
     }
-
+    // /me: which is a shortcut to /users/{id} for the authenticated user. You should also implement /me/profile and /me/bio.
     @GetMapping({"/me", "/me/profile", "/me/bio"}) //gets your own authorized profile
     public ProfileResponseDTO getProfile() throws AccessDeniedException {
         return profileService.getProfile();
     }
-
-    //TODO: placeholders below.
-    /*@GetMapping("/profile/{id}")
-    public ProfileResponseDTO getProfile(@PathVariable long id) {
-        return ProfileAuthorizationService
+    //TODO: returns the user's name and link to the profile picture.
+    //TODO: If the id is not found, or the user does not have permission to view that profile, it must return HTTP404.
+    @GetMapping("/profile/{id}")
+    public ProfileResponseDTO getProfile(@PathVariable long id) throws AccessDeniedException {
+        return profileService.getProfileWithId(id);
     }
 
-    @GetMapping("/me/profile")
-    public ProfileResponseDTO getProfile(@PathVariable long id) {
-        return profileService.findById(id);
-    }
-
-    @GetMapping("/me/bio")
-    public ProfileResponseDTO getProfile(@PathVariable long id) {
-        return profileService.findById(id);
-    }*/
 }

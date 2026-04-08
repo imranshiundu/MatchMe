@@ -18,9 +18,7 @@ public class Profile {
     @Column(name = "user_id")
     private Long id;
 
-    private String firstName;
-
-    private String lastName;
+    private String nickname;
 
     @Lob
     private byte[] profilePicture; // Large-OBject which saves binary data of image.

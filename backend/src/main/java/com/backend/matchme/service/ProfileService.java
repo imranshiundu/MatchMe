@@ -7,6 +7,8 @@ import com.backend.matchme.entity.User;
 import com.backend.matchme.exception.ResourceNotFoundException;
 import com.backend.matchme.repository.ProfileRepository;
 import com.backend.matchme.repository.UserRepository;
+import com.backend.matchme.utils.GetAuthPrinciple;
+import com.backend.matchme.utils.ProfileMapper;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
@@ -15,31 +17,39 @@ import java.util.List;
 @Service
 public class ProfileService {
     private final ProfileRepository profileRepository;
-    private final UserService userService;
+    private final GetAuthPrinciple getAuthPrinciple;
 
 
-    public ProfileService(ProfileRepository profileRepository, UserRepository userRepository, UserService userService) {
+    public ProfileService(ProfileRepository profileRepository, UserRepository userRepository, UserService userService, GetAuthPrinciple getAuthPrinciple) {
         this.profileRepository = profileRepository;
-        this.userService = userService;
+        this.getAuthPrinciple = getAuthPrinciple;
     }
 
     public ProfileResponseDTO getProfile() throws AccessDeniedException {
-        User user = userService.findUserById();
+        User user = getAuthPrinciple.getAuthenticatedUser();
         Profile profile = profileRepository.findById(user.getId()).orElseThrow(() -> new ResourceNotFoundException("Profile not found" + user.getId()));
-        return new ProfileResponseDTO(profile.getId(), profile.getFirstName(), profile.getLastName(), profile.getInterest());
+        return ProfileMapper.toProfileResponseDTO(profile);
+    }
+
+    public ProfileResponseDTO getProfileWithId(Long id) throws AccessDeniedException {
+        User user = getAuthPrinciple.getAuthenticatedUser();
+        if (!user.getId().equals(id)) {
+            throw new AccessDeniedException("access denied, not authorized to view profile with ID: " + id);
+        }
+        Profile profile = profileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Profile not found" + id));
+        return ProfileMapper.toProfileResponseDTO(profile);
     }
 
     public List<ProfileResponseDTO> findAll() {
         System.out.println(profileRepository.findAll());
-        return profileRepository.findAll().stream().map(profile -> new ProfileResponseDTO(profile.getId(), profile.getFirstName(), profile.getLastName(), profile.getInterest())).toList();
+        return profileRepository.findAll().stream().map(ProfileMapper::toProfileResponseDTO).toList();
 
     }
 
 
-
     public ProfileResponseDTO findById(Long id) {
         Profile profile = profileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Can't find profile with id " + id));
-        return new ProfileResponseDTO(profile.getId(), profile.getFirstName(), profile.getLastName(), profile.getInterest());
+        return ProfileMapper.toProfileResponseDTO(profile);
     }
 
 

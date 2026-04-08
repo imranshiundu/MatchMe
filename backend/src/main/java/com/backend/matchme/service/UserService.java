@@ -9,6 +9,7 @@ import com.backend.matchme.entity.User;
 import com.backend.matchme.exception.*;
 import com.backend.matchme.repository.ProfileRepository;
 import com.backend.matchme.repository.UserRepository;
+import com.backend.matchme.utils.GetAuthPrinciple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -25,11 +26,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final ProfileRepository profileRepository;
+    private final GetAuthPrinciple getAuthPrinciple;
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, ProfileRepository profileRepository) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, ProfileRepository profileRepository, GetAuthPrinciple getAuthPrinciple) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.profileRepository = profileRepository;
+        this.getAuthPrinciple = getAuthPrinciple;
     }
 
     //TODO: debugger method for now, delete for prod.
@@ -38,12 +41,12 @@ public class UserService {
     }
 
     public void deleteUser() throws AccessDeniedException {
-        User user = findUserById();
+        User user = getAuthPrinciple.getAuthenticatedUser();
         userRepository.delete(user);
     }
 
     public void changePassword(ChangePasswordDTO passDTO) throws AccessDeniedException {
-        User user = findUserById();
+        User user = getAuthPrinciple.getAuthenticatedUser();
         if (passDTO.newPassword().length() < 3) { //check for password length, we want to have at least 3 characters in password.
             throw new PasswordTooShortException("Password must be at least 3 characters long.");
         }
@@ -65,7 +68,7 @@ public class UserService {
     }
 
     public void changeEmail(ChangeEmailDTO changeEmail) throws AccessDeniedException {
-        User user = findUserById();
+        User user = getAuthPrinciple.getAuthenticatedUser();
         if (changeEmail.newEmail().equals(user.getEmail())) { //check if entered email already exists.
             throw new EmailAlreadyExistsException("Email " + changeEmail.newEmail() + " is the same as current one");
         }
@@ -80,6 +83,10 @@ public class UserService {
         //TODO: add DTO to set response to frontend maybe.
         System.out.println("Email changed successfully!");
 
+    }
+
+    private GetAuthPrinciple getGetAuthPrinciple() {
+        return getAuthPrinciple;
     }
 
     public UserResponseDTO createNewUser(registerRequestDTO registerRequestDTO) {
@@ -109,26 +116,9 @@ public class UserService {
     }
 
     public UserResponseDTO getUser() throws AccessDeniedException {
-        User user = findUserById();
+        User user = getAuthPrinciple.getAuthenticatedUser();
         return new UserResponseDTO(user.getId(), user.getEmail(), user.getLocation());
     }
 
-    //helper method to reduce boilerplate
-    public User findUserById() throws AccessDeniedException {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth == null || !auth.isAuthenticated() || auth.getPrincipal() == null
-                || auth.getPrincipal().equals("anonymousUser")) {
-            log.info("Authentication object: {}", auth);
-            log.info("Principal: {}", auth != null ? auth.getPrincipal() : null);
-            log.info("Authenticated: {}", auth != null && auth.isAuthenticated());
-            throw new AccessDeniedException("User not authenticated");
-        }
-
-        Long userId = (Long) auth.getPrincipal();
-
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User with id: " + userId + " not found."));
-    }
 
 }
