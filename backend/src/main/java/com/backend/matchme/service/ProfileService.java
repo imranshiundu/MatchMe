@@ -1,5 +1,6 @@
 package com.backend.matchme.service;
 
+import com.backend.matchme.dto.EditProfileDTO;
 import com.backend.matchme.dto.ProfilePostDTO;
 import com.backend.matchme.dto.ProfileResponseDTO;
 import com.backend.matchme.entity.Profile;
@@ -46,10 +47,24 @@ public class ProfileService {
 
     }
 
-
     public ProfileResponseDTO findById(Long id) {
         Profile profile = profileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Can't find profile with id " + id));
         return ProfileMapper.toProfileResponseDTO(profile);
+    }
+
+    public ProfileResponseDTO editProfile(EditProfileDTO newProfileData) throws AccessDeniedException {
+        User user = getAuthPrinciple.getAuthenticatedUser();
+        Profile profile = profileRepository.findById(user.getId()).orElseThrow(() -> new ResourceNotFoundException("Profile not found" + user.getId()));
+        profile.setNickname(newProfileData.nickname());
+        profile.setInterest(newProfileData.interest());
+        profile.setAge(newProfileData.age());
+        profile.setGender(newProfileData.gender());
+        profile.setBio(newProfileData.bio());
+        profile.setLookingFor(newProfileData.lookingFor());
+
+        profileRepository.save(profile);
+
+        return ProfileMapper.toProfileResponseDTO(profileRepository.save(profile));
     }
 
 
