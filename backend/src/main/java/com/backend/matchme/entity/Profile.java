@@ -15,17 +15,30 @@ import lombok.Setter;
 public class Profile {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    @Column(nullable = false)
-    private String firstName;
-    @Column(nullable = false)
-    private String lastName;
-    @Column(nullable = false)
+    @Column(name = "user_id")
+    private Long id;
+
+    private String nickname;
+
+    @Lob
+    private byte[] profilePicture; // Large-OBject which saves binary data of image.
+
+    private String profilePictureContentType; //This tells frontend how to handle it e.g. Content type: JPG
+
     private String interest;
 
+    private String bio;
+
+    private Integer age;
+
+    private String gender;
+
+    private String lookingFor;
+
+
     @OneToOne
-    @JoinColumn(nullable = false)
+    @MapsId //use user ID and profile doesn't have its own id.
+    @JoinColumn(name = "user_id")
     private User user;
 
 }

@@ -1,14 +1,16 @@
 package com.backend.matchme.controller;
 
-import com.backend.matchme.dto.registerRequestDTO;
-import com.backend.matchme.dto.UserResponseDTO;
+import com.backend.matchme.dto.*;
 import com.backend.matchme.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
+@RequestMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 public class UserController {
     private final UserService userService;
@@ -22,9 +24,35 @@ public class UserController {
         return userService.findAll();
     }
 
-    @GetMapping("/users/{id}")
-    public UserResponseDTO getUser(@PathVariable long id) {
-        return userService.getUser(id);
+    //TODO: placeholders below.
+    /*@GetMapping("/users/{id}")
+    public List<UserResponseDTO> getUsers(@PathVariable Long id) {
+        return userService.findAll();
+    }
+
+    @GetMapping("/users/{id}/profile")
+    public List<UserResponseDTO> getUsers(@PathVariable Long id) {
+        return userService.findAll();
+    }
+
+    @GetMapping("/users/{id}/bio")
+    public List<UserResponseDTO> getUsers(@PathVariable Long id) {
+        return userService.findAll();
+    }*/
+
+    @PutMapping("/change-email")
+    public void changeEmail(@RequestBody ChangeEmailDTO changeEmail) throws AccessDeniedException {
+        userService.changeEmail(changeEmail);
+    }
+
+    @PutMapping("/change-password")
+    public void changePassword(@RequestBody ChangePasswordDTO changePw) throws AccessDeniedException {
+        userService.changePassword(changePw);
+    }
+
+    @DeleteMapping("/delete")
+    public void deleteUser() throws AccessDeniedException {
+        userService.deleteUser();
     }
 
     @ResponseStatus(HttpStatus.CREATED)
