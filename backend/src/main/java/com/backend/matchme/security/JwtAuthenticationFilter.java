@@ -1,5 +1,6 @@
 package com.backend.matchme.security;
 
+import com.backend.matchme.utils.ProfileValidator;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
@@ -17,6 +18,7 @@ import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.function.Function;
+
 /* Spring Security expects an Authentication in its context
 Many parts of Spring (method-level security, @PreAuthorize, @Secured, filters, etc.) check the SecurityContextHolder.
 By creating a UsernamePasswordAuthenticationToken and setting it in the SecurityContext, you standardize how the app sees the user:
@@ -30,10 +32,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //runs only 
     @Value("${jwt.secret}")
     private String jwtSecret;
 
-
     //spring calls this method on every request. Everything to do with JWT happens here.
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        //TODO: create log instead of system out
         System.out.println("JWT FILTER HIT");
         String header = request.getHeader("Authorization"); // request = the incoming HTTP request object, getHeader grabs the value of the header with that name
         if (header == null || !header.startsWith("Bearer ")) { //JWT might not be present for public endpoints -- If header missing → we just let the request pass, security config will handle it later
@@ -44,6 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //runs only 
         final Claims claims = extractAllClaims(token);
         //TODO: query the user again to check if user status is banned or something else before setting user Authentication as Authorized.
         Long userId = claims.get("userId", Long.class);
+
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList()); //we create new AuthToken which we later set in securityContextHolder so we can use it anywhere else in Spring system
         SecurityContextHolder.getContext().setAuthentication(authToken);
         //TODO: remove this debug line when in prod.
@@ -75,14 +78,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //runs only 
         return null;
     }
 
-    public String extractUsername(String token) { //Helper to get username from token.
-        return extractClaim(token, Claims::getSubject);
-    }
-
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
-    }
 }
 
 
