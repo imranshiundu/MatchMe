@@ -83,10 +83,6 @@ public class UserService {
 
     }
 
-    private GetAuthPrinciple getGetAuthPrinciple() {
-        return getAuthPrinciple;
-    }
-
     public RegisterResponseDTO createNewUser(registerRequestDTO registerRequestDTO) {
 
         //TODO: check if email has @, maybe apply some rules for email and password.
