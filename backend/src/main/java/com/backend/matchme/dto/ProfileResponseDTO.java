@@ -6,6 +6,8 @@ public record ProfileResponseDTO(Long id,
                                  String bio,
                                  Integer age,
                                  String gender,
-                                 String lookingFor) {
+                                 String lookingFor,
+                                 String imageUrl,
+                                 String publicId) {
 
 }

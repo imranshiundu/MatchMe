@@ -37,8 +37,6 @@ public class ProfileController {
     @PatchMapping("/me/editProfile")
     public ProfileResponseDTO editProfile(@RequestBody EditProfileDTO editProfileDTO) throws AccessDeniedException {
         return profileService.editProfile(editProfileDTO);
-
-
     }
 
 }

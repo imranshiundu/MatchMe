@@ -10,6 +10,7 @@ import com.backend.matchme.repository.ProfileRepository;
 import com.backend.matchme.repository.UserRepository;
 import com.backend.matchme.utils.GetAuthPrinciple;
 import com.backend.matchme.utils.ProfileMapper;
+import com.cloudinary.Cloudinary;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
@@ -19,11 +20,13 @@ import java.util.List;
 public class ProfileService {
     private final ProfileRepository profileRepository;
     private final GetAuthPrinciple getAuthPrinciple;
+    private final Cloudinary cloudinary;
 
 
-    public ProfileService(ProfileRepository profileRepository, UserRepository userRepository, UserService userService, GetAuthPrinciple getAuthPrinciple) {
+    public ProfileService(ProfileRepository profileRepository, UserRepository userRepository, UserService userService, GetAuthPrinciple getAuthPrinciple, Cloudinary cloudinary) {
         this.profileRepository = profileRepository;
         this.getAuthPrinciple = getAuthPrinciple;
+        this.cloudinary = cloudinary;
     }
 
     public ProfileResponseDTO getProfile() throws AccessDeniedException {
@@ -61,6 +64,8 @@ public class ProfileService {
         profile.setGender(newProfileData.gender());
         profile.setBio(newProfileData.bio());
         profile.setLookingFor(newProfileData.lookingFor());
+        profile.setImageUrl(newProfileData.imageUrl());
+        profile.setPublicId(newProfileData.publicId());
 
         profileRepository.save(profile);
 
