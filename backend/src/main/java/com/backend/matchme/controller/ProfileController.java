@@ -1,16 +1,16 @@
 package com.backend.matchme.controller;
 
-import com.backend.matchme.dto.EditProfileDTO;
-import com.backend.matchme.dto.ProfilePostDTO;
-import com.backend.matchme.dto.ProfileResponseDTO;
+import com.backend.matchme.dto.profile.EditProfileDTO;
+import com.backend.matchme.dto.profile.ProfileImageUploadResponseDTO;
+import com.backend.matchme.dto.profile.ProfileResponseDTO;
+import com.backend.matchme.exception.UploadFailedException;
 import com.backend.matchme.repository.ProfileRepository;
-import com.backend.matchme.service.ProfileAuthorizationService;
 import com.backend.matchme.service.ProfileService;
-import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.file.AccessDeniedException;
-import java.util.List;
 
 @RestController
 public class ProfileController {
@@ -37,6 +37,11 @@ public class ProfileController {
     @PatchMapping("/me/editProfile")
     public ProfileResponseDTO editProfile(@RequestBody EditProfileDTO editProfileDTO) throws AccessDeniedException {
         return profileService.editProfile(editProfileDTO);
+    }
+
+    @PostMapping("/profile/upload-image")
+    public ProfileImageUploadResponseDTO uploadImage(@RequestParam("file") MultipartFile file) throws UploadFailedException, IOException {
+        return profileService.uploadImage(file);
     }
 
 }

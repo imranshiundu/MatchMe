@@ -1,4 +1,4 @@
-package com.backend.matchme.dto;
+package com.backend.matchme.dto.profile;
 
 public record ProfileResponseDTO(Long id,
                                  String nickname,

@@ -1,6 +1,6 @@
 package com.backend.matchme.exception;
 
-import com.backend.matchme.dto.ErrorResponseDTO;
+import com.backend.matchme.dto.error.ErrorResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -85,6 +85,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponseDTO> handleAccessDenied(AccessDeniedException ex) {
         log.info("Access denied: {}", ex.getMessage());
+        return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+    @ExceptionHandler(UploadFailedException.class)
+    public ResponseEntity<ErrorResponseDTO> handleAccessDenied(UploadFailedException ex) {
+        log.info("Image upload failed: {}", ex.getMessage());
         return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 

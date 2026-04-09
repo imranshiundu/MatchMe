@@ -1,20 +1,25 @@
 package com.backend.matchme.service;
 
-import com.backend.matchme.dto.EditProfileDTO;
-import com.backend.matchme.dto.ProfilePostDTO;
-import com.backend.matchme.dto.ProfileResponseDTO;
+import com.backend.matchme.dto.profile.EditProfileDTO;
+import com.backend.matchme.dto.profile.ProfileImageUploadResponseDTO;
+import com.backend.matchme.dto.profile.ProfileResponseDTO;
 import com.backend.matchme.entity.Profile;
 import com.backend.matchme.entity.User;
 import com.backend.matchme.exception.ResourceNotFoundException;
+import com.backend.matchme.exception.UploadFailedException;
 import com.backend.matchme.repository.ProfileRepository;
 import com.backend.matchme.repository.UserRepository;
 import com.backend.matchme.utils.GetAuthPrinciple;
 import com.backend.matchme.utils.ProfileMapper;
 import com.cloudinary.Cloudinary;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ProfileService {
@@ -70,6 +75,21 @@ public class ProfileService {
         profileRepository.save(profile);
 
         return ProfileMapper.toProfileResponseDTO(profileRepository.save(profile));
+    }
+
+    public ProfileImageUploadResponseDTO uploadImage(MultipartFile file) throws UploadFailedException, IOException {
+        User user = getAuthPrinciple.getAuthenticatedUser();
+        Profile profile = profileRepository.findById(user.getId()).orElseThrow(() -> new ResourceNotFoundException("Profile not found" + user.getId()));
+
+        HashMap<Object, Object> options = new HashMap<>(); //we create a map to instruct cloudinary what we want to do with image or its properties.
+        options.put("public_id", "profile_" + profile.getId());
+        options.put("overwrite", true);
+        Map uploadedFile = cloudinary.uploader().upload(file.getBytes(), options);
+
+        profile.setImageUrl((uploadedFile.get("secure_url").toString()));
+        profile.setPublicId(uploadedFile.get("public_id").toString());
+        Profile savedProfile = profileRepository.save(profile);
+        return new ProfileImageUploadResponseDTO(uploadedFile.get("secure_url").toString());
     }
 
 

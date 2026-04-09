@@ -1,6 +1,6 @@
 package com.backend.matchme.utils;
 
-import com.backend.matchme.dto.ProfileResponseDTO;
+import com.backend.matchme.dto.profile.ProfileResponseDTO;
 import com.backend.matchme.entity.Profile;
 
 public class ProfileMapper {

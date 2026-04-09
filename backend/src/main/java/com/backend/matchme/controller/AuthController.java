@@ -1,7 +1,7 @@
 package com.backend.matchme.controller;
 
-import com.backend.matchme.dto.LoginRequestDTO;
-import com.backend.matchme.dto.LoginResponseDTO;
+import com.backend.matchme.dto.user.LoginRequestDTO;
+import com.backend.matchme.dto.user.LoginResponseDTO;
 import com.backend.matchme.service.AuthService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

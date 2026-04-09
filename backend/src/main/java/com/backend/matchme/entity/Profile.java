@@ -20,9 +20,9 @@ public class Profile {
 
     private String nickname;
 
-    private String imageUrl = "https://res.cloudinary.com/ddvukican/image/upload/v1775725641/default-profile-picture-icon-avatar-photo-placeholder-illustration-vector_rvxyt7.jpg";// URL for frontend display
+    private String imageUrl = "https://res.cloudinary.com/ddvukican/image/upload/v1775725641/default-profile-image.jpg";// URL for frontend display
 
-    private String publicId = "placeholder-image"; // Cloudinary identifier for backend management
+    private String publicId = "default-placeholder-image"; // Cloudinary identifier for backend management
 
     private String profilePictureContentType; //This tells frontend how to handle it e.g. Content type: JPG
 

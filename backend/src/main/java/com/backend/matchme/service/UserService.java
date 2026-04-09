@@ -1,9 +1,9 @@
 package com.backend.matchme.service;
 
-import com.backend.matchme.dto.ChangeEmailDTO;
-import com.backend.matchme.dto.ChangePasswordDTO;
-import com.backend.matchme.dto.registerRequestDTO;
-import com.backend.matchme.dto.UserResponseDTO;
+import com.backend.matchme.dto.user.ChangeEmailDTO;
+import com.backend.matchme.dto.user.ChangePasswordDTO;
+import com.backend.matchme.dto.user.registerRequestDTO;
+import com.backend.matchme.dto.user.RegisterResponseDTO;
 import com.backend.matchme.entity.Profile;
 import com.backend.matchme.entity.User;
 import com.backend.matchme.exception.*;
@@ -12,8 +12,6 @@ import com.backend.matchme.repository.UserRepository;
 import com.backend.matchme.utils.GetAuthPrinciple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -36,8 +34,8 @@ public class UserService {
     }
 
     //TODO: debugger method for now, delete for prod.
-    public List<UserResponseDTO> findAll() {
-        return userRepository.findAll().stream().map(user -> new UserResponseDTO(user.getId(), user.getEmail(), user.getLocation())).toList();
+    public List<RegisterResponseDTO> findAll() {
+        return userRepository.findAll().stream().map(user -> new RegisterResponseDTO(user.getId(), user.getEmail(), user.getLocation())).toList();
     }
 
     public void deleteUser() throws AccessDeniedException {
@@ -89,7 +87,7 @@ public class UserService {
         return getAuthPrinciple;
     }
 
-    public UserResponseDTO createNewUser(registerRequestDTO registerRequestDTO) {
+    public RegisterResponseDTO createNewUser(registerRequestDTO registerRequestDTO) {
 
         //TODO: check if email has @, maybe apply some rules for email and password.
         if (userRepository.existsByEmail(registerRequestDTO.email())) { //check if entered email already exists.
@@ -112,12 +110,12 @@ public class UserService {
         Profile savedProfile = profileRepository.save(profile);
 
 
-        return new UserResponseDTO(savedUser.getId(), savedUser.getEmail(), savedUser.getLocation());
+        return new RegisterResponseDTO(savedUser.getId(), savedUser.getEmail(), savedUser.getLocation());
     }
 
-    public UserResponseDTO getUser() throws AccessDeniedException {
+    public RegisterResponseDTO getUser() throws AccessDeniedException {
         User user = getAuthPrinciple.getAuthenticatedUser();
-        return new UserResponseDTO(user.getId(), user.getEmail(), user.getLocation());
+        return new RegisterResponseDTO(user.getId(), user.getEmail(), user.getLocation());
     }
 
 

@@ -1,4 +1,4 @@
-package com.backend.matchme.dto;
+package com.backend.matchme.dto.error;
 
 public record ErrorResponseDTO(
         int status,
