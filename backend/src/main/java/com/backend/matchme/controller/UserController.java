@@ -1,6 +1,9 @@
 package com.backend.matchme.controller;
 
-import com.backend.matchme.dto.*;
+import com.backend.matchme.dto.user.ChangeEmailDTO;
+import com.backend.matchme.dto.user.ChangePasswordDTO;
+import com.backend.matchme.dto.user.RegisterResponseDTO;
+import com.backend.matchme.dto.user.registerRequestDTO;
 import com.backend.matchme.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -20,7 +23,7 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public List<UserResponseDTO> getUsers() {
+    public List<RegisterResponseDTO> getUsers() {
         return userService.findAll();
     }
 
@@ -57,7 +60,7 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register")
-    public UserResponseDTO createUser(@RequestBody @Valid registerRequestDTO registerRequestDTO) {
+    public RegisterResponseDTO createUser(@RequestBody @Valid registerRequestDTO registerRequestDTO) {
         return userService.createNewUser(registerRequestDTO);
     }
 }

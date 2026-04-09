@@ -20,8 +20,9 @@ public class Profile {
 
     private String nickname;
 
-    @Lob
-    private byte[] profilePicture; // Large-OBject which saves binary data of image.
+    private String imageUrl = "https://res.cloudinary.com/ddvukican/image/upload/v1775725641/default-profile-image.jpg";// URL for frontend display
+
+    private String publicId = "default-placeholder-image"; // Cloudinary identifier for backend management
 
     private String profilePictureContentType; //This tells frontend how to handle it e.g. Content type: JPG
 

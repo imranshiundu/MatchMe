@@ -1,6 +1,6 @@
 package com.backend.matchme.utils;
 
-import com.backend.matchme.dto.ProfileResponseDTO;
+import com.backend.matchme.dto.profile.ProfileResponseDTO;
 import com.backend.matchme.entity.Profile;
 
 public class ProfileMapper {
@@ -12,7 +12,9 @@ public class ProfileMapper {
                 profile.getBio(),
                 profile.getAge(),
                 profile.getGender(),
-                profile.getLookingFor()
+                profile.getLookingFor(),
+                profile.getPublicId(),
+                profile.getImageUrl()
         );
     }
 }

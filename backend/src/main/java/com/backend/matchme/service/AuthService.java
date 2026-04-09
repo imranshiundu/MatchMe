@@ -1,6 +1,6 @@
 package com.backend.matchme.service;
 
-import com.backend.matchme.dto.LoginResponseDTO;
+import com.backend.matchme.dto.user.LoginResponseDTO;
 import com.backend.matchme.entity.User;
 import com.backend.matchme.exception.InvalidCredentialsException;
 import com.backend.matchme.repository.UserRepository;
