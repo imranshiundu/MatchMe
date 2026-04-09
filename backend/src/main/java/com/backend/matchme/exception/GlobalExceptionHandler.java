@@ -9,6 +9,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -76,6 +77,7 @@ public class GlobalExceptionHandler {
         log.info("Password already in use: {}", ex.getMessage());
         return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
+
     @ExceptionHandler(InvalidPasswordException.class)
     public ResponseEntity<ErrorResponseDTO> handleInvalidOldPassword(InvalidPasswordException ex) {
         log.info("Current password mismatch: {}", ex.getMessage());
@@ -87,10 +89,17 @@ public class GlobalExceptionHandler {
         log.info("Access denied: {}", ex.getMessage());
         return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
+
     @ExceptionHandler(UploadFailedException.class)
-    public ResponseEntity<ErrorResponseDTO> handleAccessDenied(UploadFailedException ex) {
+    public ResponseEntity<ErrorResponseDTO> handleUploadFailed(UploadFailedException ex) {
         log.info("Image upload failed: {}", ex.getMessage());
         return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponseDTO> handleMaxSize(MaxUploadSizeExceededException ex) {
+        log.info("Image upload failed: {}", ex.getMessage());
+        return createErrorResponse(HttpStatus.PAYLOAD_TOO_LARGE, ex.getMessage());
     }
 
     // Catch-all for unexpected exceptions
