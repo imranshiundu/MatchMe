@@ -24,8 +24,6 @@ public class Profile {
 
     private String publicId = "default-placeholder-image"; // Cloudinary identifier for backend management
 
-    private String profilePictureContentType; //This tells frontend how to handle it e.g. Content type: JPG
-
     private String interest;
 
     private String bio;
@@ -35,7 +33,6 @@ public class Profile {
     private String gender;
 
     private String lookingFor;
-
 
     @OneToOne
     @MapsId //use user ID and profile doesn't have its own id.
