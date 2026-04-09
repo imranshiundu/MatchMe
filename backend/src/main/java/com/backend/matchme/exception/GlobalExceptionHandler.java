@@ -102,6 +102,12 @@ public class GlobalExceptionHandler {
         return createErrorResponse(HttpStatus.PAYLOAD_TOO_LARGE, ex.getMessage());
     }
 
+    @ExceptionHandler(ProfileIncompleteException.class)
+    public ResponseEntity<ErrorResponseDTO> handleProfileIncomplete(ProfileIncompleteException ex) {
+        log.info("Not authorized to access page: {}", ex.getMessage());
+        return createErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
     // Catch-all for unexpected exceptions
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleAll(Exception ex) {
