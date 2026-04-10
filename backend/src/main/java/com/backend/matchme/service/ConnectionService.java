@@ -1,7 +1,7 @@
 package com.backend.matchme.service;
 
 import com.backend.matchme.dto.connections.ConnectionResponseDTO;
-import com.backend.matchme.entity.Connection;
+import com.backend.matchme.dto.connections.RecommendationsResponseDTO;
 import com.backend.matchme.entity.Profile;
 import com.backend.matchme.entity.User;
 import com.backend.matchme.exception.ProfileIncompleteException;
@@ -11,6 +11,7 @@ import com.backend.matchme.repository.ProfileRepository;
 import com.backend.matchme.utils.ConnectionMapper;
 import com.backend.matchme.utils.GetAuthPrinciple;
 import com.backend.matchme.utils.ProfileValidator;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
@@ -41,5 +42,12 @@ public class ConnectionService {
                 .stream()
                 .map(ConnectionMapper::toDTO)
                 .toList();
+    }
+
+    //TODO: currently returns list of profile ids 1->10 with paging. edit to match with recommendations.
+    public RecommendationsResponseDTO getRecommendations(Pageable pageable) throws AccessDeniedException {
+
+        List<Long> profileList = profileRepository.findAll(pageable).stream().map(Profile::getId).toList();
+        return new RecommendationsResponseDTO(profileList, pageable);
     }
 }

@@ -1,5 +1,8 @@
 package com.backend.matchme.service;
 
+import com.backend.matchme.dto.endpoints.UserProfileBioDTO;
+import com.backend.matchme.dto.endpoints.UserProfileInterestDTO;
+import com.backend.matchme.dto.endpoints.UserSummaryDTO;
 import com.backend.matchme.dto.profile.EditProfileDTO;
 import com.backend.matchme.dto.profile.ProfileImageUploadResponseDTO;
 import com.backend.matchme.dto.profile.ProfileResponseDTO;
@@ -61,9 +64,21 @@ public class ProfileService {
 
     }
 
-    public ProfileResponseDTO findById(Long id) {
+    public UserSummaryDTO findById(Long id) {
         Profile profile = profileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Can't find profile with id " + id));
-        return ProfileMapper.toProfileResponseDTO(profile);
+        return new UserSummaryDTO(profile.getId(), profile.getNickname(), profile.getImageUrl());
+    }
+
+    public UserProfileInterestDTO getProfileInterest(Long id) throws AccessDeniedException {
+        User user = getAuthPrinciple.getAuthenticatedUser();
+        Profile profile = profileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Can't find profile with id " + id));
+        return new UserProfileInterestDTO(profile.getId(), profile.getInterest());
+    }
+
+    public UserProfileBioDTO getProfileBio(Long id) throws AccessDeniedException {
+        User user = getAuthPrinciple.getAuthenticatedUser();
+        Profile profile = profileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Can't find profile with id " + id));
+        return new UserProfileBioDTO(profile.getId(), profile.getBio());
     }
 
     public ProfileResponseDTO editProfile(EditProfileDTO newProfileData) throws AccessDeniedException {

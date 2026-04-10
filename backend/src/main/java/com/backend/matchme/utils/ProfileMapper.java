@@ -13,8 +13,9 @@ public class ProfileMapper {
                 profile.getAge(),
                 profile.getGender(),
                 profile.getLookingFor(),
-                profile.getPublicId(),
-                profile.getImageUrl()
+                profile.getImageUrl(),
+                profile.getPublicId()
+
         );
     }
 }

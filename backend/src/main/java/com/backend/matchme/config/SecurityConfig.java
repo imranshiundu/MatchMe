@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)        // disable CSRF = Cross-Site Request Forgery. not needed when we use JWT because we are stateless.
                 .authorizeHttpRequests(auth -> auth.
                         //TODO: remove /users from allowed endpoints later on.
-                        requestMatchers("/login", "/users/register", "/users/users") //these endpoints are allowed without authentication
+                        requestMatchers("/login", "/register", "/users") //these endpoints are allowed without authentication
                         .permitAll()
                         .anyRequest()//anything that comes after those, needs authentication token.
                         .authenticated());
