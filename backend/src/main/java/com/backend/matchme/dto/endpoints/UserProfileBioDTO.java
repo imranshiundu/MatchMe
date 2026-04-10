@@ -1,4 +1,4 @@
 package com.backend.matchme.dto.endpoints;
 
-public record UserProfileBioDTO() {
+public record UserProfileBioDTO(String bio) {
 }

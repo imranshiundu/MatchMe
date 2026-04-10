@@ -1,7 +1,8 @@
 package com.backend.matchme.controller;
 
+import com.backend.matchme.dto.endpoints.UserProfileBioDTO;
+import com.backend.matchme.dto.endpoints.UserProfileInterestDTO;
 import com.backend.matchme.dto.endpoints.UserSummaryDTO;
-import com.backend.matchme.dto.profile.ProfileResponseDTO;
 import com.backend.matchme.dto.user.ChangeEmailDTO;
 import com.backend.matchme.dto.user.ChangePasswordDTO;
 import com.backend.matchme.dto.user.RegisterResponseDTO;
@@ -10,7 +11,6 @@ import com.backend.matchme.service.ProfileService;
 import com.backend.matchme.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
@@ -27,13 +27,22 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public List<RegisterResponseDTO> getUsers() {
+    public List<RegisterResponseDTO> getAllUsers() {
         return userService.findAll();
     }
 
     @GetMapping("/users/{id}")
-    public UserSummaryDTO getUsers(@PathVariable Long id) {
+    public UserSummaryDTO getUsersById(@PathVariable Long id) {
         return profileService.findById(id);
+    }
+
+    @GetMapping("/users/{id}/profile")
+    public UserProfileInterestDTO getProfileInterest(@PathVariable Long id) throws AccessDeniedException {
+        return profileService.getProfileInterest(id);
+    }
+    @GetMapping("/users/{id}/bio")
+    public UserProfileBioDTO getProfileBio(@PathVariable Long id) throws AccessDeniedException {
+        return profileService.getProfileBio(id);
     }
 
 //    @GetMapping("/users/{id}/profile")
