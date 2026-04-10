@@ -1,5 +1,7 @@
 package com.backend.matchme.dto.endpoints;
 
-public record UserSummaryDTO(String nickname,
-                             String imageUrl) {
+public record UserSummaryDTO(
+        Long id,
+        String nickname,
+        String imageUrl) {
 }

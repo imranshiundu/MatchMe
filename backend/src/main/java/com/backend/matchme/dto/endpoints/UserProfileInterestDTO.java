@@ -1,4 +1,5 @@
 package com.backend.matchme.dto.endpoints;
 
-public record UserProfileInterestDTO(String interest) {
+public record UserProfileInterestDTO(Long id,
+                                     String interest) {
 }

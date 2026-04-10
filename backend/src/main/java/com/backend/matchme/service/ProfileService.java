@@ -66,19 +66,19 @@ public class ProfileService {
 
     public UserSummaryDTO findById(Long id) {
         Profile profile = profileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Can't find profile with id " + id));
-        return new UserSummaryDTO(profile.getNickname(), profile.getImageUrl());
+        return new UserSummaryDTO(profile.getId(), profile.getNickname(), profile.getImageUrl());
     }
 
     public UserProfileInterestDTO getProfileInterest(Long id) throws AccessDeniedException {
         User user = getAuthPrinciple.getAuthenticatedUser();
         Profile profile = profileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Can't find profile with id " + id));
-        return new UserProfileInterestDTO(profile.getInterest());
+        return new UserProfileInterestDTO(profile.getId(), profile.getInterest());
     }
 
     public UserProfileBioDTO getProfileBio(Long id) throws AccessDeniedException {
         User user = getAuthPrinciple.getAuthenticatedUser();
         Profile profile = profileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Can't find profile with id " + id));
-        return new UserProfileBioDTO(profile.getBio());
+        return new UserProfileBioDTO(profile.getId(), profile.getBio());
     }
 
     public ProfileResponseDTO editProfile(EditProfileDTO newProfileData) throws AccessDeniedException {
