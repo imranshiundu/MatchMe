@@ -6,6 +6,7 @@ import com.backend.matchme.dto.profile.ProfileResponseDTO;
 import com.backend.matchme.exception.UploadFailedException;
 import com.backend.matchme.repository.ProfileRepository;
 import com.backend.matchme.service.ProfileService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,6 +43,12 @@ public class ProfileController {
     @PostMapping("/profile/upload-image")
     public ProfileImageUploadResponseDTO uploadImage(@RequestParam("file") MultipartFile file) throws UploadFailedException, IOException {
         return profileService.uploadImage(file);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/profile/remove-image")
+    public void removeImage() throws IOException {
+        profileService.removeImage();
     }
 
 }

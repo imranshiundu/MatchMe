@@ -125,5 +125,10 @@ public class ProfileService {
         return new ProfileImageUploadResponseDTO(uploadedFile.get("secure_url").toString());
     }
 
-
+    public void removeImage() throws AccessDeniedException {
+        User user = getAuthPrinciple.getAuthenticatedUser();
+        Profile profile = profileRepository.findById(user.getId()).orElseThrow(() -> new ResourceNotFoundException("Profile not found" + user.getId()));
+        profile.setImageUrl("https://res.cloudinary.com/ddvukican/image/upload/v1775725641/default-profile-image.jpg");
+        profileRepository.save(profile);
+    }
 }
