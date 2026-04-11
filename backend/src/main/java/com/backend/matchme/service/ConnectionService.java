@@ -46,7 +46,11 @@ public class ConnectionService {
 
     //TODO: currently returns list of profile ids 1->10 with paging. edit to match with recommendations.
     public RecommendationsResponseDTO getRecommendations(Pageable pageable) throws AccessDeniedException {
-
+        User user = getAuthPrinciple.getAuthenticatedUser();
+        Profile profile = profileRepository.findById(user.getId()).orElseThrow(() -> new ResourceNotFoundException("Profile not found" + user.getId()));
+        if (!profileValidator.isProfileComplete(profile)) {
+            throw new ProfileIncompleteException("Profile incomplete. Please complete profile before proceeding");
+        }
         List<Long> profileList = profileRepository.findAll(pageable).stream().map(Profile::getId).toList();
         return new RecommendationsResponseDTO(profileList, pageable);
     }
