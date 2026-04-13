@@ -1,6 +1,5 @@
 package com.backend.matchme.security;
 
-import com.backend.matchme.utils.ProfileValidator;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
@@ -17,7 +16,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.function.Function;
 
 /* Spring Security expects an Authentication in its context
 Many parts of Spring (method-level security, @PreAuthorize, @Secured, filters, etc.) check the SecurityContextHolder.
@@ -44,11 +42,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //runs only 
         }
         final String token = header.substring(7); //we remove Bearer from our token (Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)
         final Claims claims = extractAllClaims(token);
-        //TODO: query the user again to check if user status is banned or something else before setting user Authentication as Authorized.
-        Long userId = claims.get("userId", Long.class);
+        if (claims == null) {
+            // Invalid token should not crash request handling; continue unauthenticated.
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList()); //we create new AuthToken which we later set in securityContextHolder so we can use it anywhere else in Spring system
-        SecurityContextHolder.getContext().setAuthentication(authToken);
+        Long userId = claims.get("userId", Long.class);
+        if (userId != null) {
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList()); //we create new AuthToken which we later set in securityContextHolder so we can use it anywhere else in Spring system
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+        }
+
         //TODO: remove this debug line when in prod.
         System.out.println("USERID is: " + userId);
         filterChain.doFilter(request, response);// we pass this onto another filter in Spring Security system.
@@ -79,5 +84,3 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //runs only 
     }
 
 }
-
-
