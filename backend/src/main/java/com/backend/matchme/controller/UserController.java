@@ -45,16 +45,6 @@ public class UserController {
         return profileService.getProfileBio(id);
     }
 
-//    @GetMapping("/users/{id}/profile")
-//    public List<UserResponseDTO> getUsers(@PathVariable Long id) {
-//        return userService.findAll();
-//    }
-//
-//    @GetMapping("/users/{id}/bio")
-//    public List<UserResponseDTO> getUsers(@PathVariable Long id) {
-//        return userService.findAll();
-//    }
-
     @PutMapping("/change-email")
     public void changeEmail(@RequestBody ChangeEmailDTO changeEmail) throws AccessDeniedException {
         userService.changeEmail(changeEmail);

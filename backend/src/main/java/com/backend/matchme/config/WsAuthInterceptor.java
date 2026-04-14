@@ -1,6 +1,6 @@
 package com.backend.matchme.config;
 
-import com.backend.matchme.security.JwtService;
+import com.backend.matchme.service.AuthService;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -14,10 +14,10 @@ import java.util.List;
 
 @Component
 public class WsAuthInterceptor implements ChannelInterceptor {
-    private final JwtService jwtService;
+    private final AuthService authService;
 
-    public WsAuthInterceptor(JwtService jwtService) {
-        this.jwtService = jwtService;
+    public WsAuthInterceptor(AuthService authService) {
+        this.authService = authService;
     }
 
     @Override
@@ -25,7 +25,10 @@ public class WsAuthInterceptor implements ChannelInterceptor {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
             String jwt = token(accessor);
-            Long userId = jwtService.extractUserId(jwt);
+            Long userId = authService.extractUserId(jwt);
+            if (userId == null) {
+                throw new IllegalArgumentException("Invalid socket token");
+            }
             accessor.setUser(new UsernamePasswordAuthenticationToken(
                     userId,
                     null,
