@@ -42,32 +42,35 @@ function RegistrationForm() {
     }
 
     return (
-        <div className='grid place-items-center'>
+        <div className='grid place-items-center bg-[#1C1B1B] h-fit w-fit px-10 py-5 rounded-xl'>
+            <h1 className={'text-2xl py-2'}>create_account</h1>
             <form
                 onSubmit={handleSubmit}
                 className='flex flex-col w-75 gap-2'>
+                <p className={'text-[#adaaaa] mt-5'}>//enter <span className={'text-[#D8FF80]'}>email</span></p>
                 <input
                     type={"text"}
-                    placeholder='email'
+                    placeholder='e.g. neo@matrix.net'
                     name={'email'}
                     value={registrationDetails.email}
                     onChange={handleChange}
-                    className='bg-white text-black'/>
+                    className='bg-[#121212] placeholder-[#adaaaa] text-[#C0FF00] p-2 my-3 outline-none'/>
+                <p className={'mt-5 text-[#adaaaa]'}>//create <span className={'text-[#D8FF80]'}>password</span></p>
                 <input
                     type={"password"}
                     placeholder='password'
                     name={'password'}
                     value={registrationDetails.password}
                     onChange={handleChange}
-                    className='bg-white text-black'/>
+                    className='bg-[#121212] placeholder-[#adaaaa] text-[#C0FF00] p-2 my-3 outline-none'/>
                 <input
                     type={"password"}
                     placeholder='repeat password'
                     name={'repeatPassword'}
                     value={registrationDetails.repeatPassword}
                     onChange={handleChange}
-                    className='bg-white text-black'/>
-                <button type='submit' className='cursor-pointer bg-[#EB5E28]'>Register</button>
+                    className='bg-[#121212] placeholder-[#adaaaa] text-[#C0FF00] p-2 outline-none'/>
+                <button type='submit' className='cursor-pointer bg-[#C0FF00] text-[#121212] mt-8 p-2 rounded-md hover:bg-[#D8FF80] hover:text-[#1c1b1b] transition-all delay-100'>register</button>
                 {
                     // TODO style the error message
                 }
