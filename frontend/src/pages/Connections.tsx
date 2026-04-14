@@ -13,14 +13,14 @@ function Connections() {
     };
 
     return (
-        <div className={'flex'}>
-            <section className={'max-w-80 ml-5 mt-5 bg-[#1C1B1B] px-5 py-3 rounded-xl'}>
+        <div className={'flex h-full'}>
+            <section className={'max-w-80 mx-3 my-3 bg-[#1C1B1B] px-5 py-3 rounded-xl'}>
                 <p className={'ml-3 text-[#C0FF00] text-xl'}>connections</p>
                 <div>
                     <ConnectionCard connectionName={connection.name} recentMessage={connection.recentMessage} isOnline={connection.online}/>
                 </div>
             </section>
-            <section className={'flex flex-col'}>
+            <section className={'flex-grow my-3 mx-3'}>
                 <ChatView connectionName={connection.name} isOnline={connection.online}/>
             </section>
         </div>
