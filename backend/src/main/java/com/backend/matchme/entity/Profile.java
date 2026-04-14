@@ -15,17 +15,28 @@ import lombok.Setter;
 public class Profile {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    @Column(nullable = false)
-    private String firstName;
-    @Column(nullable = false)
-    private String lastName;
-    @Column(nullable = false)
+    @Column(name = "user_id")
+    private Long id;
+
+    private String nickname;
+
+    private String imageUrl = "https://res.cloudinary.com/ddvukican/image/upload/v1775725641/default-profile-image.jpg";// URL for frontend display
+
+    private String publicId = "default-placeholder-image"; // Cloudinary identifier for backend management
+
     private String interest;
 
+    private String bio;
+
+    private Integer age;
+
+    private String gender;
+
+    private String lookingFor;
+
     @OneToOne
-    @JoinColumn(nullable = false)
+    @MapsId //use user ID and profile doesn't have its own id.
+    @JoinColumn(name = "user_id")
     private User user;
 
 }

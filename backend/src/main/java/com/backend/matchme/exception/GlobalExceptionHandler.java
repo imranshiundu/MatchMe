@@ -1,6 +1,6 @@
 package com.backend.matchme.exception;
 
-import com.backend.matchme.dto.ErrorResponseDTO;
+import com.backend.matchme.dto.error.ErrorResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -9,6 +9,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -69,6 +70,42 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDTO> handleInvalidCredentials(InvalidCredentialsException ex) {
         log.info("Invalid credentials: {}", ex.getMessage());
         return createErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
+    }
+
+    @ExceptionHandler(PasswordReuseException.class)
+    public ResponseEntity<ErrorResponseDTO> handlePasswordInUse(PasswordReuseException ex) {
+        log.info("Password already in use: {}", ex.getMessage());
+        return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<ErrorResponseDTO> handleInvalidOldPassword(InvalidPasswordException ex) {
+        log.info("Current password mismatch: {}", ex.getMessage());
+        return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponseDTO> handleAccessDenied(AccessDeniedException ex) {
+        log.info("Access denied: {}", ex.getMessage());
+        return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(UploadFailedException.class)
+    public ResponseEntity<ErrorResponseDTO> handleUploadFailed(UploadFailedException ex) {
+        log.info("Image upload failed: {}", ex.getMessage());
+        return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponseDTO> handleMaxSize(MaxUploadSizeExceededException ex) {
+        log.info("Image upload failed: {}", ex.getMessage());
+        return createErrorResponse(HttpStatus.PAYLOAD_TOO_LARGE, ex.getMessage());
+    }
+
+    @ExceptionHandler(ProfileIncompleteException.class)
+    public ResponseEntity<ErrorResponseDTO> handleProfileIncomplete(ProfileIncompleteException ex) {
+        log.info("Not authorized to access page: {}", ex.getMessage());
+        return createErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     // Catch-all for unexpected exceptions

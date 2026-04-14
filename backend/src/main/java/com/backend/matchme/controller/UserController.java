@@ -1,35 +1,79 @@
 package com.backend.matchme.controller;
 
-import com.backend.matchme.dto.registerRequestDTO;
-import com.backend.matchme.dto.UserResponseDTO;
+import com.backend.matchme.dto.endpoints.UserProfileBioDTO;
+import com.backend.matchme.dto.endpoints.UserProfileInterestDTO;
+import com.backend.matchme.dto.endpoints.UserSummaryDTO;
+import com.backend.matchme.dto.user.ChangeEmailDTO;
+import com.backend.matchme.dto.user.ChangePasswordDTO;
+import com.backend.matchme.dto.user.RegisterResponseDTO;
+import com.backend.matchme.dto.user.registerRequestDTO;
+import com.backend.matchme.service.ProfileService;
 import com.backend.matchme.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestController
 public class UserController {
     private final UserService userService;
+    private final ProfileService profileService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, ProfileService profileService) {
         this.userService = userService;
+        this.profileService = profileService;
     }
 
     @GetMapping("/users")
-    public List<UserResponseDTO> getUsers() {
+    public List<RegisterResponseDTO> getAllUsers() {
         return userService.findAll();
     }
 
     @GetMapping("/users/{id}")
-    public UserResponseDTO getUser(@PathVariable long id) {
-        return userService.getUser(id);
+    public UserSummaryDTO getUsersById(@PathVariable Long id) {
+        return profileService.findById(id);
+    }
+
+    @GetMapping("/users/{id}/profile")
+    public UserProfileInterestDTO getProfileInterest(@PathVariable Long id) throws AccessDeniedException {
+        return profileService.getProfileInterest(id);
+    }
+    @GetMapping("/users/{id}/bio")
+    public UserProfileBioDTO getProfileBio(@PathVariable Long id) throws AccessDeniedException {
+        return profileService.getProfileBio(id);
+    }
+
+//    @GetMapping("/users/{id}/profile")
+//    public List<UserResponseDTO> getUsers(@PathVariable Long id) {
+//        return userService.findAll();
+//    }
+//
+//    @GetMapping("/users/{id}/bio")
+//    public List<UserResponseDTO> getUsers(@PathVariable Long id) {
+//        return userService.findAll();
+//    }
+
+    @PutMapping("/change-email")
+    public void changeEmail(@RequestBody ChangeEmailDTO changeEmail) throws AccessDeniedException {
+        userService.changeEmail(changeEmail);
+    }
+
+    @PutMapping("/change-password")
+    public void changePassword(@RequestBody ChangePasswordDTO changePw) throws AccessDeniedException {
+        userService.changePassword(changePw);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/delete")
+    public void deleteUser() throws AccessDeniedException {
+        userService.deleteUser();
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register")
-    public UserResponseDTO createUser(@RequestBody @Valid registerRequestDTO registerRequestDTO) {
+    public RegisterResponseDTO createUser(@RequestBody @Valid registerRequestDTO registerRequestDTO) {
         return userService.createNewUser(registerRequestDTO);
     }
 }
