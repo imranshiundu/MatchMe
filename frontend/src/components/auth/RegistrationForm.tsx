@@ -22,10 +22,13 @@ function RegistrationForm() {
     const handleSubmit = async (e: SubmitEvent) => {
         e.preventDefault()
         try {
-            const response = await fetch('http://localhost:5432/matchme/register',
+            const response = await fetch('http://localhost:8080/register',
                 {
                     method: 'POST',
-                    body: JSON.stringify(registrationDetails)
+                    body: JSON.stringify(registrationDetails),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
                 })
             if (!response.ok) {
                 const error = await response.json() as { message: string };

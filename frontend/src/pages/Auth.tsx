@@ -12,18 +12,18 @@ function Auth() {
         <div className='grid place-items-center'>
             {login ?
                 <section>
-                    <LoginForm/>
-                    <p>Don't yet have an account?</p>
-                    <button onClick={switchAuth} className='text-blue-300 underline cursor-pointer'>
-                        Register here!
-                    </button>
-                </section>
-                :
-                <section>
                     <RegistrationForm/>
                     <p>Already have an account?</p>
                     <button onClick={switchAuth} className='text-blue-300 underline cursor-pointer'>
                         Login here!
+                    </button>
+                </section>
+                :
+                <section>
+                    <LoginForm/>
+                    <p>Don't yet have an account?</p>
+                    <button onClick={switchAuth} className='text-blue-300 underline cursor-pointer'>
+                        Register here!
                     </button>
                 </section>
             }

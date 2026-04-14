@@ -21,10 +21,13 @@ function LoginForm() {
     const handleSubmit = async (e: SubmitEvent) => {
         e.preventDefault()
         try {
-            const response = await fetch('http://localhost:8080/matchme/login',
+            const response = await fetch('http://localhost:8080/login',
                 {
                     method: 'POST',
-                    body: JSON.stringify(loginDetails)
+                    body: JSON.stringify(loginDetails),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
                 })
             if (!response.ok) {
                 const error = await response.json() as { message: string };
