@@ -2,32 +2,33 @@ package com.backend.matchme.entity;
 
 import com.backend.matchme.enums.ConnectionStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
+@Entity
+@Table(name = "connections")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-@Entity
+@AllArgsConstructor
+@Builder
 public class Connection {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @MapsId
     @ManyToOne
-    @JoinColumn(name = "user_a_id")
-    private User userA;
+    @JoinColumn(name = "requester_id")
+    private User requester;
 
-    @MapsId
     @ManyToOne
-    @JoinColumn(name = "user_b_id")
-    private User userB;
+    @JoinColumn(name = "receiver_id")
+    private User receiver;
 
     @Enumerated(EnumType.STRING)
     private ConnectionStatus status;
 
-
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

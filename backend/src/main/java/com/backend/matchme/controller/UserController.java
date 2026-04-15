@@ -37,23 +37,13 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}/profile")
-    public UserProfileInterestDTO getProfileInterest(@PathVariable Long id) throws AccessDeniedException {
+    public UserProfileInterestDTO getProfileInterest(@PathVariable Long id) throws com.backend.matchme.exception.AccessDeniedException {
         return profileService.getProfileInterest(id);
     }
     @GetMapping("/users/{id}/bio")
     public UserProfileBioDTO getProfileBio(@PathVariable Long id) throws AccessDeniedException {
         return profileService.getProfileBio(id);
     }
-
-//    @GetMapping("/users/{id}/profile")
-//    public List<UserResponseDTO> getUsers(@PathVariable Long id) {
-//        return userService.findAll();
-//    }
-//
-//    @GetMapping("/users/{id}/bio")
-//    public List<UserResponseDTO> getUsers(@PathVariable Long id) {
-//        return userService.findAll();
-//    }
 
     @PutMapping("/change-email")
     public void changeEmail(@RequestBody ChangeEmailDTO changeEmail) throws AccessDeniedException {

@@ -87,7 +87,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponseDTO> handleAccessDenied(AccessDeniedException ex) {
         log.info("Access denied: {}", ex.getMessage());
-        return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return createErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler(UploadFailedException.class)

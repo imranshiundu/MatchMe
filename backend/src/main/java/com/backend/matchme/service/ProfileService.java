@@ -69,7 +69,7 @@ public class ProfileService {
         return new UserSummaryDTO(profile.getId(), profile.getNickname(), profile.getImageUrl());
     }
 
-    public UserProfileInterestDTO getProfileInterest(Long id) throws AccessDeniedException {
+    public UserProfileInterestDTO getProfileInterest(Long id) throws com.backend.matchme.exception.AccessDeniedException {
         User user = getAuthPrinciple.getAuthenticatedUser();
         Profile profile = profileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Can't find profile with id " + id));
         return new UserProfileInterestDTO(profile.getId(), profile.getInterest());
