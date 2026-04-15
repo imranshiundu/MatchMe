@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}/profile")
-    public UserProfileInterestDTO getProfileInterest(@PathVariable Long id) throws AccessDeniedException {
+    public UserProfileInterestDTO getProfileInterest(@PathVariable Long id) throws com.backend.matchme.exception.AccessDeniedException {
         return profileService.getProfileInterest(id);
     }
     @GetMapping("/users/{id}/bio")

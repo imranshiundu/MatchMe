@@ -14,15 +14,15 @@ import java.util.List;
 
 @RestController
 public class ConnectionController {
-    private final ConnectionService connService;
+    private final ConnectionService connectionService;
 
-    public ConnectionController(ConnectionService connService) {
-        this.connService = connService;
+    public ConnectionController(ConnectionService connectionService) {
+        this.connectionService = connectionService;
     }
 
     @GetMapping("/connections")
     public List<ConnectionResponseDTO> getConnections(@AuthenticationPrincipal Long userId) {
-        return connService.getConnections(userId);
+        return connectionService.getConnections(userId);
     }
 
     @GetMapping("/recommendations")
@@ -31,12 +31,12 @@ public class ConnectionController {
                                                          @RequestParam(defaultValue = "10") int size) {
         PaginationValidator.validate(page, size);
         Pageable pageable = PageRequest.of(page, size);
-        return connService.getRecommendations(pageable, userId);
+        return connectionService.getRecommendations(pageable, userId);
     }
 
     @PostMapping("/{id}/request")
     public ResponseEntity<Void> request(@AuthenticationPrincipal Long userId, @PathVariable Long id) {
-        connService.requestConnection(userId, id);
+        connectionService.requestConnection(userId, id);
         return ResponseEntity.ok().build();
     }
 }

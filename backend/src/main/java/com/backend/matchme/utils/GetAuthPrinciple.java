@@ -19,12 +19,12 @@ public class GetAuthPrinciple {
 
 
     //helper method to reduce boilerplate
-    public User getAuthenticatedUser() throws AccessDeniedException {
+    public User getAuthenticatedUser() throws com.backend.matchme.exception.AccessDeniedException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth == null || !auth.isAuthenticated() || auth.getPrincipal() == null
                 || auth.getPrincipal().equals("anonymousUser")) {
-            throw new AccessDeniedException("User not authenticated");
+            throw new com.backend.matchme.exception.AccessDeniedException("User not authenticated");
         }
 
         Long userId = (Long) auth.getPrincipal();

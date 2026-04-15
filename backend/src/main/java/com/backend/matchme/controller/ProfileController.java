@@ -30,6 +30,7 @@ public class ProfileController {
 
     //TODO: returns the user's name and link to the profile picture.
     //TODO: If the id is not found, or the user does not have permission to view that profile, it must return HTTP404.
+
     @GetMapping("/profile/{id}")
     public ProfileResponseDTO getProfile(@PathVariable long id) throws AccessDeniedException {
         return profileService.getProfileWithId(id);
