@@ -1,13 +1,12 @@
 package com.backend.matchme.utils;
 
 import com.backend.matchme.entity.User;
+import com.backend.matchme.exception.NoPermissionsException;
 import com.backend.matchme.exception.ResourceNotFoundException;
 import com.backend.matchme.repository.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-
-import java.nio.file.AccessDeniedException;
 
 @Component
 public class GetAuthPrinciple {
@@ -19,12 +18,12 @@ public class GetAuthPrinciple {
 
 
     //helper method to reduce boilerplate
-    public User getAuthenticatedUser() throws com.backend.matchme.exception.AccessDeniedException {
+    public User getAuthenticatedUser() throws NoPermissionsException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth == null || !auth.isAuthenticated() || auth.getPrincipal() == null
                 || auth.getPrincipal().equals("anonymousUser")) {
-            throw new com.backend.matchme.exception.AccessDeniedException("User not authenticated");
+            throw new NoPermissionsException("User not authenticated");
         }
 
         Long userId = (Long) auth.getPrincipal();

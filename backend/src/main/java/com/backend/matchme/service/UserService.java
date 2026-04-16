@@ -38,12 +38,12 @@ public class UserService {
         return userRepository.findAll().stream().map(user -> new RegisterResponseDTO(user.getId(), user.getEmail(), user.getLocation())).toList();
     }
 
-    public void deleteUser() throws AccessDeniedException {
+    public void deleteUser() throws NoPermissionsException {
         User user = getAuthPrinciple.getAuthenticatedUser();
         userRepository.delete(user);
     }
 
-    public void changePassword(ChangePasswordDTO passDTO) throws AccessDeniedException {
+    public void changePassword(ChangePasswordDTO passDTO) throws NoPermissionsException {
         User user = getAuthPrinciple.getAuthenticatedUser();
         if (passDTO.newPassword().length() < 3) { //check for password length, we want to have at least 3 characters in password.
             throw new PasswordTooShortException("Password must be at least 3 characters long.");
@@ -65,7 +65,7 @@ public class UserService {
         System.out.println("New password set successfully.");
     }
 
-    public void changeEmail(ChangeEmailDTO changeEmail) throws AccessDeniedException {
+    public void changeEmail(ChangeEmailDTO changeEmail) throws NoPermissionsException {
         User user = getAuthPrinciple.getAuthenticatedUser();
         if (changeEmail.newEmail().equals(user.getEmail())) { //check if entered email already exists.
             throw new EmailAlreadyExistsException("Email " + changeEmail.newEmail() + " is the same as current one");
@@ -109,7 +109,7 @@ public class UserService {
         return new RegisterResponseDTO(savedUser.getId(), savedUser.getEmail(), savedUser.getLocation());
     }
 
-    public RegisterResponseDTO getUser() throws AccessDeniedException {
+    public RegisterResponseDTO getUser() throws NoPermissionsException {
         User user = getAuthPrinciple.getAuthenticatedUser();
         return new RegisterResponseDTO(user.getId(), user.getEmail(), user.getLocation());
     }
