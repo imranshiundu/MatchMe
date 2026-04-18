@@ -20,9 +20,9 @@ public class Profile {
 
     private String nickname;
 
-    private String imageUrl = "https://res.cloudinary.com/ddvukican/image/upload/v1775725641/default-profile-image.jpg";// URL for frontend display
+    private String imageUrl = "https://res.cloudinary.com/ddvukican/image/upload/v1775725641/default-profile-image.jpg";
 
-    private String publicId = "default-placeholder-image"; // Cloudinary identifier for backend management
+    private String publicId = "default-placeholder-image";
 
     private String interest;
 
@@ -35,8 +35,7 @@ public class Profile {
     private String lookingFor;
 
     @OneToOne
-    @MapsId //use user ID and profile doesn't have its own id.
+    @MapsId
     @JoinColumn(name = "user_id")
     private User user;
-
 }
