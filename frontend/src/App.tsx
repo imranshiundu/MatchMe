@@ -2,6 +2,7 @@ import './App.css'
 import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
 
 // page imports
+import Landing from "./pages/Landing.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import Profile from "./pages/Profile.tsx";
 import Layout from "./components/layout/Layout.tsx";
@@ -14,13 +15,13 @@ function App() {
     return (
         <BrowserRouter>
             <Routes>
+                <Route path="/" element={<Landing/>}/>
+                <Route path="/login" element={<Auth/>}/>
                 <Route element={<Layout/>}>
-                    <Route path="/" element={<Navigate to="/dashboard" replace/>}/>
                     <Route path="/dashboard" element={<Dashboard/>}/>
                     <Route path="/profile" element={<Profile/>}/>
                     <Route path="/messages" element={<Connections/>}/>
                     <Route path="/chat" element={<Chat/>}/>
-                    <Route path="/login" element={<Auth/>}/>
                 </Route>
             </Routes>
         </BrowserRouter>
