@@ -4,26 +4,18 @@ import com.backend.matchme.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-/*
- * New config bean for BCrypt so we can inject cleanly to userService
- * makes it a reusable encoder.
- * */
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
     @Autowired
     private JwtAuthenticationFilter jwtFilter;
 
@@ -34,10 +26,15 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(AbstractHttpConfigurer::disable)        // disable CSRF = Cross-Site Request Forgery. not needed when we use JWT because we are stateless.
+                .csrf(AbstractHttpConfigurer::disable)// disable CSRF = Cross-Site Request Forgery. not needed when we use JWT because we are stateless.
+                .formLogin(AbstractHttpConfigurer::disable) //don't redirect to /login because react handles it. Enables server side login flow.
+                .httpBasic(AbstractHttpConfigurer::disable) //disable http basic authentication
+                .logout(AbstractHttpConfigurer::disable) //backend is stateless and doesn't track sessions
+                .cors(Customizer.withDefaults())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //no memory of login on the server between requests.
                 .authorizeHttpRequests(auth -> auth.
                         //TODO: remove /users from allowed endpoints later on.
-                        requestMatchers("/login", "/register", "/users") //these endpoints are allowed without authentication
+                                requestMatchers("/login", "/register", "/users", "/ws-chat/**") //these endpoints are allowed without authentication
                         .permitAll()
                         .anyRequest()//anything that comes after those, needs authentication token.
                         .authenticated());

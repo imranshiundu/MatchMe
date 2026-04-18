@@ -8,6 +8,7 @@ import com.backend.matchme.dto.profile.ProfileImageUploadResponseDTO;
 import com.backend.matchme.dto.profile.ProfileResponseDTO;
 import com.backend.matchme.entity.Profile;
 import com.backend.matchme.entity.User;
+import com.backend.matchme.exception.NoPermissionsException;
 import com.backend.matchme.exception.ResourceNotFoundException;
 import com.backend.matchme.exception.UploadFailedException;
 import com.backend.matchme.repository.ProfileRepository;
@@ -58,30 +59,26 @@ public class ProfileService {
         return ProfileMapper.toProfileResponseDTO(profile);
     }
 
-    public List<ProfileResponseDTO> findAll() {
-        System.out.println(profileRepository.findAll());
-        return profileRepository.findAll().stream().map(ProfileMapper::toProfileResponseDTO).toList();
-
-    }
-
     public UserSummaryDTO findById(Long id) {
         Profile profile = profileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Can't find profile with id " + id));
         return new UserSummaryDTO(profile.getId(), profile.getNickname(), profile.getImageUrl());
     }
 
-    public UserProfileInterestDTO getProfileInterest(Long id) throws AccessDeniedException {
+    public UserProfileInterestDTO getProfileInterest(Long id) throws NoPermissionsException {
         User user = getAuthPrinciple.getAuthenticatedUser();
         Profile profile = profileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Can't find profile with id " + id));
         return new UserProfileInterestDTO(profile.getId(), profile.getInterest());
     }
 
-    public UserProfileBioDTO getProfileBio(Long id) throws AccessDeniedException {
+    public UserProfileBioDTO getProfileBio(Long id) throws NoPermissionsException
+
+    {
         User user = getAuthPrinciple.getAuthenticatedUser();
         Profile profile = profileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Can't find profile with id " + id));
         return new UserProfileBioDTO(profile.getId(), profile.getBio());
     }
 
-    public ProfileResponseDTO editProfile(EditProfileDTO newProfileData) throws AccessDeniedException {
+    public ProfileResponseDTO editProfile(EditProfileDTO newProfileData) throws NoPermissionsException {
         User user = getAuthPrinciple.getAuthenticatedUser();
         Profile profile = profileRepository.findById(user.getId()).orElseThrow(() -> new ResourceNotFoundException("Profile not found" + user.getId()));
         profile.setNickname(newProfileData.nickname());

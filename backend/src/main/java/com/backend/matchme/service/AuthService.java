@@ -4,9 +4,14 @@ import com.backend.matchme.dto.user.LoginResponseDTO;
 import com.backend.matchme.entity.User;
 import com.backend.matchme.exception.InvalidCredentialsException;
 import com.backend.matchme.repository.UserRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -42,20 +47,44 @@ public class AuthService {
             throw new InvalidCredentialsException("Invalid email or password");
         }
         User user = userRepository.findByEmail(email).orElseThrow(() -> new InvalidCredentialsException("User not found")); // we need user entity to set claims and later send DTO.
+
+        String token = generateToken(user);
+
+        return new LoginResponseDTO(token, user.getEmail(), user.getId());
+    }
+
+    public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getId());//claim is a sealed data inside token
 
         Date now = new Date(); //we calculate expiration.
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
         SecretKey secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes()); //create secretKey
-        String token = Jwts.builder() //this builds JWT token to send with DTO.
+        return Jwts.builder() //this builds JWT token to send with DTO.
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(secretKey, HS256)
                 .compact();
+    }
 
-        return new LoginResponseDTO(token, user.getEmail(), user.getId());
+    public Long extractUserId(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims == null ? null : claims.get("userId", Long.class);
+    }
+
+    private Claims extractAllClaims(String token) {
+        try {
+            SecretKey secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+            return Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (SignatureException | MalformedJwtException | ExpiredJwtException |
+                 UnsupportedJwtException | IllegalArgumentException e) {
+            return null;
+        }
     }
 
 

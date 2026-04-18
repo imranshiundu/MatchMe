@@ -7,6 +7,7 @@ import com.backend.matchme.dto.user.ChangeEmailDTO;
 import com.backend.matchme.dto.user.ChangePasswordDTO;
 import com.backend.matchme.dto.user.RegisterResponseDTO;
 import com.backend.matchme.dto.user.registerRequestDTO;
+import com.backend.matchme.exception.NoPermissionsException;
 import com.backend.matchme.service.ProfileService;
 import com.backend.matchme.service.UserService;
 import jakarta.validation.Valid;
@@ -26,48 +27,42 @@ public class UserController {
         this.profileService = profileService;
     }
 
+
     @GetMapping("/users")
     public List<RegisterResponseDTO> getAllUsers() {
         return userService.findAll();
     }
+
 
     @GetMapping("/users/{id}")
     public UserSummaryDTO getUsersById(@PathVariable Long id) {
         return profileService.findById(id);
     }
 
+
     @GetMapping("/users/{id}/profile")
-    public UserProfileInterestDTO getProfileInterest(@PathVariable Long id) throws AccessDeniedException {
+    public UserProfileInterestDTO getProfileInterest(@PathVariable Long id) throws NoPermissionsException {
         return profileService.getProfileInterest(id);
     }
+
     @GetMapping("/users/{id}/bio")
-    public UserProfileBioDTO getProfileBio(@PathVariable Long id) throws AccessDeniedException {
+    public UserProfileBioDTO getProfileBio(@PathVariable Long id) throws NoPermissionsException {
         return profileService.getProfileBio(id);
     }
 
-//    @GetMapping("/users/{id}/profile")
-//    public List<UserResponseDTO> getUsers(@PathVariable Long id) {
-//        return userService.findAll();
-//    }
-//
-//    @GetMapping("/users/{id}/bio")
-//    public List<UserResponseDTO> getUsers(@PathVariable Long id) {
-//        return userService.findAll();
-//    }
-
     @PutMapping("/change-email")
-    public void changeEmail(@RequestBody ChangeEmailDTO changeEmail) throws AccessDeniedException {
+    public void changeEmail(@RequestBody ChangeEmailDTO changeEmail) throws NoPermissionsException {
         userService.changeEmail(changeEmail);
     }
 
     @PutMapping("/change-password")
-    public void changePassword(@RequestBody ChangePasswordDTO changePw) throws AccessDeniedException {
+    public void changePassword(@RequestBody ChangePasswordDTO changePw) throws NoPermissionsException {
         userService.changePassword(changePw);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/delete")
-    public void deleteUser() throws AccessDeniedException {
+    public void deleteUser() throws NoPermissionsException {
         userService.deleteUser();
     }
 

@@ -1,5 +1,6 @@
 package com.backend.matchme.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -7,18 +8,25 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class CorsConfig {
+    @Value("${app.frontend.url}")
+    private String allowedOrigin;
+
     @Bean
     public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() { //Spring MVC is the part that handles HTTP requests.
-            @Override //we override because we want to use these settings instead of default ones.
-            public void addCorsMappings(CorsRegistry corsRegistry) {
-                corsRegistry.addMapping("/**") //applies to all endpoints.
-                        .allowedOrigins("http://localhost:5174") //this indicates react dev server.
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH") // indicates which methods are allowed.
-                        .allowedHeaders("*") // indicates that all headers are allowed.
-                        .allowCredentials(true); // this is required if using Authorization header.
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins(allowedOrigin)
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
+                registry.addMapping("/ws-chat/**")
+                        .allowedOrigins(allowedOrigin)
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
             }
         };
     }
-
 }
