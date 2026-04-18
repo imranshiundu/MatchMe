@@ -15,9 +15,6 @@ public class GetAuthPrinciple {
     public GetAuthPrinciple(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
-
-
-    //helper method to reduce boilerplate
     public User getAuthenticatedUser() throws NoPermissionsException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
