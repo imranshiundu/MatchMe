@@ -31,10 +31,13 @@ public class MatchService {
 
     public List<Long> getRecommendations(Long userId) {
         Profile me = profileRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow();
 
         return profileRepository.findAll().stream()
                 .filter(candidate -> !candidate.getId().equals(userId))
                 .filter(this::ready)
+                .filter(candidate -> sameLocation(me, candidate))
+                .filter(candidate -> !isDismissed(user, candidate.getId()))
                 .filter(candidate -> !hasConnection(userId, candidate.getId()))
                 .map(candidate -> new MatchScore(candidate.getId(), score(me, candidate)))
                 .sorted(Comparator.comparingDouble(MatchScore::score).reversed())
@@ -43,8 +46,19 @@ public class MatchService {
                 .collect(Collectors.toList());
     }
 
+    private boolean sameLocation(Profile me, Profile other) {
+        if (me.getUser().getLocation() == null || other.getUser().getLocation() == null) return false;
+        return me.getUser().getLocation().equalsIgnoreCase(other.getUser().getLocation());
+    }
+
+    private boolean isDismissed(User user, Long candidateId) {
+        return user.getDismissedUserIds() != null && user.getDismissedUserIds().contains(candidateId);
+    }
+
     private boolean ready(Profile profile) {
-        return profile.getGender() != null
+        return profile.getNickname() != null && !profile.getNickname().isBlank()
+                && profile.getBio() != null && !profile.getBio().isBlank()
+                && profile.getGender() != null
                 && profile.getLookingFor() != null
                 && profile.getAge() != null;
     }

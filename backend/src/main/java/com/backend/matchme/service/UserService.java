@@ -33,7 +33,6 @@ public class UserService {
         this.getAuthPrinciple = getAuthPrinciple;
     }
 
-    //TODO: debugger method for now, delete for prod.
     public List<RegisterResponseDTO> findAll() {
         return userRepository.findAll().stream().map(user -> new RegisterResponseDTO(user.getId(), user.getEmail(), user.getLocation())).toList();
     }
@@ -45,10 +44,10 @@ public class UserService {
 
     public void changePassword(ChangePasswordDTO passDTO) throws NoPermissionsException {
         User user = getAuthPrinciple.getAuthenticatedUser();
-        if (passDTO.newPassword().length() < 3) { //check for password length, we want to have at least 3 characters in password.
+        if (passDTO.newPassword().length() < 3) {
             throw new PasswordTooShortException("Password must be at least 3 characters long.");
         }
-        if (!passDTO.newPassword().equals(passDTO.newRepeatPassword())) { //check for password mismatching.
+        if (!passDTO.newPassword().equals(passDTO.newRepeatPassword())) {
             throw new PasswordMismatchException("Passwords don't match.");
         }
         if (!bCryptPasswordEncoder.matches(passDTO.oldPassword(), user.getPassword())) {
@@ -61,48 +60,44 @@ public class UserService {
         user.setPassword(bCryptPasswordEncoder.encode(passDTO.newPassword()));
         userRepository.save(user);
 
-        //TODO: add DTO to set response to frontend maybe.
         System.out.println("New password set successfully.");
     }
 
     public void changeEmail(ChangeEmailDTO changeEmail) throws NoPermissionsException {
         User user = getAuthPrinciple.getAuthenticatedUser();
-        if (changeEmail.newEmail().equals(user.getEmail())) { //check if entered email already exists.
+        if (changeEmail.newEmail().equals(user.getEmail())) {
             throw new EmailAlreadyExistsException("Email " + changeEmail.newEmail() + " is the same as current one");
         }
         if (!bCryptPasswordEncoder.matches(changeEmail.currentPassword(), user.getPassword())) {
             throw new InvalidPasswordException("Current password is invalid.");
         }
-        if (userRepository.existsByEmail(changeEmail.newEmail())) {
+        if (userRepository.existsByEmailIgnoreCase(changeEmail.newEmail())) {
             throw new EmailAlreadyExistsException("Email already in use by another account.");
         }
         user.setEmail(changeEmail.newEmail());
         userRepository.save(user);
-        //TODO: add DTO to set response to frontend maybe.
         System.out.println("Email changed successfully!");
 
     }
 
     public RegisterResponseDTO createNewUser(registerRequestDTO registerRequestDTO) {
-
-        //TODO: check if email has @, maybe apply some rules for email and password.
-        if (userRepository.existsByEmail(registerRequestDTO.email())) { //check if entered email already exists.
+        if (userRepository.existsByEmailIgnoreCase(registerRequestDTO.email())) {
             throw new EmailAlreadyExistsException("Email " + registerRequestDTO.email() + " already exists.");
         }
-        if (!registerRequestDTO.password().equals(registerRequestDTO.repeatPassword())) { //check for password mismatching.
+        if (!registerRequestDTO.password().equals(registerRequestDTO.repeatPassword())) {
             throw new PasswordMismatchException("Passwords don't match.");
         }
-        if (registerRequestDTO.password().length() < 3) { //check for password length, we want to have at least 3 characters in password.
+        if (registerRequestDTO.password().length() < 3) {
             throw new PasswordTooShortException("Password must be at least 3 characters long.");
         }
 
         User user = new User();
         user.setEmail(registerRequestDTO.email());
-        String hashedPassword = bCryptPasswordEncoder.encode(registerRequestDTO.password()); //we encrypt password and never save the plain password.
+        String hashedPassword = bCryptPasswordEncoder.encode(registerRequestDTO.password());
         user.setPassword(hashedPassword);
         Profile profile = new Profile();
-        profile.setUser(user); // link user
-        User savedUser = userRepository.save(user); //save email and hashed password to database.
+        profile.setUser(user);
+        User savedUser = userRepository.save(user);
         Profile savedProfile = profileRepository.save(profile);
 
 

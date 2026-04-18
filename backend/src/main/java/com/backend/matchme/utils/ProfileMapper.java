@@ -4,9 +4,10 @@ import com.backend.matchme.dto.profile.ProfileResponseDTO;
 import com.backend.matchme.entity.Profile;
 
 public class ProfileMapper {
-    public static ProfileResponseDTO toProfileResponseDTO(Profile profile) {
+    public static ProfileResponseDTO toProfileResponseDTO(Profile profile, boolean isOwner) {
         return new ProfileResponseDTO(
                 profile.getId(),
+                (profile.getUser() != null && isOwner) ? profile.getUser().getEmail() : null,
                 profile.getNickname(),
                 profile.getInterest(),
                 profile.getBio(),
@@ -14,8 +15,8 @@ public class ProfileMapper {
                 profile.getGender(),
                 profile.getLookingFor(),
                 profile.getImageUrl(),
-                profile.getPublicId()
-
+                profile.getPublicId(),
+                profile.getUser() != null ? profile.getUser().getLocation() : null
         );
     }
 }

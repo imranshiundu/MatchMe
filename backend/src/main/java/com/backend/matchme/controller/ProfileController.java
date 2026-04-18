@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.util.List;
 
 @RestController
 public class ProfileController {
@@ -22,14 +23,10 @@ public class ProfileController {
 
     }
 
-    // /me: which is a shortcut to /users/{id} for the authenticated user. You should also implement /me/profile and /me/bio.
-    @GetMapping({"/me", "/me/profile", "/me/bio"}) //gets your own authorized profile
+    @GetMapping({"/me", "/me/profile", "/me/bio"})
     public ProfileResponseDTO getProfile() throws AccessDeniedException {
         return profileService.getProfile();
     }
-
-    //TODO: returns the user's name and link to the profile picture.
-    //TODO: If the id is not found, or the user does not have permission to view that profile, it must return HTTP404.
 
     @GetMapping("/profile/{id}")
     public ProfileResponseDTO getProfile(@PathVariable long id) throws AccessDeniedException {
@@ -52,4 +49,13 @@ public class ProfileController {
         profileService.removeImage();
     }
 
+    @PostMapping("/profile/{id}/dismiss")
+    public void dismiss(@PathVariable Long id) {
+        profileService.dismiss(id);
+    }
+
+    @GetMapping("/profiles/search")
+    public List<ProfileResponseDTO> searchProfiles(@RequestParam String q) {
+        return profileService.searchProfiles(q);
+    }
 }

@@ -39,4 +39,27 @@ public class ConnectionController {
         connectionService.requestConnection(userId, id);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/connection-requests")
+    public ResponseEntity<List<ConnectionResponseDTO>> getConnectionRequests(@AuthenticationPrincipal Long userId) {
+        return ResponseEntity.ok(connectionService.getConnectionRequests(userId));
+    }
+
+    @PostMapping("/connection-requests/{id}/accept")
+    public ResponseEntity<Void> acceptRequest(@AuthenticationPrincipal Long userId, @PathVariable Long id) {
+        connectionService.acceptRequest(userId, id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/connection-requests/{id}/dismiss")
+    public ResponseEntity<Void> dismissRequest(@AuthenticationPrincipal Long userId, @PathVariable Long id) {
+        connectionService.dismissRequest(userId, id);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/connections/{id}")
+    public ResponseEntity<Void> deleteConnection(@AuthenticationPrincipal Long userId, @PathVariable Long id) {
+        connectionService.deleteConnection(userId, id);
+        return ResponseEntity.ok().build();
+    }
 }

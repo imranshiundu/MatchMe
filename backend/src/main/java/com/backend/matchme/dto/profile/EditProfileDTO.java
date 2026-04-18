@@ -7,5 +7,6 @@ public record EditProfileDTO(String nickname,
                              String gender,
                              String lookingFor,
                              String imageUrl,
-                             String publicId) {
+                             String publicId,
+                             String location) {
 }
