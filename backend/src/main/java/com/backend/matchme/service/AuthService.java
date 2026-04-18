@@ -41,12 +41,11 @@ public class AuthService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    //TODO: Could extract JWT creation into a private helper method in AuthService, keeping login() cleaner. private String generateJwt(User user) { ... }
     public LoginResponseDTO login(String email, String password) {
         if (!authenticate(email, password)) {
             throw new InvalidCredentialsException("Invalid email or password");
         }
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new InvalidCredentialsException("User not found")); // we need user entity to set claims and later send DTO.
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new InvalidCredentialsException("User not found"));
 
         String token = generateToken(user);
 
@@ -55,12 +54,12 @@ public class AuthService {
 
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", user.getId());//claim is a sealed data inside token
+        claims.put("userId", user.getId());
 
-        Date now = new Date(); //we calculate expiration.
+        Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
-        SecretKey secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes()); //create secretKey
-        return Jwts.builder() //this builds JWT token to send with DTO.
+        SecretKey secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
@@ -104,5 +103,4 @@ public class AuthService {
     }
 
 }
-
 
