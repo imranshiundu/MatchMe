@@ -1,4 +1,5 @@
 import {type SubmitEvent, useState} from "react";
+import {useNavigate} from 'react-router-dom';
 import type {registrationData, serverAuthResponse} from "../../types/loginFormData.ts";
 
 function RegistrationForm() {
@@ -10,6 +11,8 @@ function RegistrationForm() {
         });
 
     const [error, setError] = useState<string>('');
+
+    const navigate = useNavigate();
 
     const handleChange = (e:React.ChangeEvent<HTMLInputElement>) => {
         const { name , value } = e.target;
@@ -36,6 +39,8 @@ function RegistrationForm() {
             }
             const data = (await response.json()) as serverAuthResponse;
             console.log('Auth successful: ', data);
+            // TODO test redirect with server
+            navigate('/dashboard');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred.');
         }
@@ -70,11 +75,8 @@ function RegistrationForm() {
                     value={registrationDetails.repeatPassword}
                     onChange={handleChange}
                     className='bg-[#121212] placeholder-[#adaaaa] text-[#C0FF00] p-2 outline-none'/>
-                <button type='submit' className='cursor-pointer bg-[#C0FF00] text-[#121212] mt-8 p-2 rounded-md hover:bg-[#D8FF80] hover:text-[#1c1b1b] transition-all delay-100'>register</button>
-                {
-                    // TODO style the error message
-                }
-                {error && <p className={''}>
+                <button type='submit' className='cursor-pointer bg-[#C0FF00] text-[#121212] mt-5 p-2 rounded-md hover:bg-[#D8FF80] hover:text-[#1c1b1b] transition-all delay-100'>register</button>
+                {error && <p className={'bg-[#121212] text-[#ff7351] border-1 p-2 rounded-sm mt-5'}>
                     {error}
                 </p>}
             </form>

@@ -18,7 +18,6 @@ function Landing () {
                 <section className={'mt-35 ml-50'}>
                     <RegistrationForm/>
                 </section>
-
             </div>
         </div>
     )
