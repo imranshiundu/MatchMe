@@ -7,7 +7,6 @@ import com.backend.matchme.entity.Profile;
 import com.backend.matchme.entity.User;
 import com.backend.matchme.enums.ConnectionStatus;
 import com.backend.matchme.exception.ProfileIncompleteException;
-import com.backend.matchme.exception.ResourceNotFoundException;
 import com.backend.matchme.repository.ConnectionRepository;
 import com.backend.matchme.repository.ProfileRepository;
 import com.backend.matchme.repository.UserRepository;
@@ -66,16 +65,21 @@ public class ConnectionService {
 
     public void requestConnection(Long requesterId, Long receiverId) {
         if (requesterId.equals(receiverId)) {
-            return;
+            throw new IllegalStateException("You cannot send a connection request to yourself");
         }
         ensureProfileComplete(requesterId);
 
         User requester = userRepository.findById(requesterId).orElseThrow();
         User receiver = userRepository.findById(receiverId).orElseThrow();
 
-        if (connectionRepository.findByRequesterAndReceiver(requester, receiver).isPresent()
-                || connectionRepository.findByRequesterAndReceiver(receiver, requester).isPresent()) {
-            return;
+        Connection outbound = connectionRepository.findByRequesterAndReceiver(requester, receiver).orElse(null);
+        if (outbound != null) {
+            throw new IllegalStateException("You already sent a request to this user");
+        }
+
+        Connection inbound = connectionRepository.findByRequesterAndReceiver(receiver, requester).orElse(null);
+        if (inbound != null) {
+            throw new IllegalStateException("This user already has a request/connection with you");
         }
 
         Connection conn = Connection.builder()
