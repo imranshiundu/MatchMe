@@ -3,10 +3,15 @@ package com.backend.matchme.service;
 import com.backend.matchme.dto.connections.ConnectionResponseDTO;
 import com.backend.matchme.dto.connections.RecommendationsResponseDTO;
 import com.backend.matchme.entity.Connection;
+import com.backend.matchme.entity.Profile;
 import com.backend.matchme.entity.User;
 import com.backend.matchme.enums.ConnectionStatus;
+import com.backend.matchme.exception.ProfileIncompleteException;
+import com.backend.matchme.exception.ResourceNotFoundException;
 import com.backend.matchme.repository.ConnectionRepository;
+import com.backend.matchme.repository.ProfileRepository;
 import com.backend.matchme.repository.UserRepository;
+import com.backend.matchme.utils.ProfileValidator;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -20,13 +25,17 @@ public class ConnectionService {
     private final ConnectionRepository connectionRepository;
     private final UserRepository userRepository;
     private final MatchService matchService;
+    private final ProfileValidator profileValidator;
+    private final ProfileRepository profileRepository;
 
     public ConnectionService(ConnectionRepository connectionRepository,
                              UserRepository userRepository,
-                             MatchService matchService) {
+                             MatchService matchService, ProfileValidator profileValidator, ProfileRepository profileRepository) {
         this.connectionRepository = connectionRepository;
         this.userRepository = userRepository;
         this.matchService = matchService;
+        this.profileValidator = profileValidator;
+        this.profileRepository = profileRepository;
     }
 
     public List<ConnectionResponseDTO> getConnections(Long userId) {
@@ -42,6 +51,8 @@ public class ConnectionService {
     }
 
     public RecommendationsResponseDTO getRecommendations(Pageable pageable, Long userId) {
+        ensureProfileComplete(userId);
+
         List<Long> recommendedIds = matchService.getRecommendations(userId);
         int start = (int) pageable.getOffset();
 
@@ -57,6 +68,7 @@ public class ConnectionService {
         if (requesterId.equals(receiverId)) {
             return;
         }
+        ensureProfileComplete(requesterId);
 
         User requester = userRepository.findById(requesterId).orElseThrow();
         User receiver = userRepository.findById(receiverId).orElseThrow();
@@ -115,11 +127,18 @@ public class ConnectionService {
     public void deleteConnection(Long userId, Long otherUserId) {
         User user = userRepository.findById(userId).orElseThrow();
         User other = userRepository.findById(otherUserId).orElseThrow();
-        
+
         Connection connection = connectionRepository.findByRequesterAndReceiverAndStatus(user, other, ConnectionStatus.ACCEPTED)
                 .orElseGet(() -> connectionRepository.findByRequesterAndReceiverAndStatus(other, user, ConnectionStatus.ACCEPTED)
                         .orElseThrow(() -> new RuntimeException("Connection not found")));
-        
+
         connectionRepository.delete(connection);
+    }
+
+    private void ensureProfileComplete(Long userId) {
+        Profile requesterProfile = profileRepository.findById(userId).orElseThrow(() -> new ProfileIncompleteException("Complete your profile before using recommendations or connections"));
+        if (!profileValidator.isProfileComplete(requesterProfile)) {
+            throw new ProfileIncompleteException("Complete your profile before using recommendations or connections");
+        }
     }
 }
