@@ -1,0 +1,9 @@
+:root {
+    /* background-color: #403D39; */
+    background-color: #121212;
+    color: #FFFCF2;
+    font-family: "monospace";
+    background-image: radial-gradient(circle, #262626 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: center;
+}
