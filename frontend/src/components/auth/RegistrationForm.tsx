@@ -25,7 +25,7 @@ function RegistrationForm() {
     const handleSubmit = async (e: SubmitEvent) => {
         e.preventDefault()
         try {
-            const response = await fetch('http://localhost:8080/register',
+            const response = await fetch('http://localhost:8085/register',
                 {
                     method: 'POST',
                     body: JSON.stringify(registrationDetails),
@@ -39,7 +39,7 @@ function RegistrationForm() {
             }
             const data = (await response.json()) as serverAuthResponse;
             console.log('Auth successful: ', data);
-            // TODO test redirect with server
+            localStorage.setItem('token', data.token)
             navigate('/dashboard');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred.');

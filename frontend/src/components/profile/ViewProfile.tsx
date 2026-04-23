@@ -5,11 +5,11 @@ function ViewProfile({user, editButton}) {
             <section className="p-5 mt-5">
                 <div className="flex items-start">
                     {/* Profile Picture */}
-                    <div className="h-40 w-40 bg-[#CCC5B9] border-2 border-[#eaffb8] ml-5 mt-5 rounded-xl" />
+                    <img className="h-40 w-40 bg-[#CCC5B9] border-2 border-[#eaffb8] ml-5 mt-5 rounded-xl" src={`${user.imageUrl}`} />
 
                     {/* User Info */}
                     <div className="ml-8 mt-5">
-                        <h1 className="text-3xl font-bold">{user.name}</h1>
+                        <h1 className="text-3xl font-bold">{user.nickname}</h1>
                         <div className="mt-4 space-y-2">
                             {/* User Info Fields */}
                             <div>{user.age} • {user.gender} • {user.location}</div>
@@ -33,14 +33,20 @@ function ViewProfile({user, editButton}) {
                 <section className="bg-[#403D39] p-5 flex-1 rounded-xl">
                     <h2 className="text-[#C0FF00] text-xl font-semibold mb-2">my_stack</h2>
                     <div className="flex flex-wrap gap-2">
-                        {user.interests.map((interest) => (
-                            <span
-                                key={interest}
-                                className="px-3 py-1 bg-[#eaffb8] text-sm text-black rounded-xl"
-                            >
+                        {
+                            //TODO fix interest mapping
+                        }
+                        {/*
+                            {user.interest.map((interest) => (
+                                <span
+                                    key={interest}
+                                    className="px-3 py-1 bg-[#eaffb8] text-sm text-black rounded-xl"
+                                >
                 {interest}
               </span>
-                        ))}
+                            ))
+                        }
+                        */}
                     </div>
                 </section>
             </div>

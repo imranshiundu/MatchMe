@@ -23,7 +23,7 @@ function LoginForm() {
     const handleSubmit = async (e: SubmitEvent) => {
         e.preventDefault()
         try {
-            const response = await fetch('http://localhost:8080/login',
+            const response = await fetch('http://localhost:8085/login',
                 {
                     method: 'POST',
                     body: JSON.stringify(loginDetails),
@@ -37,7 +37,7 @@ function LoginForm() {
             }
             const data = (await response.json()) as serverAuthResponse;
             console.log('Auth successful: ', data);
-            // TODO test redirect with server
+            localStorage.setItem('token', data.token)
             navigate('/dashboard');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred.');
