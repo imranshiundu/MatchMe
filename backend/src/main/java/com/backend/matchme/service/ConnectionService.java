@@ -7,6 +7,7 @@ import com.backend.matchme.entity.Connection;
 import com.backend.matchme.entity.Profile;
 import com.backend.matchme.entity.User;
 import com.backend.matchme.enums.ConnectionStatus;
+import com.backend.matchme.exception.ConnectionStateException;
 import com.backend.matchme.exception.ProfileIncompleteException;
 import com.backend.matchme.repository.ConnectionRepository;
 import com.backend.matchme.repository.ProfileRepository;
@@ -54,7 +55,7 @@ public class ConnectionService {
 
     public void requestConnection(Long requesterId, Long receiverId) {
         if (requesterId.equals(receiverId)) {
-            throw new IllegalStateException("You cannot send a connection request to yourself");
+            throw new ConnectionStateException("You cannot send a connection request to yourself");
         }
         ensureProfileComplete(requesterId);
 
@@ -63,12 +64,12 @@ public class ConnectionService {
 
         Connection outbound = connectionRepository.findByRequesterAndReceiver(requester, receiver).orElse(null);
         if (outbound != null) {
-            throw new IllegalStateException("You already sent a request to this user");
+            throw new ConnectionStateException("You already sent a request to this user");
         }
 
         Connection inbound = connectionRepository.findByRequesterAndReceiver(receiver, requester).orElse(null);
         if (inbound != null) {
-            throw new IllegalStateException("This user already has a request/connection with you");
+            throw new ConnectionStateException("This user already has a request/connection with you");
         }
 
         Connection conn = Connection.builder()
