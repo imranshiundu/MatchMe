@@ -64,16 +64,7 @@ public class ProfileService {
 
     public ProfileResponseDTO getProfileWithId(Long id) {
         User me = getAuthPrinciple.getAuthenticatedUser();
-        Profile target = profileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Profile not found"));
-
-        boolean allowed = me.getId().equals(id)
-                || isRecommended(me.getId(), id)
-                || hasRelationship(me, target.getUser());
-
-        if (!allowed) {
-            log.warn("Unauthorized access attempt to profile {} by user {}", id, me.getId());
-            throw new ResourceNotFoundException("Profile not found");
-        }
+        Profile target = getAuthorizedProfileOrThrow(id);
 
         return ProfileMapper.toProfileResponseDTO(target, me.getId().equals(id));
     }
@@ -88,7 +79,7 @@ public class ProfileService {
     }
 
     public UserSummaryDTO findById(Long id) {
-        Profile profile = profileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Profile not found"));
+        Profile profile = getAuthorizedProfileOrThrow(id);
         return new UserSummaryDTO(profile.getId(), profile.getNickname(), profile.getImageUrl());
     }
 
@@ -123,7 +114,7 @@ public class ProfileService {
         }
 
         HashMap<Object, Object> options = new HashMap<>();
-        options.put("public_id", "profile_" + profile.getId());
+        options.put("public_id", "profilePictureOfUserId_" + profile.getId());
         options.put("overwrite", true);
         Map uploadedFile = cloudinary.uploader().upload(file.getBytes(), options);
 
@@ -158,12 +149,28 @@ public class ProfileService {
     }
 
     public UserProfileInterestDTO getProfileInterest(Long id) {
-        Profile profile = profileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Profile not found"));
+        Profile profile = getAuthorizedProfileOrThrow(id);
         return new UserProfileInterestDTO(profile.getId(), profile.getInterest());
     }
 
     public UserProfileBioDTO getProfileBio(Long id) {
-        Profile profile = profileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Profile not found"));
+        Profile profile = getAuthorizedProfileOrThrow(id);
         return new UserProfileBioDTO(profile.getId(), profile.getBio());
+    }
+
+    private Profile getAuthorizedProfileOrThrow(Long targetId) {
+        User me = getAuthPrinciple.getAuthenticatedUser();
+        Profile target = profileRepository.findById(targetId).orElseThrow(() -> new ResourceNotFoundException("Profile not found"));
+
+        boolean allowed = me.getId().equals(targetId)
+                || isRecommended(me.getId(), targetId)
+                || hasRelationship(me, target.getUser());
+
+        if (!allowed) {
+            log.warn("Unauthorized access attempt to profile {} by user {}", targetId, me.getId());
+            throw new ResourceNotFoundException("Profile not found");
+        }
+
+        return target;
     }
 }
