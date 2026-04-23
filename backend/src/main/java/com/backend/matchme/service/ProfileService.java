@@ -8,7 +8,6 @@ import com.backend.matchme.dto.profile.ProfileImageUploadResponseDTO;
 import com.backend.matchme.dto.profile.ProfileResponseDTO;
 import com.backend.matchme.entity.Profile;
 import com.backend.matchme.entity.User;
-import com.backend.matchme.exception.NoPermissionsException;
 import com.backend.matchme.exception.ResourceNotFoundException;
 import com.backend.matchme.exception.UploadFailedException;
 import com.backend.matchme.repository.ConnectionRepository;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
