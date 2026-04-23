@@ -1,5 +1,6 @@
 package com.backend.matchme.service;
 
+import com.backend.matchme.dto.connections.ConnectionIdDTO;
 import com.backend.matchme.dto.connections.ConnectionResponseDTO;
 import com.backend.matchme.dto.connections.RecommendationsResponseDTO;
 import com.backend.matchme.entity.Connection;
@@ -35,18 +36,6 @@ public class ConnectionService {
         this.matchService = matchService;
         this.profileValidator = profileValidator;
         this.profileRepository = profileRepository;
-    }
-
-    public List<ConnectionResponseDTO> getConnections(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow();
-
-        return connectionRepository.findByRequesterOrReceiverAndStatus(user, user, ConnectionStatus.ACCEPTED)
-                .stream()
-                .map(connection -> new ConnectionResponseDTO(
-                        connection.getRequester().getEmail(),
-                        connection.getReceiver().getEmail(),
-                        connection.getStatus().name()))
-                .collect(Collectors.toList());
     }
 
     public RecommendationsResponseDTO getRecommendations(Pageable pageable, Long userId) {
@@ -91,12 +80,12 @@ public class ConnectionService {
         connectionRepository.save(conn);
     }
 
-    public List<Long> getConnectedIds(Long userId) {
+    public List<ConnectionIdDTO> getConnectedIds(Long userId) {
         User user = userRepository.findById(userId).orElseThrow();
         return connectionRepository.findByRequesterOrReceiverAndStatus(user, user, ConnectionStatus.ACCEPTED)
                 .stream()
-                .map(c -> c.getRequester().getId().equals(userId) ? c.getReceiver().getId() : c.getRequester().getId())
-                .collect(Collectors.toList());
+                .map(c -> new ConnectionIdDTO(c.getRequester().getId().equals(userId) ? c.getReceiver().getId() : c.getRequester().getId())).toList();
+
     }
 
     public List<ConnectionResponseDTO> getConnectionRequests(Long userId) {

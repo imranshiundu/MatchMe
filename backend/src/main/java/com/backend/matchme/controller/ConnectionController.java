@@ -1,5 +1,6 @@
 package com.backend.matchme.controller;
 
+import com.backend.matchme.dto.connections.ConnectionIdDTO;
 import com.backend.matchme.dto.connections.ConnectionResponseDTO;
 import com.backend.matchme.dto.connections.RecommendationsResponseDTO;
 import com.backend.matchme.service.ConnectionService;
@@ -21,8 +22,8 @@ public class ConnectionController {
     }
 
     @GetMapping("/connections")
-    public List<ConnectionResponseDTO> getConnections(@AuthenticationPrincipal Long userId) {
-        return connectionService.getConnections(userId);
+    public List<ConnectionIdDTO> getConnections(@AuthenticationPrincipal Long userId) {
+        return connectionService.getConnectedIds(userId);
     }
 
     @GetMapping("/recommendations")
