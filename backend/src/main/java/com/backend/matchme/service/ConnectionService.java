@@ -103,18 +103,22 @@ public class ConnectionService {
     }
 
     public void acceptRequest(Long userId, Long requesterId) {
+        if(userId.equals(requesterId)) { throw new ConnectionStateException("Cannot accept your own request."); }
         User receiver = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         User requester = userRepository.findById(requesterId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         Connection connection = connectionRepository.findByRequesterAndReceiverAndStatus(requester, receiver, ConnectionStatus.PENDING)
                 .orElseThrow(() -> new ResourceNotFoundException("Connection request not found"));
+
         connection.setStatus(ConnectionStatus.ACCEPTED);
         connection.setUpdatedAt(LocalDateTime.now());
         connectionRepository.save(connection);
     }
 
     public void dismissRequest(Long userId, Long requesterId) {
+        if(userId.equals(requesterId)) { throw new ConnectionStateException("Cannot dismiss self connection."); }
         User receiver = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         User requester = userRepository.findById(requesterId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
         Connection connection = connectionRepository.findByRequesterAndReceiverAndStatus(requester, receiver, ConnectionStatus.PENDING)
                 .orElseThrow(() -> new ResourceNotFoundException("Connection request not found"));
         connection.setStatus(ConnectionStatus.DISMISSED);
@@ -123,6 +127,7 @@ public class ConnectionService {
     }
 
     public void deleteConnection(Long userId, Long otherUserId) {
+        if(userId.equals(otherUserId)) { throw new ConnectionStateException("Cannot delete self connection."); }
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         User other = userRepository.findById(otherUserId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
