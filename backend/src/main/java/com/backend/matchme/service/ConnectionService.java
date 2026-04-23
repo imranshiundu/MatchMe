@@ -9,6 +9,7 @@ import com.backend.matchme.entity.User;
 import com.backend.matchme.enums.ConnectionStatus;
 import com.backend.matchme.exception.ConnectionStateException;
 import com.backend.matchme.exception.ProfileIncompleteException;
+import com.backend.matchme.exception.ResourceNotFoundException;
 import com.backend.matchme.repository.ConnectionRepository;
 import com.backend.matchme.repository.ProfileRepository;
 import com.backend.matchme.repository.UserRepository;
@@ -59,8 +60,8 @@ public class ConnectionService {
         }
         ensureProfileComplete(requesterId);
 
-        User requester = userRepository.findById(requesterId).orElseThrow();
-        User receiver = userRepository.findById(receiverId).orElseThrow();
+        User requester = userRepository.findById(requesterId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User receiver = userRepository.findById(receiverId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Connection outbound = connectionRepository.findByRequesterAndReceiver(requester, receiver).orElse(null);
         if (outbound != null) {
@@ -77,12 +78,13 @@ public class ConnectionService {
                 .receiver(receiver)
                 .status(ConnectionStatus.PENDING)
                 .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
         connectionRepository.save(conn);
     }
 
     public List<ConnectionIdDTO> getConnectedIds(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return connectionRepository.findByRequesterOrReceiverAndStatus(user, user, ConnectionStatus.ACCEPTED)
                 .stream()
                 .map(c -> new ConnectionIdDTO(c.getRequester().getId().equals(userId) ? c.getReceiver().getId() : c.getRequester().getId())).toList();
@@ -90,7 +92,7 @@ public class ConnectionService {
     }
 
     public List<ConnectionResponseDTO> getConnectionRequests(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return connectionRepository.findByReceiverAndStatus(user, ConnectionStatus.PENDING)
                 .stream()
                 .map(connection -> new ConnectionResponseDTO(
@@ -101,30 +103,32 @@ public class ConnectionService {
     }
 
     public void acceptRequest(Long userId, Long requesterId) {
-        User receiver = userRepository.findById(userId).orElseThrow();
-        User requester = userRepository.findById(requesterId).orElseThrow();
+        User receiver = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User requester = userRepository.findById(requesterId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         Connection connection = connectionRepository.findByRequesterAndReceiverAndStatus(requester, receiver, ConnectionStatus.PENDING)
-                .orElseThrow(() -> new RuntimeException("Connection request not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Connection request not found"));
         connection.setStatus(ConnectionStatus.ACCEPTED);
+        connection.setUpdatedAt(LocalDateTime.now());
         connectionRepository.save(connection);
     }
 
     public void dismissRequest(Long userId, Long requesterId) {
-        User receiver = userRepository.findById(userId).orElseThrow();
-        User requester = userRepository.findById(requesterId).orElseThrow();
+        User receiver = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User requester = userRepository.findById(requesterId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         Connection connection = connectionRepository.findByRequesterAndReceiverAndStatus(requester, receiver, ConnectionStatus.PENDING)
-                .orElseThrow(() -> new RuntimeException("Connection request not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Connection request not found"));
         connection.setStatus(ConnectionStatus.DISMISSED);
+        connection.setUpdatedAt(LocalDateTime.now());
         connectionRepository.save(connection);
     }
 
     public void deleteConnection(Long userId, Long otherUserId) {
-        User user = userRepository.findById(userId).orElseThrow();
-        User other = userRepository.findById(otherUserId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User other = userRepository.findById(otherUserId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Connection connection = connectionRepository.findByRequesterAndReceiverAndStatus(user, other, ConnectionStatus.ACCEPTED)
                 .orElseGet(() -> connectionRepository.findByRequesterAndReceiverAndStatus(other, user, ConnectionStatus.ACCEPTED)
-                        .orElseThrow(() -> new RuntimeException("Connection not found")));
+                        .orElseThrow(() -> new ResourceNotFoundException("Connection not found")));
 
         connectionRepository.delete(connection);
     }
