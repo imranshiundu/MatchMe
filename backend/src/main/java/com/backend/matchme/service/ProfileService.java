@@ -42,10 +42,10 @@ public class ProfileService {
     private final Cloudinary cloudinary;
     private final MatchService matchService;
 
-    public ProfileService(ProfileRepository profileRepository, 
-                          UserRepository userRepository, 
+    public ProfileService(ProfileRepository profileRepository,
+                          UserRepository userRepository,
                           ConnectionRepository connectionRepository,
-                          GetAuthPrinciple getAuthPrinciple, 
+                          GetAuthPrinciple getAuthPrinciple,
                           Cloudinary cloudinary,
                           MatchService matchService) {
         this.profileRepository = profileRepository;
@@ -66,8 +66,8 @@ public class ProfileService {
         User me = getAuthPrinciple.getAuthenticatedUser();
         Profile target = profileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Profile not found"));
 
-        boolean allowed = me.getId().equals(id) 
-                || isRecommended(me.getId(), id) 
+        boolean allowed = me.getId().equals(id)
+                || isRecommended(me.getId(), id)
                 || hasRelationship(me, target.getUser());
 
         if (!allowed) {
@@ -83,7 +83,7 @@ public class ProfileService {
     }
 
     private boolean hasRelationship(User me, User target) {
-        return connectionRepository.findByRequesterAndReceiver(me, target).isPresent() 
+        return connectionRepository.findByRequesterAndReceiver(me, target).isPresent()
                 || connectionRepository.findByRequesterAndReceiver(target, me).isPresent();
     }
 
@@ -95,16 +95,15 @@ public class ProfileService {
     public ProfileResponseDTO editProfile(EditProfileDTO newProfileData) {
         User user = getAuthPrinciple.getAuthenticatedUser();
         Profile profile = getOrCreateProfile(user);
-        
+
         profile.setNickname(newProfileData.nickname());
         profile.setInterest(newProfileData.interest());
         profile.setAge(newProfileData.age());
         profile.setGender(newProfileData.gender());
         profile.setBio(newProfileData.bio());
         profile.setLookingFor(newProfileData.lookingFor());
-        if (newProfileData.imageUrl() != null) profile.setImageUrl(newProfileData.imageUrl());
         if (newProfileData.location() != null) user.setLocation(newProfileData.location());
-        
+
         userRepository.save(user);
         return ProfileMapper.toProfileResponseDTO(profileRepository.save(profile), true);
     }
@@ -118,11 +117,11 @@ public class ProfileService {
     public ProfileImageUploadResponseDTO uploadImage(MultipartFile file) throws UploadFailedException, IOException {
         User user = getAuthPrinciple.getAuthenticatedUser();
         Profile profile = getOrCreateProfile(user);
-        
+
         if (file.getContentType() == null || file.isEmpty() || !ALLOWED_TYPES.contains(file.getContentType())) {
             throw new UploadFailedException("Invalid image file");
         }
-        
+
         HashMap<Object, Object> options = new HashMap<>();
         options.put("public_id", "profile_" + profile.getId());
         options.put("overwrite", true);
@@ -131,7 +130,7 @@ public class ProfileService {
         profile.setImageUrl(uploadedFile.get("secure_url").toString());
         profile.setPublicId(uploadedFile.get("public_id").toString());
         profileRepository.save(profile);
-        
+
         return new ProfileImageUploadResponseDTO(profile.getImageUrl());
     }
 
