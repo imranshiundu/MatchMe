@@ -4,37 +4,35 @@ import com.backend.matchme.dto.profile.EditProfileDTO;
 import com.backend.matchme.dto.profile.ProfileImageUploadResponseDTO;
 import com.backend.matchme.dto.profile.ProfileResponseDTO;
 import com.backend.matchme.exception.UploadFailedException;
-import com.backend.matchme.repository.ProfileRepository;
 import com.backend.matchme.service.ProfileService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestController
 public class ProfileController {
     private final ProfileService profileService;
 
-    public ProfileController(ProfileService profileService, ProfileRepository profileRepository) {
+    public ProfileController(ProfileService profileService) {
         this.profileService = profileService;
 
     }
 
     @GetMapping({"/me", "/me/profile", "/me/bio"})
-    public ProfileResponseDTO getProfile() throws AccessDeniedException {
+    public ProfileResponseDTO getProfile() {
         return profileService.getProfile();
     }
 
     @GetMapping("/profile/{id}")
-    public ProfileResponseDTO getProfile(@PathVariable long id) throws AccessDeniedException {
+    public ProfileResponseDTO getProfile(@PathVariable long id) {
         return profileService.getProfileWithId(id);
     }
 
     @PatchMapping("/me/editProfile")
-    public ProfileResponseDTO editProfile(@RequestBody EditProfileDTO editProfileDTO) throws AccessDeniedException {
+    public ProfileResponseDTO editProfile(@RequestBody EditProfileDTO editProfileDTO) {
         return profileService.editProfile(editProfileDTO);
     }
 
@@ -45,7 +43,7 @@ public class ProfileController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/profile/remove-image")
-    public void removeImage() throws IOException {
+    public void removeImage(){
         profileService.removeImage();
     }
 
