@@ -101,6 +101,11 @@ public class GlobalExceptionHandler {
         return createErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    @ExceptionHandler(ConnectionStateException.class)
+    public ResponseEntity<ErrorResponseDTO> handleConnectionException(ConnectionStateException ex) {
+        log.info("Connection problem: {}", ex.getMessage());
+        return createErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleAll(Exception ex) {
         log.error("Unhandled exception", ex);
