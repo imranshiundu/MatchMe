@@ -1,11 +1,13 @@
 package com.backend.matchme.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -24,15 +26,27 @@ public class Profile {
 
     private String publicId = "default-placeholder-image";
 
-    private String interest;
-
     private String bio;
 
     private Integer age;
 
     private String gender;
 
-    private String lookingFor;
+    @ElementCollection
+    @CollectionTable(
+            name = "profile_interest",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Column(name = "interest")
+    private List<String> interest = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(
+            name = "profile_looking_for",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Column(name = "looking_for")
+    private List<String> lookingFor = new ArrayList<>();
 
     @OneToOne
     @MapsId

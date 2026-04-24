@@ -1,11 +1,13 @@
 package com.backend.matchme.dto.profile;
 
+import java.util.List;
+
 public record EditProfileDTO(String nickname,
-                             String interest,
+                             List<String> interest,
                              String bio,
                              Integer age,
                              String gender,
-                             String lookingFor,
+                             List<String> lookingFor,
                              String publicId,
                              String location) {
 }

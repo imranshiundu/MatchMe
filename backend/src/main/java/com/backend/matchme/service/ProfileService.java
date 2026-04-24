@@ -8,6 +8,7 @@ import com.backend.matchme.dto.profile.ProfileImageUploadResponseDTO;
 import com.backend.matchme.dto.profile.ProfileResponseDTO;
 import com.backend.matchme.entity.Profile;
 import com.backend.matchme.entity.User;
+import com.backend.matchme.exception.InvalidProfileOptionException;
 import com.backend.matchme.exception.ResourceNotFoundException;
 import com.backend.matchme.exception.UploadFailedException;
 import com.backend.matchme.repository.ConnectionRepository;
@@ -15,6 +16,7 @@ import com.backend.matchme.repository.ProfileRepository;
 import com.backend.matchme.repository.UserRepository;
 import com.backend.matchme.utils.GetAuthPrinciple;
 import com.backend.matchme.utils.ProfileMapper;
+import com.backend.matchme.utils.ProfileOptions;
 import com.cloudinary.Cloudinary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +24,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +36,8 @@ import java.util.stream.Collectors;
 public class ProfileService {
     private static final Logger log = LoggerFactory.getLogger(ProfileService.class);
     private static final Set<String> ALLOWED_TYPES = Set.of("image/jpeg", "image/png");
+    private static final Set<String> ALLOWED_INTERESTS = Set.copyOf(ProfileOptions.INTEREST_OPTIONS);
+    private static final Set<String> ALLOWED_LOOKING_FOR = Set.copyOf(ProfileOptions.LOOKING_FOR_OPTIONS);
 
     private final ProfileRepository profileRepository;
     private final UserRepository userRepository;
@@ -86,11 +92,11 @@ public class ProfileService {
         Profile profile = getOrCreateProfile(user);
 
         profile.setNickname(newProfileData.nickname());
-        profile.setInterest(newProfileData.interest());
+        profile.setInterest(normalizeAndValidateList(newProfileData.interest(), ALLOWED_INTERESTS, "interest"));
         profile.setAge(newProfileData.age());
         profile.setGender(newProfileData.gender());
         profile.setBio(newProfileData.bio());
-        profile.setLookingFor(newProfileData.lookingFor());
+        profile.setLookingFor(normalizeAndValidateList(newProfileData.lookingFor(), ALLOWED_LOOKING_FOR, "lookingFor"));
         if (newProfileData.location() != null) user.setLocation(newProfileData.location());
 
         userRepository.save(user);
@@ -131,7 +137,7 @@ public class ProfileService {
     }
 
     public List<ProfileResponseDTO> searchProfiles(String q) {
-        return profileRepository.findByNicknameContainingIgnoreCaseOrInterestContainingIgnoreCase(q, q)
+        return profileRepository.findByNicknameContainingIgnoreCase(q)
                 .stream()
                 .map(p -> ProfileMapper.toProfileResponseDTO(p, false))
                 .collect(Collectors.toList());
@@ -170,5 +176,25 @@ public class ProfileService {
         }
 
         return target;
+    }
+
+    private List<String> normalizeAndValidateList(List<String> values, Set<String> allowedValues, String fieldName) {
+        if (values == null) {
+            return new ArrayList<>();
+        }
+
+        LinkedHashSet<String> cleaned = new LinkedHashSet<>();
+        for (String value : values) {
+            if (value != null) {
+                String trimmed = value.trim();
+                if (!trimmed.isBlank()) {
+                    if (!allowedValues.contains(trimmed)) {
+                        throw new InvalidProfileOptionException("Invalid " + fieldName + " value: " + trimmed);
+                    }
+                    cleaned.add(trimmed);
+                }
+            }
+        }
+        return new ArrayList<>(cleaned);
     }
 }

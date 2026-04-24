@@ -7,11 +7,12 @@ import com.backend.matchme.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 @Component
 public class DataLoader implements CommandLineRunner {
@@ -27,7 +28,7 @@ public class DataLoader implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         if (userRepository.count() > 0) {
             System.out.println("Database already seeded.");
             return;
@@ -36,18 +37,18 @@ public class DataLoader implements CommandLineRunner {
         System.out.println("Seeding database with fictitious users...");
 
         String[] locations = {"New York", "London", "Tokyo", "Paris", "Berlin", "Sydney", "Toronto", "Dubai", "Singapore"};
-        String[] interests = {"Reading", "Traveling", "Gaming", "Swimming", "Music", "Photography", "Cooking", "Sports", "Art"};
+        List<String> interests = ProfileOptions.INTEREST_OPTIONS;
         String[] genders = {"Male", "Female", "Non-binary"};
-        String[] lookingForOpts = {"Male", "Female", "Non-binary", "Any"};
+        List<String> lookingForOpts = ProfileOptions.LOOKING_FOR_OPTIONS;
 
         Random random = new Random();
         List<User> users = new ArrayList<>();
 
-        String encodedPassword = passwordEncoder.encode("password123");
+        String encodedPassword = passwordEncoder.encode("123");
 
         for (int i = 1; i <= 100; i++) {
             User user = new User();
-            user.setEmail("user" + i + "@example.com");
+            user.setEmail("user" + i + "@test.com");
             user.setPassword(encodedPassword);
             user.setLocation(locations[random.nextInt(locations.length)]);
             users.add(user);
@@ -56,22 +57,30 @@ public class DataLoader implements CommandLineRunner {
         userRepository.saveAll(users);
         userRepository.flush();
 
-        for (int i = 0; i < users.size(); i++) {
-            User user = users.get(i);
-            String interest = interests[random.nextInt(interests.length)];
+        for (User user : users) {
+            List<String> selectedInterests = randomSelection(interests, 1 + random.nextInt(interests.size()), random);
             String gender = genders[random.nextInt(genders.length)];
+            List<String> selectedLookingFor = randomSelection(lookingForOpts, 1 + random.nextInt(3), random);
             String nickname = user.getEmail().split("@")[0];
             Profile profile = new Profile();
             profile.setUser(user);
             profile.setNickname(nickname);
-            profile.setInterest(interest);
-            profile.setAge(18 + random.nextInt(40));
+            profile.setInterest(selectedInterests);
+            profile.setAge(18 + random.nextInt(50));
             profile.setGender(gender);
-            profile.setLookingFor(lookingForOpts[random.nextInt(lookingForOpts.length)]);
-            profile.setBio("Hi, I'm " + nickname + ". I enjoy " + interest.toLowerCase() + " and love exploring " + user.getLocation() + ".");
+            profile.setLookingFor(selectedLookingFor);
+            profile.setBio("Hi, I'm " + nickname + ". I enjoy " + String.join(", ", selectedInterests).toLowerCase() + " and love exploring " + user.getLocation() + ".");
             profileRepository.save(profile);
         }
 
         System.out.println("Successfully seeded 100 fictitious users and profiles.");
+    }
+
+    private List<String> randomSelection(List<String> options, int count, Random random) {
+        Set<String> selected = new LinkedHashSet<>();
+        while (selected.size() < count) {
+            selected.add(options.get(random.nextInt(options.size())));
+        }
+        return new ArrayList<>(selected);
     }
 }
