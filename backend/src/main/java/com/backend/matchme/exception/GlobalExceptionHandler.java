@@ -1,6 +1,7 @@
 package com.backend.matchme.exception;
 
 import com.backend.matchme.dto.error.ErrorResponseDTO;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
@@ -57,6 +59,22 @@ public class GlobalExceptionHandler {
 
         log.info("Validation failed: {}", errorMessage);
         return createErrorResponse(HttpStatus.BAD_REQUEST, errorMessage);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponseDTO> handleUnreadableJson(HttpMessageNotReadableException ex) {
+        Throwable cause = ex.getCause();
+        if (cause instanceof MismatchedInputException mismatched && !mismatched.getPath().isEmpty()) {
+            String field = mismatched.getPath().get(0).getFieldName();
+            if ("interest".equals(field) || "lookingFor".equals(field)) {
+                String message = "Field '" + field + "' must be an array of strings. Example: [\"Music\", \"Gaming\"]";
+                log.info("Invalid JSON type for {}: {}", field, ex.getMessage());
+                return createErrorResponse(HttpStatus.BAD_REQUEST, message);
+            }
+        }
+
+        log.info("Malformed JSON body: {}", ex.getMessage());
+        return createErrorResponse(HttpStatus.BAD_REQUEST, "Malformed request body");
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
