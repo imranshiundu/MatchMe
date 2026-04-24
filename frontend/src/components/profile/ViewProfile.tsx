@@ -32,7 +32,7 @@ function ViewProfile({user, editButton}) {
                     <section className="bg-[#121212] p-5 rounded-xl">
                         <h2 className="text-[#C0FF00] text-xl font-semibold mb-3">//my_stack</h2>
                         <div className="flex flex-wrap gap-2">
-                            {user.interests?.map((interest) => (
+                            {user.interest?.map((interest) => (
                                 <span
                                     key={interest}
                                     className="px-3 py-1 bg-[#C0FF00] text-sm text-black rounded-xl"
@@ -47,12 +47,12 @@ function ViewProfile({user, editButton}) {
                     <section className="bg-[#121212] p-5 rounded-xl">
                         <h2 className="text-[#C0FF00] text-xl font-semibold mb-3">//looking_for</h2>
                         <div className="flex flex-wrap gap-2">
-                            {user.lookingFor?.map((item) => (
+                            {user.lookingFor?.map((looking) => (
                                 <span
-                                    key={item}
+                                    key={looking}
                                     className="px-3 py-1 bg-[#C0FF00] text-sm text-black rounded-xl"
                                 >
-                {item}
+                {looking}
               </span>
                             ))}
                         </div>

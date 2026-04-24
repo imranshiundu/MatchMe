@@ -2,25 +2,6 @@ import type {serverAuthResponse} from "../../types/loginFormData";
 import {useState} from 'react';
 
 function EditProfile({userDetails, viewChange}) {
-
-    // List & logic for interests
-    const interestsList = ['Full-Stack', 'Front-End', 'Back-End', 'Cyber-Security', 'Vibe Coding', 'Open Source', 'Linux'];
-    const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
-    const toggleInterests = (interest:string) => {
-        setSelectedInterests(prevState => {
-            return prevState.includes(interest) ? prevState.filter(item => item !== interest) : [...prevState, interest]
-        })
-    };
-
-    // List & logic for "looking for"
-    const lookingForList = ['Co-Founder', 'Pair-Programmer', 'Reviewer', 'Teammate'];
-    const [selectedLookingFor, setSelectedLookingFor] = useState<string[]>([]);
-    const toggleLookingFor = (lookingFor:string) => {
-        setSelectedLookingFor(prevState => {
-            return prevState.includes(lookingFor) ? prevState.filter(item => item !== lookingFor) : [...prevState, lookingFor]
-        })
-    };
-
     // Error message
     const [error, setError] = useState<string>('');
 
@@ -34,6 +15,24 @@ function EditProfile({userDetails, viewChange}) {
         lookingFor: userDetails.lookingFor,
         location: userDetails.location
     })
+
+    // List & logic for interests
+    const interestsList = ['Full-Stack', 'Front-End', 'Back-End', 'Cyber-Security', 'Vibe Coding', 'Open Source', 'Linux'];
+    const [selectedInterests, setSelectedInterests] = useState<string[]>(userDetails.interest);
+    const toggleInterests = (interest:string) => {
+        const newInterests = selectedInterests.includes(interest) ? selectedInterests.filter(item => item !== interest) : [...selectedInterests, interest];
+        setSelectedInterests(newInterests);
+        handleChange('interest', newInterests);
+    };
+
+    // List & logic for "looking for"
+    const lookingForList = ['Co-Founder', 'Pair-Programmer', 'Reviewer', 'Teammate'];
+    const [selectedLookingFor, setSelectedLookingFor] = useState<string[]>(userDetails.lookingFor);
+    const toggleLookingFor = (looking:string) => {
+        const newLookingFors = selectedLookingFor.includes(looking) ? selectedLookingFor.filter(item => item !== looking) : [...selectedLookingFor, looking]
+        setSelectedLookingFor(newLookingFors);
+        handleChange('lookingFor', newLookingFors);
+    };
 
     // Profile picture logic
     const [newProfilePicture, setNewProfilePicture] = useState(null)
