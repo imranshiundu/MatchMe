@@ -58,8 +58,9 @@ public class MatchService {
     private boolean ready(Profile profile) {
         return profile.getNickname() != null && !profile.getNickname().isBlank()
                 && profile.getBio() != null && !profile.getBio().isBlank()
-                && profile.getGender() != null
-                && profile.getLookingFor() != null
+                && profile.getGender() != null && !profile.getGender().isBlank()
+                && profile.getLookingFor() != null && !profile.getLookingFor().isEmpty()
+                && profile.getInterest() != null && !profile.getInterest().isEmpty()
                 && profile.getAge() != null;
     }
 
@@ -80,21 +81,44 @@ public class MatchService {
             total += 0.50d;
         }
 
-        total += overlap(left.getInterest(), right.getInterest()) * 0.35d;
-        total += overlap(left.getBio(), right.getBio()) * 0.15d;
+        total += overlapCollections(left.getInterest(), right.getInterest()) * 0.35d;
+        total += overlapText(left.getBio(), right.getBio()) * 0.15d;
         return total;
     }
 
     private boolean compatibleLookingFor(Profile left, Profile right) {
-        String leftLookingFor = clean(left.getLookingFor());
         String rightGender = clean(right.getGender());
-        String rightLookingFor = clean(right.getLookingFor());
         String leftGender = clean(left.getGender());
 
-        return leftLookingFor.contains(rightGender) || rightLookingFor.contains(leftGender);
+        boolean leftAcceptsRight = acceptsGender(left.getLookingFor(), rightGender);
+        boolean rightAcceptsLeft = acceptsGender(right.getLookingFor(), leftGender);
+        return leftAcceptsRight && rightAcceptsLeft;
     }
 
-    private double overlap(String left, String right) {
+    private boolean acceptsGender(List<String> lookingFor, String gender) {
+        if (lookingFor == null || lookingFor.isEmpty() || gender.isBlank()) {
+            return false;
+        }
+
+        Set<String> options = normalize(lookingFor);
+        return options.contains("any") || options.contains(gender);
+    }
+
+    private double overlapCollections(List<String> left, List<String> right) {
+        Set<String> leftTokens = normalize(left);
+        Set<String> rightTokens = normalize(right);
+        if (leftTokens.isEmpty() || rightTokens.isEmpty()) {
+            return 0d;
+        }
+
+        Set<String> common = new HashSet<>(leftTokens);
+        common.retainAll(rightTokens);
+        Set<String> union = new HashSet<>(leftTokens);
+        union.addAll(rightTokens);
+        return (double) common.size() / union.size();
+    }
+
+    private double overlapText(String left, String right) {
         Set<String> leftTokens = tokens(left);
         Set<String> rightTokens = tokens(right);
         if (leftTokens.isEmpty() || rightTokens.isEmpty()) {
@@ -106,6 +130,21 @@ public class MatchService {
         Set<String> union = new HashSet<>(leftTokens);
         union.addAll(rightTokens);
         return (double) common.size() / union.size();
+    }
+
+    private Set<String> normalize(List<String> values) {
+        Set<String> result = new HashSet<>();
+        if (values == null) {
+            return result;
+        }
+
+        for (String value : values) {
+            String cleaned = clean(value);
+            if (!cleaned.isBlank()) {
+                result.add(cleaned);
+            }
+        }
+        return result;
     }
 
     private Set<String> tokens(String value) {
