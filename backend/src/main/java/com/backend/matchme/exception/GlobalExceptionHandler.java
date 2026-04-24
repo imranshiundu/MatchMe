@@ -106,6 +106,13 @@ public class GlobalExceptionHandler {
         log.info("Connection problem: {}", ex.getMessage());
         return createErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
     }
+
+    @ExceptionHandler(InvalidProfileOptionException.class)
+    public ResponseEntity<ErrorResponseDTO> handleInvalidProfileOption(InvalidProfileOptionException ex) {
+        log.info("Invalid profile option: {}", ex.getMessage());
+        return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleAll(Exception ex) {
         log.error("Unhandled exception", ex);
