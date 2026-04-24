@@ -10,19 +10,21 @@ public final class ProfileOptions {
 
     // Fixed selectable values for frontend multi-select fields.
     public static final List<String> INTEREST_OPTIONS = List.of(
-            "Reading",
-            "Traveling",
-            "Gaming",
-            "Music",
-            "Sports"
+            "Full-Stack",
+            "Front-End",
+            "Back-End",
+            "Cyber-Security",
+            "Vibe Coding",
+            "Open Source",
+            "Linux"
     );
 
     public static final List<String> LOOKING_FOR_OPTIONS = List.of(
-            "backend",
-            "frontend",
-            "fullstack",
+            "Co-Founder",
+            "Pair-Programmer",
+            "Reviewer",
             LOOKING_FOR_ANY,
-            "Friendship"
+            "Teammate"
     );
 }
 
