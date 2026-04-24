@@ -18,9 +18,9 @@ public final class ProfileOptions {
     );
 
     public static final List<String> LOOKING_FOR_OPTIONS = List.of(
-            "Male",
-            "Female",
-            "Non-binary",
+            "backend",
+            "frontend",
+            "fullstack",
             LOOKING_FOR_ANY,
             "Friendship"
     );
