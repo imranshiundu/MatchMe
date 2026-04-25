@@ -8,6 +8,5 @@ public record EditProfileDTO(String nickname,
                              Integer age,
                              String gender,
                              List<String> lookingFor,
-                             String publicId,
                              String location) {
 }
