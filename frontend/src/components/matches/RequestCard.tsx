@@ -28,7 +28,7 @@ function RequestCard({userID}) {
 
     const handleAccept = async () => {
         try {
-            const response = await fetch(`http://localhost:8085/${userID}/accept`, {
+            const response = await fetch(`http://localhost:8085/connection-requests/${userID}/accept`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -46,7 +46,7 @@ function RequestCard({userID}) {
 
     const handleReject = async () => {
         try {
-            const response = await fetch(`http://localhost:8085/${userID}/reject`, {
+            const response = await fetch(`http://localhost:8085/connection-requests/${userID}/dismiss`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
