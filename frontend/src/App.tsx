@@ -21,7 +21,7 @@ function App() {
                     <Route path="/dashboard" element={<Dashboard/>}/>
                     <Route path="/profile" element={<Profile/>}/>
                     <Route path="/messages" element={<Connections/>}/>
-                    <Route path="/chat" element={<Chat/>}/>
+                    <Route path="/messages/chat" element={<Chat/>}/>
                 </Route>
             </Routes>
         </BrowserRouter>
