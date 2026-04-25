@@ -96,8 +96,8 @@ public class ConnectionService {
         return connectionRepository.findByReceiverAndStatus(user, ConnectionStatus.PENDING)
                 .stream()
                 .map(connection -> new ConnectionResponseDTO(
-                        connection.getRequester().getEmail(),
-                        connection.getReceiver().getEmail(),
+                        connection.getRequester().getId(),
+                        connection.getReceiver().getId(),
                         connection.getStatus().name()))
                 .collect(Collectors.toList());
     }
