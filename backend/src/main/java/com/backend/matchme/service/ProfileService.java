@@ -83,6 +83,10 @@ public class ProfileService {
     }
 
     public UserSummaryDTO findById(Long id) {
+        User user = getAuthPrinciple.getAuthenticatedUser();
+        if (!user.getId().equals(id)) {
+            throw new ResourceNotFoundException("User with ID " + id + " not found");
+        }
         Profile profile = getAuthorizedProfileOrThrow(id);
         return new UserSummaryDTO(profile.getId(), profile.getNickname(), profile.getImageUrl());
     }
