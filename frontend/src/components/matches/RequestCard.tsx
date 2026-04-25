@@ -1,15 +1,15 @@
 import {useState, useEffect} from 'react';
 
-function RequestCard({userId}) {
+function RequestCard({userID}) {
 
     const [userDetails, setUserDetails] = useState({
         nickname: '',
         imageUrl: ''
     });
     useEffect(() => {
-        async function getUserDetails(userId) {
+        async function getUserDetails(userID) {
             try {
-                const fetchedUserNameAndPicture = await fetch(`http://localhost:8085/users/${userId}`, {
+                const fetchedUserNameAndPicture = await fetch(`http://localhost:8085/users/${userID}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -22,13 +22,13 @@ function RequestCard({userId}) {
                 console.error("Failed to fetch profile:", error);
             }
         }
-        getUserDetails(userId);
+        getUserDetails(userID);
     }, []);
 
 
     const handleAccept = async () => {
         try {
-            const response = await fetch(`http://localhost:8085/${userId}/accept`, {
+            const response = await fetch(`http://localhost:8085/${userID}/accept`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -46,7 +46,7 @@ function RequestCard({userId}) {
 
     const handleReject = async () => {
         try {
-            const response = await fetch(`http://localhost:8085/${userId}/reject`, {
+            const response = await fetch(`http://localhost:8085/${userID}/reject`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -73,13 +73,13 @@ function RequestCard({userId}) {
             </div>
             <p className={'mx-3 flex-1 cursor-auto text-lg text-[#FFFCF2]'}>{userDetails.nickname}</p>
             <button
-                onClick={handleReject}
+                onClick={() => handleReject()}
                 className={'text-[#FAE44C] hover:text-[#FFF2AB] hover:bg-[#313030] px-3 py-1 rounded-xl cursor-pointer transition-colors'}
             >
                 Reject
             </button>
             <button
-                onClick={handleAccept}
+                onClick={() => handleAccept()}
                 className={'text-[#C0FF00] hover:text-[#D8FF80] hover:bg-[#313030] ml-2 px-3 py-1 rounded-xl cursor-pointer transition-colors'}
             >
                 Accept

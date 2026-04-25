@@ -49,9 +49,10 @@ function IncomingRequests() {
         <>
             <h1 className='text-[#C0FF00] text-2xl mt-5 mb-5'>Connection Requests</h1>
             <div className={'flex flex-col gap-4'}>
-                {requests.map(request => (
+                {requests.map((request, index) => (
                     <RequestCard
-                        userId={request.requester}
+                        key={`${request.userA}-${index}`}
+                        userID={request.userA}
                     />
                 ))}
             </div>
