@@ -5,19 +5,7 @@ import ChatView from '../components/chat/ChatView.tsx'
 function Connections() {
     const [openChat, setOpenChat] = useState(null);
     const [connections, setConnections] = useState([])
-
-    //placeholder data until we have real user connections
-    /*
-    const connection = {
-        name: 'Johnny Silverhand',
-        recentMessage: "Wake the fuck up samurai, we've got a city to burn",
-        online: false
-    };
-     */
-
-    // <ConnectionCard connectionName={connection.name} recentMessage={connection.recentMessage} isOnline={connection.online}/>
-
-
+    
     useEffect(() => {
         async function fetchConnections() {
             const connectionsHttpRequest = await fetch('http://localhost:8085/connections', {

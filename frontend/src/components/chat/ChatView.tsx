@@ -1,11 +1,16 @@
 import ChatBubble from '../chat/ChatBubble.tsx'
 
-function ChatView({connectionName, isOnline}) {
+function ChatView({nickname, imageUrl, isOnline}) {
     return (
         <div className={'flex flex-col bg-[#313030] rounded-xl w-full h-full'}>
             <header className={'bg-[#1C1B1B] rounded-t-xl h-12 py-2'}>
                 <button className={'px-3 py-1 inline hover:text-[#CCC5B9] cursor-pointer'}>[X]</button>
-                <p className={'px-3 py-1 text-xl inline'}>{connectionName}</p>
+                <img
+                    className={'h-8 w-8 rounded-sm object-cover border-2 border-[#FFFCF2] inline'}
+                    src={imageUrl}
+                    alt="Profile"
+                />
+                <p className={'px-3 py-1 text-xl inline'}>{nickname}</p>
                 <p className={`px-3 inline text-xs ${isOnline ? "text-[#eaffb8]" : "text-[#ff7351]"}`}>{isOnline ? 'ONLINE' : 'OFFLINE'}</p>
                 <button className={'px-3 py-1 inline float-right cursor-pointer hover:text-[#ff7351]'}>[unmatch]</button>
             </header>

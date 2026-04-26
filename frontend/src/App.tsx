@@ -20,10 +20,11 @@ function App() {
                 <Route path="/login" element={<Auth/>}/>
                 <Route element={<ProtectedRoute/>}>
                     <Route element={<Layout/>}>
-                        <Route path="/dashboard" element={<Dashboard/>}/>
-                        <Route path="/profile" element={<Profile/>}/>
-                        <Route path="/messages" element={<Connections/>}/>
-                        <Route path="/messages/chat" element={<Chat/>}/>
+                        <Route path="/match" element={<Dashboard/>}/>
+                        <Route path="/me" element={<Profile/>}/>
+                        <Route path="/connections" element={<Connections/>}/>
+                        <Route path="/connections/profile/:userId" element={<Profile/>}/>
+                        <Route path="/connections/chat/:userId" element={<Chat/>}/>
                     </Route>
                 </Route>
                 <Route path="*" element={<Navigate to={"/"} replace/>}/>

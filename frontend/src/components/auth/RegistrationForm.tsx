@@ -40,7 +40,7 @@ function RegistrationForm() {
             const data = (await response.json()) as serverAuthResponse;
             console.log('Auth successful: ', data);
             localStorage.setItem('token', data.token)
-            navigate('/dashboard');
+            navigate('/match');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred.');
         }
