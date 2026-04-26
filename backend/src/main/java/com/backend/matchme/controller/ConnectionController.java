@@ -28,10 +28,9 @@ public class ConnectionController {
 
     @GetMapping("/recommendations")
     public RecommendationsResponseDTO getRecommendations(@AuthenticationPrincipal Long userId,
-                                                         @RequestParam(defaultValue = "0") int page,
-                                                         @RequestParam(defaultValue = "10") int size) {
-        PaginationValidator.validate(page, size);
-        Pageable pageable = PageRequest.of(page, size);
+                                                         @RequestParam(defaultValue = "0") int page) {
+        PaginationValidator.validate(page, 10);
+        Pageable pageable = PageRequest.of(page, 10);
         return connectionService.getRecommendations(pageable, userId);
     }
 

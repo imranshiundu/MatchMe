@@ -50,7 +50,7 @@ public class ConnectionService {
             return new RecommendationsResponseDTO(Collections.emptyList(), pageable);
         }
 
-        int end = Math.min(start + pageable.getPageSize(), recommendedIds.size());
+        int end = Math.min(start + 10, recommendedIds.size());
         return new RecommendationsResponseDTO(recommendedIds.subList(start, end), pageable);
     }
 

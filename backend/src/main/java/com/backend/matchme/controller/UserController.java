@@ -41,7 +41,7 @@ public class UserController {
 
 
     @GetMapping("/users/{id}/profile")
-    public UserProfileInterestDTO getProfileInterest(@PathVariable Long id) throws NoPermissionsException {
+    public UserProfileInterestDTO getProfileById(@PathVariable Long id) throws NoPermissionsException {
         return profileService.getProfileInterest(id);
     }
 
