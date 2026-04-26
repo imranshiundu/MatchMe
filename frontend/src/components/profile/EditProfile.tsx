@@ -140,10 +140,11 @@ function EditProfile({userDetails, viewChange}) {
                     <p className="text-[#adaaaa] mt-2">//select <span className="text-[#D8FF80]">gender</span></p>
                     <select
                         name="gender"
-                        value={inputFields.gender}
+                        value={inputFields.gender ?? ""}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                         className="bg-[#121212] text-[#C0FF00] p-2 outline-none rounded-md"
                     >
+                        <option value="" disabled>Please select gender</option>
                         <option value="male">male</option>
                         <option value="female">female</option>
                         <option value="other">other</option>
