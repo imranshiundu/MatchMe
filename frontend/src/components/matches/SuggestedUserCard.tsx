@@ -78,7 +78,7 @@ function SuggestedUserCard({userID}) {
             <div className="mb-5">
                 <h3 className="text-[#D8FF80] text-sm font-medium mb-2">//common interests</h3>
                 <div className="flex flex-wrap gap-2">
-                    {userDetails.interest.map((interest) => (
+                    {userDetails.interest?.map((interest) => (
                         <span
                             key={interest}
                             className="px-3 py-1 bg-[#1C1B1B] rounded-full text-[#d8ff80] text-xs border border-[#3a3a3a]"
