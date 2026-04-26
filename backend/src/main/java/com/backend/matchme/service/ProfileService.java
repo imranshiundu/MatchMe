@@ -8,10 +8,7 @@ import com.backend.matchme.dto.profile.ProfileImageUploadResponseDTO;
 import com.backend.matchme.dto.profile.ProfileResponseDTO;
 import com.backend.matchme.entity.Profile;
 import com.backend.matchme.entity.User;
-import com.backend.matchme.exception.InvalidProfileAttributeException;
-import com.backend.matchme.exception.InvalidProfileOptionException;
-import com.backend.matchme.exception.ResourceNotFoundException;
-import com.backend.matchme.exception.UploadFailedException;
+import com.backend.matchme.exception.*;
 import com.backend.matchme.repository.ConnectionRepository;
 import com.backend.matchme.repository.ProfileRepository;
 import com.backend.matchme.repository.UserRepository;
@@ -96,8 +93,11 @@ public class ProfileService {
         if(newProfileData.bio().length() > 254) {
             throw new InvalidProfileAttributeException("Bio too long. Max 254 char. current size = " + newProfileData.bio().length());
         }
-        if (newProfileData.age() >= 120 || newProfileData.age() < 18) {
-            throw new InvalidProfileAttributeException("Age must be more than 18 and less than 120");
+
+        if (newProfileData.age() != null) {
+            if (newProfileData.age() < 18 || newProfileData.age() > 120) {
+                throw new InvalidProfileAttributeException("Age must be between 18 and 120");
+            }
         }
 
         User user = getAuthPrinciple.getAuthenticatedUser();

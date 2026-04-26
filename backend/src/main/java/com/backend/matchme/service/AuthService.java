@@ -105,24 +105,17 @@ public class AuthService {
 
     public Long extractUserId(String token) {
         Claims claims = extractAllClaims(token);
-        if (claims == null) {
-            throw new MalformedJwtException("claims is null");
-        }
         return claims.get("userId", Long.class);
     }
 
     private Claims extractAllClaims(String token) {
-        try {
-            SecretKey secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
-            return Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-        } catch (SignatureException | MalformedJwtException | ExpiredJwtException |
-                 UnsupportedJwtException | IllegalArgumentException e) {
-            return null;
-        }
+        SecretKey secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
 
