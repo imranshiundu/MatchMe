@@ -18,6 +18,7 @@ import com.backend.matchme.utils.GetAuthPrinciple;
 import com.backend.matchme.utils.ProfileMapper;
 import com.backend.matchme.utils.ProfileOptions;
 import com.cloudinary.Cloudinary;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -109,6 +110,7 @@ public class ProfileService {
         userRepository.save(user);
     }
 
+    @Transactional
     public ProfileImageUploadResponseDTO uploadImage(MultipartFile file) throws UploadFailedException, IOException {
         User user = getAuthPrinciple.getAuthenticatedUser();
         Profile profile = getOrCreateProfile(user);

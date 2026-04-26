@@ -23,13 +23,11 @@ public class UserService {
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final ProfileRepository profileRepository;
     private final GetAuthPrinciple getAuthPrinciple;
 
     public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, ProfileRepository profileRepository, GetAuthPrinciple getAuthPrinciple) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.profileRepository = profileRepository;
         this.getAuthPrinciple = getAuthPrinciple;
     }
 
@@ -78,30 +76,6 @@ public class UserService {
         userRepository.save(user);
         System.out.println("Email changed successfully!");
 
-    }
-
-    public RegisterResponseDTO createNewUser(registerRequestDTO registerRequestDTO) {
-        if (userRepository.existsByEmailIgnoreCase(registerRequestDTO.email())) {
-            throw new EmailAlreadyExistsException("Email " + registerRequestDTO.email() + " already exists.");
-        }
-        if (!registerRequestDTO.password().equals(registerRequestDTO.repeatPassword())) {
-            throw new PasswordMismatchException("Passwords don't match.");
-        }
-        if (registerRequestDTO.password().length() < 3) {
-            throw new PasswordTooShortException("Password must be at least 3 characters long.");
-        }
-
-        User user = new User();
-        user.setEmail(registerRequestDTO.email());
-        String hashedPassword = bCryptPasswordEncoder.encode(registerRequestDTO.password());
-        user.setPassword(hashedPassword);
-        Profile profile = new Profile();
-        profile.setUser(user);
-        User savedUser = userRepository.save(user);
-        Profile savedProfile = profileRepository.save(profile);
-
-
-        return new RegisterResponseDTO(savedUser.getId(), savedUser.getEmail(), savedUser.getLocation());
     }
 
     public RegisterResponseDTO getUser() throws NoPermissionsException {
