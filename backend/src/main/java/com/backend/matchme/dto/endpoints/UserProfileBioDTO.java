@@ -1,5 +1,7 @@
 package com.backend.matchme.dto.endpoints;
 
-public record UserProfileBioDTO(Long id,
-                                String bio) {
+import jakarta.validation.constraints.NotNull;
+
+public record UserProfileBioDTO(@NotNull Long id,
+                                @NotNull String bio) {
 }
