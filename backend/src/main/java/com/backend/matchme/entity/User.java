@@ -27,7 +27,7 @@ public class User {
 
     private String location;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user")
     private Profile profile;
 
     @ElementCollection

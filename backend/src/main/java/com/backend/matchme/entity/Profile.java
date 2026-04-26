@@ -48,7 +48,7 @@ public class Profile {
     @Column(name = "looking_for")
     private List<String> lookingFor = new ArrayList<>();
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "user_id")
     private User user;

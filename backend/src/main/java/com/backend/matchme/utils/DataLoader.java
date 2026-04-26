@@ -4,6 +4,7 @@ import com.backend.matchme.entity.Profile;
 import com.backend.matchme.entity.User;
 import com.backend.matchme.repository.ProfileRepository;
 import com.backend.matchme.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -28,17 +29,18 @@ public class DataLoader implements CommandLineRunner {
     }
 
     @Override
+    @Transactional
     public void run(String... args) {
         if (userRepository.count() > 0) {
-            System.out.println("Database already seeded.");
+            System.out.println("Database count is more than 0. Database already seeded.......");
             return;
         }
 
-        System.out.println("Seeding database with fictitious users...");
+        System.out.println("Database count is less than 1. Seeding database with fictitious users.........");
 
-        String[] locations = {"New York", "London", "Tokyo", "Paris", "Berlin", "Sydney", "Toronto", "Dubai", "Singapore"};
+        String[] locations = {"Tallinn", "Tartu", "Võru", "Pärnu", "Viimsi"};
         List<String> interests = ProfileOptions.INTEREST_OPTIONS;
-        String[] genders = {"Male", "Female", "Non-binary"};
+        String[] genders = {"male", "female", "other"};
         List<String> lookingForOpts = ProfileOptions.LOOKING_FOR_OPTIONS;
 
         Random random = new Random();
