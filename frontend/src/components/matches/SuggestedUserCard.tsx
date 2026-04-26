@@ -5,7 +5,7 @@ function SuggestedUserCard({userID}) {
     const [userDetails, setUserDetails] = useState<object>({
         nickname: '',
         interest:[],
-        imageUrl:''
+        imageUrl: null
     })
     useEffect(() => {
         async function getUserDetails(userID) {
