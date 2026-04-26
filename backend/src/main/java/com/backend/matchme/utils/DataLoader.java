@@ -40,7 +40,7 @@ public class DataLoader implements CommandLineRunner {
 
         String[] locations = {"Tallinn", "Tartu", "Võru", "Pärnu", "Viimsi"};
         List<String> interests = ProfileOptions.INTEREST_OPTIONS;
-        String[] genders = {"Male", "Female", "Non-binary"};
+        String[] genders = {"male", "female", "other"};
         List<String> lookingForOpts = ProfileOptions.LOOKING_FOR_OPTIONS;
 
         Random random = new Random();
