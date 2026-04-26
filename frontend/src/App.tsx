@@ -26,6 +26,7 @@ function App() {
                         <Route path="/messages/chat" element={<Chat/>}/>
                     </Route>
                 </Route>
+                <Route path="*" element={<Navigate to={"/"} replace/>}/>
             </Routes>
         </BrowserRouter>
     )
