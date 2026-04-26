@@ -8,9 +8,7 @@ import com.backend.matchme.dto.profile.ProfileImageUploadResponseDTO;
 import com.backend.matchme.dto.profile.ProfileResponseDTO;
 import com.backend.matchme.entity.Profile;
 import com.backend.matchme.entity.User;
-import com.backend.matchme.exception.InvalidProfileOptionException;
-import com.backend.matchme.exception.ResourceNotFoundException;
-import com.backend.matchme.exception.UploadFailedException;
+import com.backend.matchme.exception.*;
 import com.backend.matchme.repository.ConnectionRepository;
 import com.backend.matchme.repository.ProfileRepository;
 import com.backend.matchme.repository.UserRepository;
@@ -18,6 +16,7 @@ import com.backend.matchme.utils.GetAuthPrinciple;
 import com.backend.matchme.utils.ProfileMapper;
 import com.backend.matchme.utils.ProfileOptions;
 import com.cloudinary.Cloudinary;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -83,15 +82,24 @@ public class ProfileService {
     }
 
     public UserSummaryDTO findById(Long id) {
-        User user = getAuthPrinciple.getAuthenticatedUser();
-        if (!user.getId().equals(id)) {
-            throw new ResourceNotFoundException("User with ID " + id + " not found");
-        }
         Profile profile = getAuthorizedProfileOrThrow(id);
         return new UserSummaryDTO(profile.getId(), profile.getNickname(), profile.getImageUrl());
     }
 
     public ProfileResponseDTO editProfile(EditProfileDTO newProfileData) {
+        if(newProfileData.nickname().length() > 50) {
+            throw new InvalidProfileAttributeException("Nickname too Long. Max 50 char. current size = " + newProfileData.nickname().length() );
+        }
+        if(newProfileData.bio().length() > 254) {
+            throw new InvalidProfileAttributeException("Bio too long. Max 254 char. current size = " + newProfileData.bio().length());
+        }
+
+        if (newProfileData.age() != null) {
+            if (newProfileData.age() < 18 || newProfileData.age() > 120) {
+                throw new InvalidProfileAttributeException("Age must be between 18 and 120");
+            }
+        }
+
         User user = getAuthPrinciple.getAuthenticatedUser();
         Profile profile = getOrCreateProfile(user);
 
@@ -113,6 +121,7 @@ public class ProfileService {
         userRepository.save(user);
     }
 
+    @Transactional
     public ProfileImageUploadResponseDTO uploadImage(MultipartFile file) throws UploadFailedException, IOException {
         User user = getAuthPrinciple.getAuthenticatedUser();
         Profile profile = getOrCreateProfile(user);
@@ -157,10 +166,6 @@ public class ProfileService {
     }
 
     public UserProfileInterestDTO getProfileInterest(Long id) {
-        User user = getAuthPrinciple.getAuthenticatedUser();
-        if (!user.getId().equals(id)) {
-            throw new ResourceNotFoundException("User with ID " + id + " not found");
-        }
         Profile profile = getAuthorizedProfileOrThrow(id);
         return new UserProfileInterestDTO(profile.getId(), profile.getInterest());
     }
@@ -180,7 +185,7 @@ public class ProfileService {
 
         if (!allowed) {
             log.warn("Unauthorized access attempt to profile {} by user {}", targetId, me.getId());
-            throw new ResourceNotFoundException("Profile not found");
+            throw new ResourceNotFoundException("Profile with ID: " + target.getId() + " not found");
         }
 
         return target;

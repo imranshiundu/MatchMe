@@ -23,7 +23,6 @@ public final class ProfileOptions {
             "Co-Founder",
             "Pair-Programmer",
             "Reviewer",
-            LOOKING_FOR_ANY,
             "Teammate"
     );
 }
