@@ -27,6 +27,7 @@ function Dashboard() {
                 setLoading(false);
             }
         }
+
         getRecommendations(currentPage);
     }, [currentPage]);
 
@@ -65,16 +66,22 @@ function Dashboard() {
                                     onClick={handlePrevPage}
                                     disabled={currentPage === 0}
                                     className={`px-4 py-2 rounded-lg ${currentPage === 0 ? 'bg-gray-600 text-gray-400 cursor-not-allowed' : 'bg-[#313030] text-[#C0FF00] hover:bg-[#474646] cursor-pointer'}`}
-                                >Previous</button>
+                                >Previous
+                                </button>
                                 <button
                                     onClick={handleNextPage}
                                     disabled={currentPage >= recommendations.pageable.totalPages - 1}
                                     className={`px-4 py-2 rounded-lg ${currentPage >= recommendations.pageable.totalPages - 1 ? 'bg-gray-600 text-gray-400 cursor-not-allowed' : 'bg-[#313030] text-[#C0FF00] hover:bg-[#474646] cursor-pointer'}`}
-                                >Next</button>
+                                >Next
+                                </button>
                             </div>
                         </>
                     ) : (
-                        <div className="text-[#adaaaa] text-lg">No recommendations available</div>
+                        <div>
+                            <p className="text-[#adaaaa] text-center text-lg ">No recommendations available </p>
+                            <p className="text-[#adaaaa] text-center text-lg ">Maybe because you haven't completed your profile?</p>
+                        </div>
+
                     )}
                 </>
             ) : (
