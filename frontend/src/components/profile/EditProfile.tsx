@@ -217,6 +217,8 @@ function EditProfile({userDetails, viewChange}) {
                             Cancel
                         </button>
                     </div>
+                    {error && <p className={'bg-[#121212] text-[#ff7351] border-1 p-2 rounded-sm mt-5'}>
+                        {error}</p>}
                 </form>
             </div>
         </div>
