@@ -1,5 +1,5 @@
 import type {serverAuthResponse} from "../../types/loginFormData";
-import {useState} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import {useAuth} from "../../hooks/useAuth";
 
 function EditProfile({userDetails, viewChange}) {
@@ -38,10 +38,29 @@ function EditProfile({userDetails, viewChange}) {
 
     // Profile picture logic
     const [newProfilePicture, setNewProfilePicture] = useState(null)
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+    const fileInputRef = useRef<HTMLInputElement | null>(null)
+
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
+        if (!file) return;
+
+        // revoke previous preview URL if exists
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+        }
+
+        const url = URL.createObjectURL(file);
+        setPreviewUrl(url);
         setNewProfilePicture(file);
     }
+
+    // cleanup object URL on unmount
+    useEffect(() => {
+        return () => {
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+        }
+    }, [previewUrl])
 
 
     const handleChange = (field, value) => {
@@ -100,12 +119,12 @@ function EditProfile({userDetails, viewChange}) {
                 <div className="flex flex-col items-center">
                     <img
                         className="h-40 w-40 bg-[#CCC5B9] border-2 border-[#eaffb8] rounded-xl mt-4"
-                        src={`${userDetails.imageUrl}`}
+                        src={previewUrl ?? userDetails.imageUrl}
                         alt="Profile"
                     />
                     <button
                         type="button"
-                        onClick={() => document.querySelector('input[type="file"]').click()}
+                        onClick={() => fileInputRef.current?.click()}
                         className="mt-4 cursor-pointer bg-[#403D39] text-[#C0FF00] px-4 py-2 rounded-md hover:bg-[#6B6562] transition-all"
                     >
                         upload picture
@@ -114,6 +133,7 @@ function EditProfile({userDetails, viewChange}) {
                         type="file"
                         accept="image/png, image/jpeg"
                         onChange={handleFileUpload}
+                        ref={fileInputRef}
                         className="hidden"
                     />
                 </div>
