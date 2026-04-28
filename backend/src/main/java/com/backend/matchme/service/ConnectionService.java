@@ -108,17 +108,16 @@ public class ConnectionService {
         return connectionRepository.findByReceiverAndStatus(user, ConnectionStatus.PENDING)
                 .stream()
                 .map(connection -> new ConnectionResponseDTO(
+                        connection.getId(),
                         connection.getRequester().getId(),
                         connection.getReceiver().getId(),
                         connection.getStatus().name()))
                 .collect(Collectors.toList());
     }
 
-    public void acceptRequest(Long userId, Long requesterId) {
-        if(userId.equals(requesterId)) { throw new ConnectionStateException("Cannot accept your own request."); }
+    public void acceptRequest(Long userId, Long requestId) {
         User receiver = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        User requester = userRepository.findById(requesterId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        Connection connection = connectionRepository.findByRequesterAndReceiverAndStatus(requester, receiver, ConnectionStatus.PENDING)
+        Connection connection = connectionRepository.findByIdAndReceiverAndStatus(requestId, receiver, ConnectionStatus.PENDING)
                 .orElseThrow(() -> new ResourceNotFoundException("Connection request not found"));
 
         connection.setStatus(ConnectionStatus.ACCEPTED);
@@ -126,12 +125,10 @@ public class ConnectionService {
         connectionRepository.save(connection);
     }
 
-    public void dismissRequest(Long userId, Long requesterId) {
-        if(userId.equals(requesterId)) { throw new ConnectionStateException("Cannot dismiss self connection."); }
+    public void dismissRequest(Long userId, Long requestId) {
         User receiver = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        User requester = userRepository.findById(requesterId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        Connection connection = connectionRepository.findByRequesterAndReceiverAndStatus(requester, receiver, ConnectionStatus.PENDING)
+        Connection connection = connectionRepository.findByIdAndReceiverAndStatus(requestId, receiver, ConnectionStatus.PENDING)
                 .orElseThrow(() -> new ResourceNotFoundException("Connection request not found"));
         connection.setStatus(ConnectionStatus.DISMISSED);
         connection.setUpdatedAt(LocalDateTime.now());
