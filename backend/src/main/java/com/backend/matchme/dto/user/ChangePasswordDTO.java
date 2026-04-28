@@ -1,4 +1,7 @@
 package com.backend.matchme.dto.user;
 
-public record ChangePasswordDTO(String newPassword, String newRepeatPassword, String oldPassword) {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+public record ChangePasswordDTO(@NotNull @NotBlank String newPassword, @NotNull @NotBlank String newRepeatPassword, @NotNull @NotBlank String oldPassword) {
 }

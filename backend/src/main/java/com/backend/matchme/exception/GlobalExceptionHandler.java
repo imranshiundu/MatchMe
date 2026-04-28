@@ -131,6 +131,12 @@ public class GlobalExceptionHandler {
         return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
+    @ExceptionHandler(InvalidProfileAttributeException.class)
+    public ResponseEntity<ErrorResponseDTO> handleInvalidProfileAttribute(InvalidProfileAttributeException ex) {
+        log.info("Invalid profile option: {}", ex.getMessage());
+        return createErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleAll(Exception ex) {
         log.error("Unhandled exception", ex);
