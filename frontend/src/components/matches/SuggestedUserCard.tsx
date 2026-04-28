@@ -1,104 +1,132 @@
-import {useState, useEffect} from 'react';
-import {useAuth} from "../../hooks/useAuth";
+import { useState, useEffect } from 'react';
+import { useAuth } from "../../hooks/useAuth";
 
-function SuggestedUserCard({userID}) {
+function SuggestedUserCard({ userID }) {
     const { token } = useAuth();
+
     const [userDetails, setUserDetails] = useState<object>({
         nickname: '',
-        interest:[],
+        interest: [],
         imageUrl: null
-    })
+    });
+
+    const [loading, setLoading] = useState(true);
+
     useEffect(() => {
         async function getUserDetails(userID) {
             try {
-                // user nickname and pfp
-                const fetchedUserNameAndPicture = await fetch(`http://localhost:8085/users/${userID}`, {
+                setLoading(true);
+
+                const userRes = await fetch(`http://localhost:8085/users/${userID}`, {
                     method: 'GET',
                     headers: {
-                        'Authorization' : `Bearer ${token}`
+                        Authorization: `Bearer ${token}`
                     }
                 });
-                const userNameAndPicture = await fetchedUserNameAndPicture.json();
 
-                // user interests
-                const fetchedUserInterests = await fetch(`http://localhost:8085/users/${userID}/profile`, {
+                const user = await userRes.json();
+
+                const profileRes = await fetch(`http://localhost:8085/users/${userID}/profile`, {
                     method: 'GET',
                     headers: {
-                        'Authorization' : `Bearer ${token}`
+                        Authorization: `Bearer ${token}`
                     }
                 });
-                const userInterests = await fetchedUserInterests.json();
 
-                // merge details
-                setUserDetails(prev => ({
-                    ...prev,
-                    nickname: userNameAndPicture.nickname,
-                    imageUrl: userNameAndPicture.imageUrl,
-                    interest: userInterests.interest
-                }))
-            }
-            catch (error) {
+                const profile = await profileRes.json();
+
+                setUserDetails({
+                    nickname: user.nickname,
+                    imageUrl: user.imageUrl,
+                    interest: profile.interest
+                });
+
+            } catch (error) {
                 console.error("Failed to fetch profile:", error);
+            } finally {
+                setLoading(false);
             }
         }
-        getUserDetails(userID);
-    }, []);
 
-    const handleRequestConnection = async (userID) => {
+        getUserDetails(userID);
+    }, [userID, token]);
+
+    const handleRequestConnection = async () => {
         try {
             const response = await fetch(`http://localhost:8085/${userID}/request`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to send connection request');
-            }
-            console.log('Connection request sent successfully');
+            if (!response.ok) throw new Error('Failed');
+
+            console.log('Connection sent');
         } catch (error) {
-            console.error('Error sending connection request:', error);
+            console.error(error);
         }
     };
 
+    if (loading) {
+        return (
+            <div className="bg-[#252422] rounded-2xl p-6 w-80 h-80 animate-pulse flex flex-col">
+                <div className="flex items-center space-x-4 mb-4">
+                    <div className="h-20 w-20 bg-[#3a3a3a] rounded-xl"></div>
+                    <div className="h-5 w-32 bg-[#3a3a3a] rounded"></div>
+                </div>
+
+                <div className="flex-1 space-y-2">
+                    <div className="h-4 w-40 bg-[#3a3a3a] rounded"></div>
+                    <div className="h-4 w-32 bg-[#3a3a3a] rounded"></div>
+                </div>
+
+                <div className="h-10 w-full bg-[#3a3a3a] rounded-lg mt-auto"></div>
+            </div>
+        );
+    }
+
     return (
-        <div className="bg-[#252422] rounded-2xl p-6 w-80">
+        <div className="bg-[#252422] rounded-2xl p-6 w-80 flex flex-col min-h-80">
+
             <div className="flex items-center space-x-4 mb-4">
                 <img
                     className="h-20 w-20 rounded-xl object-cover border-2 border-[#eaffb8]"
                     src={userDetails.imageUrl}
                     alt="Profile"
                 />
-                <div className="flex-1">
-                    <h2 className="text-2xl">{userDetails.nickname}</h2>
-                </div>
+                <h2 className="text-2xl break-words">
+                    {userDetails.nickname}
+                </h2>
             </div>
 
-            <div className="mb-5">
-                <h3 className="text-[#D8FF80] text-sm font-medium mb-2">//common interests</h3>
+            <div className="flex-1">
+                <h3 className="text-[#D8FF80] text-sm mb-2">
+                    //common interests
+                </h3>
+
                 <div className="flex flex-wrap gap-2">
                     {userDetails.interest?.map((interest) => (
                         <span
                             key={interest}
-                            className="px-3 py-1 bg-[#1C1B1B] rounded-full text-[#d8ff80] text-xs border border-[#3a3a3a]"
+                            className="px-3 py-1 bg-[#1C1B1B] rounded-full text-xs text-[#d8ff80]"
                         >
-                        {interest}
-                    </span>
+                            {interest}
+                        </span>
                     ))}
                 </div>
             </div>
 
-            <div className="flex justify-between mt-4">
-                <button
-                    onClick={() => handleRequestConnection(userID)}
-                    className="bg-[#C0FF00] hover:bg-[#D8FF80] px-4 py-2 rounded-lg text-[#121212] font-medium transition-colors duration-200">
-                    Connect
-                </button>
-            </div>
+            <button
+                onClick={handleRequestConnection}
+                className="mt-auto bg-[#C0FF00] hover:bg-[#D8FF80] px-4 py-2 rounded-lg text-[#121212] font-medium"
+            >
+                Connect
+            </button>
+
         </div>
-    )
+    );
 }
 
 export default SuggestedUserCard;
