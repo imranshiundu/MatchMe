@@ -1,11 +1,12 @@
 import {useState, useEffect} from 'react';
+import {useAuth} from "../../hooks/useAuth";
 
 function SuggestedUserCard({userID}) {
-
+    const { token } = useAuth();
     const [userDetails, setUserDetails] = useState<object>({
         nickname: '',
         interest:[],
-        imageUrl:''
+        imageUrl: null
     })
     useEffect(() => {
         async function getUserDetails(userID) {
@@ -14,7 +15,7 @@ function SuggestedUserCard({userID}) {
                 const fetchedUserNameAndPicture = await fetch(`http://localhost:8085/users/${userID}`, {
                     method: 'GET',
                     headers: {
-                        'Authorization' : `Bearer ${localStorage.getItem('token')}`
+                        'Authorization' : `Bearer ${token}`
                     }
                 });
                 const userNameAndPicture = await fetchedUserNameAndPicture.json();
@@ -23,7 +24,7 @@ function SuggestedUserCard({userID}) {
                 const fetchedUserInterests = await fetch(`http://localhost:8085/users/${userID}/profile`, {
                     method: 'GET',
                     headers: {
-                        'Authorization' : `Bearer ${localStorage.getItem('token')}`
+                        'Authorization' : `Bearer ${token}`
                     }
                 });
                 const userInterests = await fetchedUserInterests.json();
@@ -48,7 +49,7 @@ function SuggestedUserCard({userID}) {
             const response = await fetch(`http://localhost:8085/${userID}/request`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });

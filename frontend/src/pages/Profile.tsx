@@ -1,6 +1,7 @@
 import ViewProfile from "../components/profile/ViewProfile.tsx";
 import EditProfile from "../components/profile/EditProfile.tsx";
 import {useState, useEffect} from "react";
+import { useAuth } from '../hooks/useAuth.tsx';
 
 function Profile() {
     const [userDetails, setUserDetails] = useState(null)
@@ -9,13 +10,14 @@ function Profile() {
         setEditView(!editView);
     }
 
+    const { token } = useAuth();
     useEffect(() => {
         async function fetchProfile() {
             try {
                 const userProfileResponse = await fetch('http://localhost:8085/me/profile', {
                     method: 'GET',
                     headers: {
-                        'Authorization' : `Bearer ${localStorage.getItem('token')}`
+                        'Authorization' : `Bearer ${token}`
                     }
                 })
                 const userProfileDetails = await userProfileResponse.json();

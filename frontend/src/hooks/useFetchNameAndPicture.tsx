@@ -1,4 +1,5 @@
 import {useState, useEffect} from 'react';
+import {useAuth} from "./useAuth";
 
 interface UserData {
     nickname: string;
@@ -10,6 +11,7 @@ export function useFetchNameAndPicture(userId: number) {
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string | null>(null)
 
+    const { token } = useAuth();
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -17,7 +19,7 @@ export function useFetchNameAndPicture(userId: number) {
 
                 const response = await fetch(`http://localhost:8085/users/${userId}`, {
                         method: 'GET',
-                        headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}
+                        headers: {'Authorization': `Bearer ${token}`}
                     }
                 )
                 if (!response.ok) {

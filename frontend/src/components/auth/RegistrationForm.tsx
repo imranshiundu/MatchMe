@@ -1,6 +1,8 @@
 import {type SubmitEvent, useState} from "react";
 import {useNavigate} from 'react-router-dom';
 import type {registrationData, serverAuthResponse} from "../../types/loginFormData.ts";
+import { websocketService } from '../../services/websocketService.ts';
+import { useAuth } from '../../hooks/useAuth.tsx';
 
 function RegistrationForm() {
     const [registrationDetails, setRegistrationDetails] =
@@ -9,11 +11,8 @@ function RegistrationForm() {
             password: '',
             repeatPassword: ''
         });
-
     const [error, setError] = useState<string>('');
-
     const navigate = useNavigate();
-
     const handleChange = (e:React.ChangeEvent<HTMLInputElement>) => {
         const { name , value } = e.target;
         setRegistrationDetails((prev) => ({
@@ -22,6 +21,7 @@ function RegistrationForm() {
         }));
     };
 
+    const { setAuthToken, token } = useAuth();
     const handleSubmit = async (e: SubmitEvent) => {
         e.preventDefault()
         try {
@@ -37,9 +37,13 @@ function RegistrationForm() {
                 const error = await response.json() as { message: string };
                 throw new Error(error.message || 'Auth failed');
             }
-            const data = (await response.json()) as serverAuthResponse;
-            console.log('Auth successful: ', data);
-            localStorage.setItem('token', data.token)
+            setAuthToken((await response.json() as serverAuthResponse).token);
+            websocketService.connect(
+                token,
+                () => console.log('WebSocket connected'),
+                () => console.log('WebSocket disconnected'),
+                (error) => console.error('WebSocket error:', error)
+            );
             navigate('/match');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred.');

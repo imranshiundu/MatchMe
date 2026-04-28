@@ -1,13 +1,13 @@
 import {Navigate, Outlet} from 'react-router-dom';
 import {jwtDecode} from 'jwt-decode';
+import { useAuth } from '../../hooks/useAuth.tsx';
 
 function ProtectedRoute() {
-    const token = localStorage.getItem('token');
-
-    if (!token || jwtDecode(token).exp < (Date.now()/1000)) {
-        return <Navigate to={"/login"} replace/>;
+    const { isAuthenticated } = useAuth();
+    if (isAuthenticated) {
+        return <Outlet/>
     }
-    return <Outlet/>
+    return <Navigate to={"/login"} replace/>;
 }
 
 export default ProtectedRoute;

@@ -1,20 +1,22 @@
 import {useState, useEffect} from 'react';
 import {Link} from 'react-router-dom';
+import {useAuth} from "../../hooks/useAuth";
 
-function ConnectionCard({userId}) {
+function ConnectionCard({userId, isOnline}) {
 
     const [userDetails, setUserDetails] = useState({
         nickname: "",
-        imageUrl: ""
+        imageUrl: null
     });
 
+    const { token } = useAuth();
     useEffect(() => {
         async function fetchUserDetails (userId) {
             try {
                 const requestUser = await fetch(`http://localhost:8085/users/${userId}`, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${token}`
                     }
                 });
                 const userResponse = await requestUser.json();
@@ -30,7 +32,7 @@ function ConnectionCard({userId}) {
     return (
         <div className={'bg-[#313030] rounded-lg flex max-w-150 mt-3'}>
             <img
-                className={'h-13 w-13 rounded-lg object-cover border-2 border-[#FFFCF2]'}
+                className={`h-13 w-13 border-3 rounded-lg inline-block ${isOnline ? "border-[#eaffb8]" : "border-[#ff7351]"}`}
                 src={userDetails.imageUrl}
                 alt="Profile"
             />

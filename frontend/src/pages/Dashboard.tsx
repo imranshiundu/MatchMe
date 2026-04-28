@@ -1,13 +1,14 @@
 import SuggestedUserCard from '../components/matches/SuggestedUserCard.tsx';
 import IncomingRequests from '../components/matches/IncomingRequests.tsx';
 import {useState, useEffect} from 'react';
+import { useAuth } from '../hooks/useAuth.tsx';
 
 function Dashboard() {
+    const { token } = useAuth();
     const [viewSuggestions, setViewSuggestions] = useState<boolean>(true);
     const [recommendations, setRecommendations] = useState(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [currentPage, setCurrentPage] = useState<number>(0);
-
     useEffect(() => {
         async function getRecommendations(page: number = 0) {
             try {
@@ -15,7 +16,7 @@ function Dashboard() {
                 const recommendationsRequest = await fetch(`http://localhost:8085/recommendations?page=${page}&size=10`, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${token}`
                     }
                 });
                 const recommendationsResponse = await recommendationsRequest.json();

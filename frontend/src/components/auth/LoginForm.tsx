@@ -1,6 +1,8 @@
-import {type SubmitEvent, useState} from "react";
+import {type SubmitEvent, useState, useEffect} from "react";
 import {useNavigate} from 'react-router-dom';
 import type {loginFormData, serverAuthResponse} from "../../types/loginFormData.ts";
+import { websocketService } from '../../services/websocketService.ts';
+import { useAuth } from '../../hooks/useAuth.tsx';
 
 function LoginForm() {
     const [loginDetails, setLoginDetails] =
@@ -20,7 +22,20 @@ function LoginForm() {
         }));
     };
 
-    const handleSubmit = async (e: SubmitEvent) => {
+    const { setAuthToken, token } = useAuth();
+
+    useEffect(() => {
+        if (token) {
+            websocketService.connect(
+                token,
+                () => console.log('WebSocket connected'),
+                () => console.log('WebSocket disconnected'),
+                (error) => console.error('WebSocket error:', error)
+            );
+        }
+    }, [token]);
+
+    const handleLogin = async (e: SubmitEvent) => {
         e.preventDefault()
         try {
             const response = await fetch('http://localhost:8085/login',
@@ -35,9 +50,7 @@ function LoginForm() {
                 const error = await response.json() as { message: string };
                 throw new Error(error.message || 'Auth failed');
             }
-            const data = (await response.json()) as serverAuthResponse;
-            console.log('Auth successful: ', data);
-            localStorage.setItem('token', data.token)
+            setAuthToken((await response.json() as serverAuthResponse).token);
             navigate('/match');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred.');
@@ -48,7 +61,7 @@ function LoginForm() {
         <div className='grid place-items-center bg-[#1C1B1B] h-fit w-fit px-10 py-5 rounded-xl'>
             <h1 className={'text-2xl py-2'}>login</h1>
             <form
-                onSubmit={handleSubmit}
+                onSubmit={handleLogin}
                 className='flex flex-col w-75 gap-2'>
                 <p className={'text-[#adaaaa] mt-5'}>//enter <span className={'text-[#D8FF80]'}>email</span></p>
                 <input
