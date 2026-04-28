@@ -22,6 +22,7 @@ function Profile() {
                 })
                 const userProfileDetails = await userProfileResponse.json();
                 setUserDetails(userProfileDetails);
+
                 console.log(userDetails);
             }
             catch (error) {

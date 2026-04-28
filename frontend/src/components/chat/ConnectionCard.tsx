@@ -32,7 +32,7 @@ function ConnectionCard({userId, isOnline}) {
     return (
         <div className={'bg-[#313030] rounded-lg flex max-w-150 mt-3'}>
             <img
-                className={`h-13 w-13 border-3 rounded-lg inline-block ${isOnline ? "border-[#eaffb8]" : "border-[#ff7351]"}`}
+                className={`h-13 w-13 rounded-lg inline-block ${isOnline !== null ? (isOnline ? "border-3 border-[#eaffb8]" : "border-3 border-[#ff7351]") : null}`}
                 src={userDetails.imageUrl}
                 alt="Profile"
             />

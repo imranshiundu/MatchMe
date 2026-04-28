@@ -34,7 +34,7 @@ function Connections() {
             // Initialize isOnline as false for all connections
             const connectionsWithStatus = connectionsHttpResponse.map((conn: Connection) => ({
                 ...conn,
-                isOnline: false
+                isOnline: null
             }));
             console.log("Fetched connections:", connectionsWithStatus);
             setConnections(connectionsWithStatus);
