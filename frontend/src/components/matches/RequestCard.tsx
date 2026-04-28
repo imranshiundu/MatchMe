@@ -1,4 +1,5 @@
 import {useState, useEffect} from 'react';
+import { Link } from 'react-router-dom';
 import {useAuth} from "../../hooks/useAuth";
 
 type RequestCardProps = {
@@ -83,7 +84,7 @@ function RequestCard({requestID, userID, onActionResult}: RequestCardProps) {
     };
 
     return (
-        <div className={'bg-[#1c1b1b] rounded-lg flex items-center p-3'}>
+        <div className={'bg-[#1c1b1b] rounded-lg flex items-center p-3 gap-2'}>
             <div className={'h-12 w-12 rounded-lg inline-block'}>
                 <img
                     className={'h-full w-full rounded-lg object-cover border-2 border-[#FFFCF2]'}
@@ -92,18 +93,21 @@ function RequestCard({requestID, userID, onActionResult}: RequestCardProps) {
                 />
             </div>
             <p className={'mx-3 flex-1 cursor-auto text-lg text-[#FFFCF2]'}>{userDetails.nickname}</p>
+            <Link
+                to={`./${userID}`}
+                className="bg-[#FAE44C] hover:bg-[#FFF2AB] p-1 rounded-lg text-[#121212] font-medium justify-center cursor-pointer">
+                Profile
+            </Link>
             <button
                 onClick={() => handleReject()}
                 disabled={isSubmitting}
-                className={'text-[#FAE44C] hover:text-[#FFF2AB] hover:bg-[#313030] px-3 py-1 rounded-xl cursor-pointer transition-colors'}
-            >
+                className="bg-[#E7EA5A] hover:bg-[#F5F867] p-1 rounded-lg text-[#121212] font-medium justify-center cursor-pointer">
                 Reject
             </button>
             <button
                 onClick={() => handleAccept()}
                 disabled={isSubmitting}
-                className={'text-[#C0FF00] hover:text-[#D8FF80] hover:bg-[#313030] ml-2 px-3 py-1 rounded-xl cursor-pointer transition-colors'}
-            >
+                className="bg-[#C0FF00] hover:bg-[#D8FF80] p-1 rounded-lg text-[#121212] font-medium justify-center cursor-pointer">
                 Accept
             </button>
         </div>

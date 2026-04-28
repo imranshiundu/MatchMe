@@ -11,8 +11,10 @@ function Dashboard() {
 
     const [currentPage, setCurrentPage] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [refreshSuggestions, setRefreshSuggestions] = useState<boolean>(true)
 
     useEffect(() => {
+        if (refreshSuggestions === false) return;
         async function getRecommendations(page: number = 0) {
             try {
                 setLoading(true);
@@ -34,12 +36,13 @@ function Dashboard() {
                 console.error("Failed to fetch recommendations:", error);
             } finally {
                 setLoading(false);
+                setRefreshSuggestions(false);
             }
         }
 
         getRecommendations(currentPage);
 
-    }, [currentPage, token]);
+    }, [currentPage, token, refreshSuggestions]);
 
     const handleNextPage = () => {
         if (recommendations?.hasNext) {
@@ -77,6 +80,7 @@ function Dashboard() {
                                     <SuggestedUserCard
                                         key={userId}
                                         userID={userId}
+                                        refresh={setRefreshSuggestions}
                                     />
                                 ))}
                             </div>
