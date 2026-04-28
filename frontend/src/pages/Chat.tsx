@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import ChatView from '../components/chat/ChatView.tsx';
-import { useFetchNameAndPicture } from '../hooks/useFetchNameAndPicture.tsx';
+import { useFetchUserDetails } from '../hooks/useFetchUserDetails';
 import { websocketService } from '../services/websocketService.ts'
 import { useFetchChatDetails } from '../hooks/useFetchChatDetails.tsx';
 
@@ -10,7 +10,7 @@ function Chat() {
     const [message, setMessage] = useState<string>('')
     const { chat } = useFetchChatDetails(userId);
     console.log(chat.chatId);
-    const { userData, loading, error } = useFetchNameAndPicture(userId);
+    const { userData, loading, error } = useFetchUserDetails(userId);
     if (loading) {
         return <div>Loading...</div>;
     }

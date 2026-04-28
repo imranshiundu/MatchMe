@@ -3,14 +3,18 @@ import {jwtDecode} from 'jwt-decode';
 
 export const useAuth = () => {
     const [token, setToken] = useState<string | null>(sessionStorage.getItem('token'));
+    const [userId, setUserId] = useState<number | null>(null);
 
     const setAuthToken = useCallback((newToken: string | null) => {
         if (newToken) {
             sessionStorage.setItem('token', newToken);
+            sessionStorage.setItem('id', (jwtDecode(token).userId))
         } else {
             sessionStorage.removeItem('token');
+            sessionStorage.removeItem('id');
         }
         setToken(newToken);
+        setUserId((jwtDecode(token).userId))
     }, []);
 
     const logout = useCallback(() => {
@@ -21,6 +25,7 @@ export const useAuth = () => {
 
     return {
         token,
+        userId,
         setAuthToken,
         logout,
         isAuthenticated

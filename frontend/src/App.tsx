@@ -22,8 +22,9 @@ function App() {
                     <Route element={<Layout/>}>
                         <Route path="/match" element={<Dashboard/>}/>
                         <Route path="/me" element={<Profile/>}/>
+                        <Route path="/match/:userId" element={<Profile isConnection={false}/>}/>
                         <Route path="/connections" element={<Connections/>}/>
-                        <Route path="/connections/profile/:userId" element={<Profile/>}/>
+                        <Route path="/connections/user/:userId" element={<Profile isConnection={true}/>}/>
                         <Route path="/connections/chat/:userId" element={<Chat/>}/>
                     </Route>
                 </Route>
