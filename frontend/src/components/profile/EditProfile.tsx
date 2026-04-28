@@ -3,7 +3,7 @@ import {useState, useEffect, useRef} from 'react';
 import {useAuth} from "../../hooks/useAuth";
 
 function EditProfile({userDetails, viewChange}) {
-    const { token } = useAuth();
+    const {token} = useAuth();
     // Error message
     const [error, setError] = useState<string>('');
 
@@ -21,7 +21,7 @@ function EditProfile({userDetails, viewChange}) {
     // List & logic for interests
     const interestsList = ['Full-Stack', 'Front-End', 'Back-End', 'Cyber-Security', 'Vibe Coding', 'Open Source', 'Linux'];
     const [selectedInterests, setSelectedInterests] = useState<string[]>(userDetails.interest);
-    const toggleInterests = (interest:string) => {
+    const toggleInterests = (interest: string) => {
         const newInterests = selectedInterests.includes(interest) ? selectedInterests.filter(item => item !== interest) : [...selectedInterests, interest];
         setSelectedInterests(newInterests);
         handleChange('interest', newInterests);
@@ -30,7 +30,7 @@ function EditProfile({userDetails, viewChange}) {
     // List & logic for "looking for"
     const lookingForList = ['Co-Founder', 'Pair-Programmer', 'Reviewer', 'Teammate'];
     const [selectedLookingFor, setSelectedLookingFor] = useState<string[]>(userDetails.lookingFor);
-    const toggleLookingFor = (looking:string) => {
+    const toggleLookingFor = (looking: string) => {
         const newLookingFors = selectedLookingFor.includes(looking) ? selectedLookingFor.filter(item => item !== looking) : [...selectedLookingFor, looking]
         setSelectedLookingFor(newLookingFors);
         handleChange('lookingFor', newLookingFors);
@@ -79,7 +79,7 @@ function EditProfile({userDetails, viewChange}) {
                     body: JSON.stringify(inputFields),
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization" : `Bearer ${token}`
+                        "Authorization": `Bearer ${token}`
                     },
                     credentials: "include"
                 })
@@ -101,12 +101,12 @@ function EditProfile({userDetails, viewChange}) {
                 if (!uploadResponse.ok) {
                     const error = await response.json() as { message: string };
                     throw new Error(error.message || 'Image upload failed');
+                }
             }
-        }
             console.log('Save successful');
             viewChange();
 
-        }   catch (err) {
+        } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred.');
         }
     }
@@ -114,11 +114,13 @@ function EditProfile({userDetails, viewChange}) {
     return (
         <div className="grid place-items-center p-4">
             <div className="bg-[#1C1B1B] w-full max-w-2xl px-10 py-8 rounded-xl">
-                <h1 className="text-2xl py-2 text-[#D8FF80] font-bold text-center">Edit Profile</h1>
-
+                <h1 className="text-2xl py-2 text-[#D8FF80] font-bold text-center">Edit your Profile</h1>
+                <p className="border border-red-500 mt-4 mb-4 text-sm leading-relaxed py-2 text-[#D8FF80] font-bold text-center">To
+                    start matching with other
+                    Programmers, you first must complete your profile to enable access to matching system.</p>
                 <div className="flex flex-col items-center">
                     <img
-                        className="h-40 w-40 bg-[#CCC5B9] border-2 border-[#eaffb8] rounded-xl mt-4"
+                        className="h-50 w-50 bg-[#CCC5B9] border-2 border-[#eaffb8] rounded-xl mt-4"
                         src={previewUrl ?? userDetails.imageUrl}
                         alt="Profile"
                     />
