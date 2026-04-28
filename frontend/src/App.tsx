@@ -9,6 +9,7 @@ import Layout from "./components/layout/Layout.tsx";
 import Connections from "./pages/Connections.tsx";
 import Auth from "./pages/Auth.tsx";
 import Chat from "./pages/Chat.tsx";
+import ProtectedRoute from "./components/auth/ProtectedRoute.tsx"
 
 // app
 function App() {
@@ -17,12 +18,16 @@ function App() {
             <Routes>
                 <Route path="/" element={<Landing/>}/>
                 <Route path="/login" element={<Auth/>}/>
-                <Route element={<Layout/>}>
-                    <Route path="/dashboard" element={<Dashboard/>}/>
-                    <Route path="/profile" element={<Profile/>}/>
-                    <Route path="/messages" element={<Connections/>}/>
-                    <Route path="/chat" element={<Chat/>}/>
+                <Route element={<ProtectedRoute/>}>
+                    <Route element={<Layout/>}>
+                        <Route path="/match" element={<Dashboard/>}/>
+                        <Route path="/me" element={<Profile/>}/>
+                        <Route path="/connections" element={<Connections/>}/>
+                        <Route path="/connections/profile/:userId" element={<Profile/>}/>
+                        <Route path="/connections/chat/:userId" element={<Chat/>}/>
+                    </Route>
                 </Route>
+                <Route path="*" element={<Navigate to={"/"} replace/>}/>
             </Routes>
         </BrowserRouter>
     )

@@ -1,10 +1,12 @@
 import RequestCard from '../matches/RequestCard.tsx'
 import {useState, useEffect} from 'react';
+import {useAuth} from "../../hooks/useAuth";
 function IncomingRequests() {
     const [requests, setRequests] = useState<ConnectionRequest[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
+    const { token } = useAuth();
     useEffect(() => {
         async function fetchConnectionRequests() {
             try {
@@ -12,7 +14,7 @@ function IncomingRequests() {
                 const response = await fetch('http://localhost:8085/connection-requests', {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${token}`
                     }
                 });
 

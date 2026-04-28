@@ -1,7 +1,9 @@
 import type {serverAuthResponse} from "../../types/loginFormData";
 import {useState} from 'react';
+import {useAuth} from "../../hooks/useAuth";
 
 function EditProfile({userDetails, viewChange}) {
+    const { token } = useAuth();
     // Error message
     const [error, setError] = useState<string>('');
 
@@ -58,7 +60,7 @@ function EditProfile({userDetails, viewChange}) {
                     body: JSON.stringify(inputFields),
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization" : `Bearer ${localStorage.getItem('token')}`
+                        "Authorization" : `Bearer ${token}`
                     },
                     credentials: "include"
                 })
@@ -74,7 +76,7 @@ function EditProfile({userDetails, viewChange}) {
                     {
                         method: "POST",
                         body: formData,
-                        headers: {"Authorization": `Bearer ${localStorage.getItem('token')}`},
+                        headers: {"Authorization": `Bearer ${token}`},
                         credentials: "include"
                     })
                 if (!uploadResponse.ok) {
