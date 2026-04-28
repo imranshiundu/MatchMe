@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from "../../hooks/useAuth";
 
-function SuggestedUserCard({ userID }) {
+function SuggestedUserCard({ userID, refresh }) {
     const { token } = useAuth();
 
     const [userDetails, setUserDetails] = useState<object>({
@@ -64,6 +65,7 @@ function SuggestedUserCard({ userID }) {
             if (!response.ok) throw new Error('Failed');
 
             console.log('Connection sent');
+            refresh(true);
         } catch (error) {
             console.error(error);
         }
@@ -118,13 +120,18 @@ function SuggestedUserCard({ userID }) {
                 </div>
             </div>
 
-            <button
-                onClick={handleRequestConnection}
-                className="mt-auto bg-[#C0FF00] hover:bg-[#D8FF80] px-4 py-2 rounded-lg text-[#121212] font-medium"
-            >
-                Connect
-            </button>
-
+            <section className={'flex grow gap-5'}>
+                <Link
+                    to={`./${userID}`}
+                    className="flex grow mt-auto bg-[#E7EA5A] hover:bg-[#F5F867] py-2 rounded-lg text-[#121212] font-medium justify-center">
+                    View Profile</Link>
+                <button
+                    onClick={handleRequestConnection}
+                    className="flex grow mt-auto bg-[#C0FF00] hover:bg-[#D8FF80] py-2 rounded-lg text-[#121212] font-medium justify-center"
+                >
+                    Connect
+                </button>
+            </section>
         </div>
     );
 }
