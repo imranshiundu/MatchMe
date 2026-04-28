@@ -41,7 +41,6 @@ public class MatchService {
                 .filter(candidate -> !hasConnection(userId, candidate.getId()))
                 .map(candidate -> new MatchScore(candidate.getId(), score(me, candidate)))
                 .sorted(Comparator.comparingDouble(MatchScore::score).reversed())
-                .limit(10)
                 .map(MatchScore::userId)
                 .collect(Collectors.toList());
     }

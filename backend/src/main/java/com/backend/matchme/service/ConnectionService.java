@@ -44,14 +44,26 @@ public class ConnectionService {
         ensureProfileComplete(userId);
 
         List<Long> recommendedIds = matchService.getRecommendations(userId);
+
         int start = (int) pageable.getOffset();
+        int size = pageable.getPageSize();
 
         if (start >= recommendedIds.size()) {
-            return new RecommendationsResponseDTO(Collections.emptyList(), pageable);
+            return new RecommendationsResponseDTO(
+                    Collections.emptyList(),
+                    false,
+                    start > 0
+            );
         }
 
-        int end = Math.min(start + 10, recommendedIds.size());
-        return new RecommendationsResponseDTO(recommendedIds.subList(start, end), pageable);
+        int end = Math.min(start + size, recommendedIds.size());
+
+        List<Long> pageContent = recommendedIds.subList(start, end);
+
+        boolean hasNext = end < recommendedIds.size();
+        boolean hasPrevious = start > 0;
+
+        return new RecommendationsResponseDTO(pageContent, hasNext, hasPrevious);
     }
 
     public void requestConnection(Long requesterId, Long receiverId) {
