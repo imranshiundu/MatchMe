@@ -11,38 +11,34 @@ function Dashboard() {
 
     const [currentPage, setCurrentPage] = useState(0);
     const [loading, setLoading] = useState(true);
-    const [refreshSuggestions, setRefreshSuggestions] = useState<boolean>(true)
+
+    async function getRecommendations(page: number = 0) {
+        try {
+            setLoading(true);
+
+            const recommendationsRequest = await fetch(
+                `http://localhost:8085/recommendations?page=${page}&size=10`,
+                {
+                    method: 'GET',
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            const recommendationsResponse = await recommendationsRequest.json();
+            setRecommendations(recommendationsResponse);
+
+        } catch (error) {
+            console.error("Failed to fetch recommendations:", error);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     useEffect(() => {
-        if (refreshSuggestions === false) return;
-        async function getRecommendations(page: number = 0) {
-            try {
-                setLoading(true);
-
-                const recommendationsRequest = await fetch(
-                    `http://localhost:8085/recommendations?page=${page}&size=10`,
-                    {
-                        method: 'GET',
-                        headers: {
-                            Authorization: `Bearer ${token}`
-                        }
-                    }
-                );
-
-                const recommendationsResponse = await recommendationsRequest.json();
-                setRecommendations(recommendationsResponse);
-
-            } catch (error) {
-                console.error("Failed to fetch recommendations:", error);
-            } finally {
-                setLoading(false);
-                setRefreshSuggestions(false);
-            }
-        }
-
         getRecommendations(currentPage);
-
-    }, [currentPage, token, refreshSuggestions]);
+    }, [currentPage, token]);
 
     const handleNextPage = () => {
         if (recommendations?.hasNext) {
@@ -80,7 +76,7 @@ function Dashboard() {
                                     <SuggestedUserCard
                                         key={userId}
                                         userID={userId}
-                                        refresh={setRefreshSuggestions}
+                                        refresh={() => getRecommendations(currentPage)}
                                     />
                                 ))}
                             </div>
@@ -105,7 +101,7 @@ function Dashboard() {
                         </>
                     ) : (
                         <div>
-                            <p className="text-[#adaaaa] text-center text-lg ">
+                            <p className="text-[#adaaaa] text-center text-lg">
                                 No recommendations available
                             </p>
                             <p className="text-[#adaaaa] text-center text-lg">
