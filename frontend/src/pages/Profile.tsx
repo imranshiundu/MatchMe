@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.tsx'
 import { useFetchUserDetails } from '../hooks/useFetchUserDetails';
 import ViewProfile from '../components/profile/ViewProfile.tsx';
+import EditProfile from "../components/profile/EditProfile.tsx";
 
 function Profile({ isConnection }: { isConnection?: boolean }) {
     const [userDetails, setUserDetails] = useState(null);
