@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react';
 import { Link } from 'react-router-dom';
 import {useAuth} from "../../hooks/useAuth";
+import Icon from "../Icon";
 
 type RequestCardProps = {
     requestID: number;
@@ -84,7 +85,7 @@ function RequestCard({requestID, userID, onActionResult}: RequestCardProps) {
     };
 
     return (
-        <div className={'bg-[#1c1b1b] rounded-lg flex items-center p-3 gap-2'}>
+        <div className={'border-2 border-[#313030] bg-[#1c1b1b] rounded-lg flex items-center p-3 gap-2'}>
             <div className={'h-12 w-12 rounded-lg inline-block'}>
                 <img
                     className={'h-full w-full rounded-lg object-cover'}
@@ -95,20 +96,20 @@ function RequestCard({requestID, userID, onActionResult}: RequestCardProps) {
             <p className={'mx-3 flex-1 cursor-auto text-lg text-[#FFFCF2]'}>{userDetails.nickname}</p>
             <Link
                 to={`./${userID}`}
-                className="bg-[#FAE44C] hover:bg-[#FFF2AB] p-1 rounded-lg text-[#121212] font-medium justify-center cursor-pointer">
-                Profile
+                className="border-b-3 border-[#DDC831] bg-[#FAE44C] hover:bg-[#fbe96f] py-2 px-3 rounded-lg text-[#121212] font-medium justify-center cursor-pointer">
+                <Icon name={'view-profile-icon'}/>
             </Link>
             <button
                 onClick={() => handleReject()}
                 disabled={isSubmitting}
-                className="bg-[#E7EA5A] hover:bg-[#F5F867] p-1 rounded-lg text-[#121212] font-medium justify-center cursor-pointer">
-                Reject
+                className="border-b-3 border-[#CACD40] bg-[#E7EA5A] hover:bg-[#F5F867] py-2 px-3 rounded-lg text-[#121212] font-medium justify-center cursor-pointer">
+                <Icon name={'reject-icon'}/>
             </button>
             <button
                 onClick={() => handleAccept()}
                 disabled={isSubmitting}
-                className="bg-[#C0FF00] hover:bg-[#D8FF80] p-1 rounded-lg text-[#121212] font-medium justify-center cursor-pointer">
-                Accept
+                className="border-b-3 border-[#A2D800] bg-[#C0FF00] hover:bg-[#D8FF80] py-2 px-3 rounded-lg text-[#121212] font-medium justify-center cursor-pointer">
+                <Icon name={'accept-icon'}/>
             </button>
         </div>
     );

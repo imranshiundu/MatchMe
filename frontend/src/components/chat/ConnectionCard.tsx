@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react';
 import {Link} from 'react-router-dom';
 import {useAuth} from "../../hooks/useAuth";
+import Icon from "../Icon";
 
 function ConnectionCard({userId, isOnline}) {
 
@@ -42,15 +43,13 @@ function ConnectionCard({userId, isOnline}) {
             </div>
             <Link
                 to={`./user/${userId}`}
-                className={'cursor-pointer bg-[#E7EA5A] text-[#121212] my-2 px-2 rounded-sm hover:bg-[#F5F867] hover:text-[#1c1b1b] transition-all delay-100'}
-            >
-                View Profile
+                className={'cursor-pointer border-b-3 border-[#CACD40] bg-[#E7EA5A] text-[#121212] my-2 px-3 py-2 rounded-sm hover:bg-[#F5F867] hover:text-[#1c1b1b] content-center transition-all delay-100'}>
+                <Icon name={'view-profile-icon'}/>
             </Link>
             <Link
                 to={`./chat/${userId}`}
-                className={'cursor-pointer bg-[#C0FF00] text-[#121212] m-2 px-2 rounded-sm hover:bg-[#D8FF80] hover:text-[#1c1b1b] transition-all delay-100'}
-            >
-                Message
+                className={'cursor-pointer content-center bg-[#C0FF00] border-b-3 border-[#A2D800] text-[#121212] m-2 px-3 py-2 rounded-sm hover:bg-[#D8FF80] hover:text-[#1c1b1b] transition-all delay-100'}>
+                <Icon name={'message-icon'}/>
             </Link>
         </div>
     )

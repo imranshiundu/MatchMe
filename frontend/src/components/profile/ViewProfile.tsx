@@ -32,7 +32,7 @@ function ViewProfile({
                         </div>)}
                         <button
                             onClick={buttonHandler}
-                            className={`mt-4 cursor-pointer px-4 py-2 text-black rounded-md transition-all ${buttonText === "Remove" ? "bg-[#ff7351] hover:bg-[#ff9a82]" : "bg-[#C0FF00] hover:bg-[#eaffb8]"}`}
+                            className={`mt-4 cursor-pointer px-4 py-2 text-black rounded-md transition-all ${buttonText === "Remove" ? "border-b-3 border-[#ff7a5a] bg-[#ff7351] hover:bg-[#ff9a82]" : "border-b-3 border-[#A2D800] bg-[#C0FF00] hover:bg-[#eaffb8]"}`}
                         >
                             {buttonText}
                         </button>
