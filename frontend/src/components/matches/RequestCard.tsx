@@ -87,7 +87,7 @@ function RequestCard({requestID, userID, onActionResult}: RequestCardProps) {
         <div className={'bg-[#1c1b1b] rounded-lg flex items-center p-3 gap-2'}>
             <div className={'h-12 w-12 rounded-lg inline-block'}>
                 <img
-                    className={'h-full w-full rounded-lg object-cover border-2 border-[#FFFCF2]'}
+                    className={'h-full w-full rounded-lg object-cover'}
                         src={userDetails.imageUrl ?? '/favicon.svg'}
                     alt="Profile"
                 />

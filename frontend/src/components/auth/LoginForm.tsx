@@ -58,7 +58,7 @@ function LoginForm() {
     }
 
     return (
-        <div className='grid place-items-center bg-[#1C1B1B] h-fit w-fit px-10 py-5 rounded-xl'>
+        <div className='grid place-items-center bg-[#1C1B1B] h-fit w-fit px-10 py-5 border-2 border-[#313030] rounded-xl'>
             <h1 className={'text-2xl py-2'}>login</h1>
             <form
                 onSubmit={handleLogin}

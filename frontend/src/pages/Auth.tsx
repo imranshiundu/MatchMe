@@ -16,26 +16,27 @@ function Auth() {
             </header>
             <section className={'mt-15'}>
             {login ?
-                <section>
                     <LoginForm/>
-                    <div className={'grid place-items-center bg-[#1C1B1B] px-10 py-5 rounded-xl mt-5'}>
+                :
+                    <RegistrationForm/>
+                }
+            </section>
+            <section className={'grid place-items-center bg-[#1C1B1B] px-10 py-5 rounded-xl mt-5 border-2 border-[#313030]'}>
+                {login ?
+                    <>
                         <p>Don't have an account?</p>
                         <button onClick={switchAuth} className='text-[#D8FF80] underline cursor-pointer'>
                             Register here!
                         </button>
-                    </div>
-                </section>
-                :
-                <section>
-                    <RegistrationForm/>
-                    <div className={'grid place-items-center bg-[#1C1B1B] px-10 py-5 rounded-xl mt-5'}>
+                    </>
+                    :
+                    <>
                         <p>Already have an account?</p>
                         <button onClick={switchAuth} className='text-[#D8FF80] underline cursor-pointer'>
                             Login here!
                         </button>
-                    </div>
-                </section>
-            }
+                    </>
+                }
             </section>
         </div>
     )
