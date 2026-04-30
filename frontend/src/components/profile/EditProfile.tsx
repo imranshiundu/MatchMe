@@ -2,7 +2,7 @@ import type {serverAuthResponse} from "../../types/loginFormData";
 import {useState, useEffect, useRef} from 'react';
 import {useAuth} from "../../hooks/useAuth";
 
-function EditProfile({userDetails, viewChange}) {
+function EditProfile({userDetails, viewChange, needsRefresh}) {
     const {token} = useAuth();
     // Error message
     const [error, setError] = useState<string>('');
@@ -37,9 +37,10 @@ function EditProfile({userDetails, viewChange}) {
     };
 
     // Profile picture logic
-    const [newProfilePicture, setNewProfilePicture] = useState(null)
-    const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-    const fileInputRef = useRef<HTMLInputElement | null>(null)
+    const [newProfilePicture, setNewProfilePicture] = useState(null);
+    const [removeProfilePicture, setRemoveProfilePicture] = useState<boolean>(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
@@ -61,6 +62,11 @@ function EditProfile({userDetails, viewChange}) {
             if (previewUrl) URL.revokeObjectURL(previewUrl);
         }
     }, [previewUrl])
+
+    const handleFileRemoval = () => {
+        setPreviewUrl("https://res.cloudinary.com/ddvukican/image/upload/v1775725641/default-profile-image.jpg")
+        setRemoveProfilePicture(true);
+    }
 
 
     const handleChange = (field, value) => {
@@ -103,7 +109,21 @@ function EditProfile({userDetails, viewChange}) {
                     throw new Error(error.message || 'Image upload failed');
                 }
             }
+
+            // removes photo if user selected remove
+            if (removeProfilePicture) {
+                const removePicture = await fetch('http://localhost:8085/profile/remove-image',
+                    {
+                        method: "DELETE",
+                        headers: {"Authorization": `Bearer ${token}`}
+                    });
+                if (!removePicture.ok) {
+                    const error = await response.json() as { message: string };
+                    throw new Error(error.message || 'Image removal failed');
+                }
+            }
             console.log('Save successful');
+            needsRefresh(true);
             viewChange();
 
         } catch (err) {
@@ -113,24 +133,33 @@ function EditProfile({userDetails, viewChange}) {
 
     return (
         <div className="grid place-items-center p-4">
-            <div className="bg-[#1C1B1B] w-full max-w-2xl px-10 py-8 rounded-xl">
-                <h1 className="text-2xl py-2 text-[#D8FF80] font-bold text-center">Edit your Profile</h1>
-                <p className="border border-red-500 mt-4 mb-4 text-sm leading-relaxed py-2 text-[#D8FF80] font-bold text-center">To
-                    start matching with other
-                    Programmers, you first must complete your profile to enable access to matching system.</p>
+            <div className="border-2 border-[#313030] bg-[#1C1B1B] w-full max-w-2xl px-10 py-8 rounded-xl">
+                <h1 className="text-2xl py-2 text-[#C0FF00] font-bold text-center">EDIT_PROFILE</h1>
+                <p className="bg-[#403d39] border-1 border-[#F5F867] rounded-lg text-sm p-2 text-[#F5F867] text-center">
+                    //Matching algorithm requires complete profile data
+                </p>
                 <div className="flex flex-col items-center">
                     <img
-                        className="h-50 w-50 bg-[#CCC5B9] border-2 border-[#eaffb8] rounded-xl mt-4"
+                        className="h-50 w-50 bg-[#CCC5B9] rounded-xl mt-4"
                         src={previewUrl ?? userDetails.imageUrl}
                         alt="Profile"
                     />
-                    <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        className="mt-4 cursor-pointer bg-[#403D39] text-[#C0FF00] px-4 py-2 rounded-md hover:bg-[#6B6562] transition-all"
-                    >
-                        upload picture
-                    </button>
+                    <div className={'flex gap-3'}>
+                        <button
+                            type="button"
+                            onClick={() => handleFileRemoval()}
+                            className="mt-4 cursor-pointer px-4 py-2 rounded-md bg-[#403D39] text-[#121212] hover:bg-[#313030] hover:text-[#1c1b1b] transition-all"
+                        >
+                            remove
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="mt-4 cursor-pointer px-4 py-2 rounded-md bg-[#C0FF00] text-[#141F00] hover:bg-[#D8FF80] hover:text-[#384E00] transition-all"
+                        >
+                            upload
+                        </button>
+                    </div>
                     <input
                         type="file"
                         accept="image/png, image/jpeg"
@@ -201,8 +230,8 @@ function EditProfile({userDetails, viewChange}) {
                                 type="button"
                                 key={interest}
                                 onClick={() => toggleInterests(interest)}
-                                className={`px-3 py-1 rounded-xl text-sm text-black transition-colors ${
-                                    selectedInterests.includes(interest) ? "bg-[#C0FF00]" : "bg-[#403D39]"
+                                className={`cursor-pointer px-3 py-1 rounded-xl text-sm text-black transition-colors ${
+                                    selectedInterests.includes(interest) ? "bg-[#C0FF00] text-[#141F00] hover:bg-[#D8FF80] hover:text-[#384E00] transition-all" : "bg-[#403D39] text-[#121212] hover:bg-[#6B6562] hover:text-[#1c1b1b] transition-all"
                                 }`}
                             >
                                 {interest}
@@ -217,8 +246,8 @@ function EditProfile({userDetails, viewChange}) {
                                 type="button"
                                 key={looking}
                                 onClick={() => toggleLookingFor(looking)}
-                                className={`px-3 py-1 rounded-xl text-sm text-black transition-colors ${
-                                    selectedLookingFor.includes(looking) ? "bg-[#C0FF00]" : "bg-[#403D39]"
+                                className={`cursor-pointer px-3 py-1 rounded-xl text-sm text-black transition-colors ${
+                                    selectedLookingFor.includes(looking) ? "bg-[#C0FF00] text-[#141F00] hover:bg-[#D8FF80] hover:text-[#384E00] transition-all" : "bg-[#403D39] text-[#121212] hover:bg-[#6B6562] hover:text-[#1c1b1b] transition-all"
                                 }`}
                             >
                                 {looking}
@@ -228,17 +257,17 @@ function EditProfile({userDetails, viewChange}) {
 
                     <div className="flex gap-4 mt-6">
                         <button
-                            type="submit"
-                            className="flex-1 cursor-pointer bg-[#C0FF00] text-[#121212] p-2 rounded-md hover:bg-[#D8FF80] hover:text-[#1c1b1b] transition-all"
-                        >
-                            Save Changes
-                        </button>
-                        <button
                             type="button"
                             onClick={viewChange}
-                            className="flex-1 cursor-pointer bg-[#403D39] text-[#C0FF00] p-2 rounded-md hover:bg-[#6B6562] transition-all"
+                            className="flex-1 cursor-pointer p-2 rounded-md bg-[#403D39] text-[#121212] hover:bg-[#313030] hover:text-[#1c1b1b] transition-all"
                         >
                             Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            className="flex-1 cursor-pointer p-2 rounded-md bg-[#C0FF00] text-[#141F00] hover:bg-[#D8FF80] hover:text-[#384E00] transition-all"
+                        >
+                            Save Changes
                         </button>
                     </div>
                     {error && <p className={'bg-[#121212] text-[#ff7351] border-1 p-2 rounded-sm mt-5'}>

@@ -90,11 +90,11 @@ function SuggestedUserCard({ userID, refresh }) {
     }
 
     return (
-        <div className="bg-[#252422] rounded-2xl p-6 w-80 flex flex-col min-h-80">
+        <div className="bg-[#1c1b1b] border-2 border-[#313030] rounded-2xl p-6 w-80 flex flex-col min-h-80">
 
             <div className="flex items-center space-x-4 mb-4">
                 <img
-                    className="h-20 w-20 rounded-xl object-cover border-2 border-[#eaffb8]"
+                    className="h-20 w-20 rounded-xl object-cover"
                     src={userDetails.imageUrl}
                     alt="Profile"
                 />
@@ -102,7 +102,6 @@ function SuggestedUserCard({ userID, refresh }) {
                     {userDetails.nickname}
                 </h2>
             </div>
-
             <div className="flex-1">
                 <h3 className="text-[#D8FF80] text-sm mb-2">
                     //common interests
@@ -112,7 +111,7 @@ function SuggestedUserCard({ userID, refresh }) {
                     {userDetails.interest?.map((interest) => (
                         <span
                             key={interest}
-                            className="px-3 py-1 bg-[#1C1B1B] rounded-full text-xs text-[#d8ff80]"
+                            className="px-3 py-1 bg-[#252422] rounded-full text-xs text-[#d8ff80]"
                         >
                             {interest}
                         </span>

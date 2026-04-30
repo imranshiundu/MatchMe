@@ -9,6 +9,7 @@ function Profile({ isConnection }: { isConnection?: boolean }) {
     const [userDetails, setUserDetails] = useState(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [editView, setEditView] = useState<boolean>(false);
+    const [needsRefresh, setNeedsRefresh] = useState<boolean>(true);
     const { token } = useAuth();
     const { userId: urlUserId } = useParams();
     const { userDetails: fetchedUserDetails, loading: isFetching, error: fetchError } = useFetchUserDetails(isConnection !== undefined && urlUserId ? Number(urlUserId) : null);
@@ -49,7 +50,7 @@ function Profile({ isConnection }: { isConnection?: boolean }) {
     };
 
     useEffect(() => {
-        if (isConnection === undefined) {
+        if (isConnection === undefined && needsRefresh) {
             async function fetchProfile() {
                 try {
                     const userProfileResponse = await fetch("http://localhost:8085/me/profile", {
@@ -67,10 +68,11 @@ function Profile({ isConnection }: { isConnection?: boolean }) {
                 }
             }
             fetchProfile();
+            setNeedsRefresh(false);
         } else {
             setIsLoading(false);
         }
-    }, [isConnection, token]);
+    }, [isConnection, needsRefresh, token]);
 
     const currentUserDetails = isConnection === undefined ? userDetails : fetchedUserDetails;
 
@@ -100,7 +102,7 @@ function Profile({ isConnection }: { isConnection?: boolean }) {
     return (
         <>
             {editView ? (
-                <EditProfile userDetails={currentUserDetails} viewChange={changeView} />
+                <EditProfile userDetails={currentUserDetails} viewChange={changeView} needsRefresh={setNeedsRefresh} />
             ) : (
                 <ViewProfile
                     user={currentUserDetails}
