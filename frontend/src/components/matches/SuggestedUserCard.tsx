@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from "../../hooks/useAuth";
+import Icon from '../Icon.tsx'
 
 function SuggestedUserCard({ userID, refresh }) {
     const { token } = useAuth();
@@ -89,6 +90,11 @@ function SuggestedUserCard({ userID, refresh }) {
         );
     }
 
+    //TODO dismiss user button once endpoint is ready
+    const handleDismissSuggestion = async () => {
+        const dismissUser = await fetch()
+    }
+
     return (
         <div className="bg-[#1c1b1b] border-2 border-[#313030] rounded-2xl p-6 w-80 flex flex-col min-h-80">
 
@@ -120,15 +126,20 @@ function SuggestedUserCard({ userID, refresh }) {
             </div>
 
             <section className={'flex grow gap-5'}>
+                <button
+                    onClick={() => {}}
+                    className="flex cursor-pointer grow mt-auto border-b-2 border-[#313030] hover:border-b-0 hover:border-t-2 hover:border-[#1C1B1B] bg-[#403d39] py-2 rounded-lg fill-[#C0FF00] hover:fill-[#608200] justify-center">
+                    <Icon name={'ignore-icon'}/>
+                </button>
                 <Link
                     to={`./${userID}`}
-                    className="flex grow mt-auto bg-[#E7EA5A] hover:bg-[#F5F867] py-2 rounded-lg text-[#121212] font-medium justify-center">
-                    View Profile</Link>
+                    className="flex grow mt-auto border-b-2 border-[#313030] hover:border-b-0 hover:border-t-2 hover:border-[#1C1B1B] bg-[#403d39] py-2 rounded-lg fill-[#C0FF00] hover:fill-[#608200] justify-center">
+                    <Icon name={'view-profile-icon'}/>
+                </Link>
                 <button
                     onClick={handleRequestConnection}
-                    className="flex grow mt-auto bg-[#C0FF00] hover:bg-[#D8FF80] py-2 rounded-lg text-[#121212] font-medium justify-center"
-                >
-                    Connect
+                    className="flex cursor-pointer grow mt-auto border-b-2 border-[#313030] hover:border-b-0 hover:border-t-2 hover:border-[#1C1B1B] bg-[#403d39] py-2 rounded-lg fill-[#C0FF00] hover:fill-[#608200] justify-center">
+                        <Icon name={'connect-icon'}/>
                 </button>
             </section>
         </div>

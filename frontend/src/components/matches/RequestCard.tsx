@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react';
 import { Link } from 'react-router-dom';
 import {useAuth} from "../../hooks/useAuth";
+import Icon from "../Icon";
 
 type RequestCardProps = {
     requestID: number;
@@ -84,7 +85,7 @@ function RequestCard({requestID, userID, onActionResult}: RequestCardProps) {
     };
 
     return (
-        <div className={'bg-[#1c1b1b] rounded-lg flex items-center p-3 gap-2'}>
+        <div className={'border-2 border-[#313030] bg-[#1c1b1b] rounded-lg flex items-center p-3 gap-2'}>
             <div className={'h-12 w-12 rounded-lg inline-block'}>
                 <img
                     className={'h-full w-full rounded-lg object-cover'}
@@ -95,20 +96,20 @@ function RequestCard({requestID, userID, onActionResult}: RequestCardProps) {
             <p className={'mx-3 flex-1 cursor-auto text-lg text-[#FFFCF2]'}>{userDetails.nickname}</p>
             <Link
                 to={`./${userID}`}
-                className="bg-[#FAE44C] hover:bg-[#FFF2AB] p-1 rounded-lg text-[#121212] font-medium justify-center cursor-pointer">
-                Profile
+                className="cursor-pointer content-center rounded-lg my-2 px-3 py-2 border-b-2 border-[#313030] bg-[#403d39] fill-[#C0FF00] hover:border-b-0 hover:border-t-2 hover:border-[#1C1B1B] hover:bg-[#474646] hover:fill-[#608200]">
+                <Icon name={'view-profile-icon'}/>
             </Link>
             <button
                 onClick={() => handleReject()}
                 disabled={isSubmitting}
-                className="bg-[#E7EA5A] hover:bg-[#F5F867] p-1 rounded-lg text-[#121212] font-medium justify-center cursor-pointer">
-                Reject
+                className="cursor-pointer content-center rounded-lg my-2 px-3 py-2 border-b-2 border-[#313030] bg-[#403d39] fill-[#C0FF00] hover:border-b-0 hover:border-t-2 hover:border-[#1C1B1B] hover:bg-[#474646] hover:fill-[#608200]">
+                <Icon name={'reject-icon'}/>
             </button>
             <button
                 onClick={() => handleAccept()}
                 disabled={isSubmitting}
-                className="bg-[#C0FF00] hover:bg-[#D8FF80] p-1 rounded-lg text-[#121212] font-medium justify-center cursor-pointer">
-                Accept
+                className="cursor-pointer content-center rounded-lg my-2 px-3 py-2 border-b-2 border-[#313030] bg-[#403d39] fill-[#C0FF00] hover:border-b-0 hover:border-t-2 hover:border-[#1C1B1B] hover:bg-[#474646] hover:fill-[#608200]">
+                <Icon name={'accept-icon'}/>
             </button>
         </div>
     );
