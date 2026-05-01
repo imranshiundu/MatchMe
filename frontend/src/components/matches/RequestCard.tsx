@@ -96,19 +96,19 @@ function RequestCard({requestID, userID, onActionResult}: RequestCardProps) {
             <p className={'mx-3 flex-1 cursor-auto text-lg text-[#FFFCF2]'}>{userDetails.nickname}</p>
             <Link
                 to={`./${userID}`}
-                className="border-b-3 border-[#DDC831] bg-[#FAE44C] hover:bg-[#fbe96f] py-2 px-3 rounded-lg text-[#121212] font-medium justify-center cursor-pointer">
+                className="cursor-pointer content-center rounded-lg my-2 px-3 py-2 border-b-2 border-[#313030] bg-[#403d39] fill-[#C0FF00] hover:border-b-0 hover:border-t-2 hover:border-[#1C1B1B] hover:bg-[#474646] hover:fill-[#608200]">
                 <Icon name={'view-profile-icon'}/>
             </Link>
             <button
                 onClick={() => handleReject()}
                 disabled={isSubmitting}
-                className="border-b-3 border-[#CACD40] bg-[#E7EA5A] hover:bg-[#F5F867] py-2 px-3 rounded-lg text-[#121212] font-medium justify-center cursor-pointer">
+                className="cursor-pointer content-center rounded-lg my-2 px-3 py-2 border-b-2 border-[#313030] bg-[#403d39] fill-[#C0FF00] hover:border-b-0 hover:border-t-2 hover:border-[#1C1B1B] hover:bg-[#474646] hover:fill-[#608200]">
                 <Icon name={'reject-icon'}/>
             </button>
             <button
                 onClick={() => handleAccept()}
                 disabled={isSubmitting}
-                className="border-b-3 border-[#A2D800] bg-[#C0FF00] hover:bg-[#D8FF80] py-2 px-3 rounded-lg text-[#121212] font-medium justify-center cursor-pointer">
+                className="cursor-pointer content-center rounded-lg my-2 px-3 py-2 border-b-2 border-[#313030] bg-[#403d39] fill-[#C0FF00] hover:border-b-0 hover:border-t-2 hover:border-[#1C1B1B] hover:bg-[#474646] hover:fill-[#608200]">
                 <Icon name={'accept-icon'}/>
             </button>
         </div>

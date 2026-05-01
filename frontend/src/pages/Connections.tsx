@@ -69,7 +69,7 @@ function Connections() {
     return (
         <div className={'flex h-full justify-center'}>
             <section
-                className={'w-185 mx-3 my-3 bg-[#1C1B1B] px-5 py-3 rounded-xl flex flex-col items-center border-2 border-[#313030]'}>
+                className={'w-185 mx-3 my-3 px-5 py-3 rounded-xl flex flex-col items-center'}>
                 <p className={'text-[#C0FF00] text-2xl'}>connections</p>
                 <div>
                     {connections?.map((connection) => (
