@@ -37,6 +37,7 @@ public class MatchService {
                 .filter(candidate -> !candidate.getId().equals(userId))
                 .filter(this::ready)
                 .filter(candidate -> sameLocation(me, candidate))
+                .filter(candidate -> compatibleLookingFor(me, candidate))
                 .filter(candidate -> !isDismissed(user, candidate.getId()))
                 .filter(candidate -> !hasConnection(userId, candidate.getId()))
                 .map(candidate -> new MatchScore(candidate.getId(), score(me, candidate)))
@@ -76,31 +77,26 @@ public class MatchService {
 
     private double score(Profile left, Profile right) {
         double total = 0d;
-        if (compatibleLookingFor(left, right)) {
-            total += 0.50d;
-        }
-
+        total += overlapLookingFor(left, right) * 0.50d;
         total += overlapCollections(left.getInterest(), right.getInterest()) * 0.35d;
         total += overlapText(left.getBio(), right.getBio()) * 0.15d;
         return total;
     }
 
     private boolean compatibleLookingFor(Profile left, Profile right) {
-        String rightGender = clean(right.getGender());
-        String leftGender = clean(left.getGender());
-
-        boolean leftAcceptsRight = acceptsGender(left.getLookingFor(), rightGender);
-        boolean rightAcceptsLeft = acceptsGender(right.getLookingFor(), leftGender);
-        return leftAcceptsRight && rightAcceptsLeft;
+        return overlapLookingFor(left, right) > 0d;
     }
 
-    private boolean acceptsGender(List<String> lookingFor, String gender) {
-        if (lookingFor == null || lookingFor.isEmpty() || gender.isBlank()) {
-            return false;
+    private double overlapLookingFor(Profile left, Profile right) {
+        Set<String> leftOptions = normalize(left.getLookingFor());
+        Set<String> rightOptions = normalize(right.getLookingFor());
+        if (leftOptions.isEmpty() || rightOptions.isEmpty()) {
+            return 0d;
         }
-
-        Set<String> options = normalize(lookingFor);
-        return options.contains("any") || options.contains(gender);
+        if (leftOptions.contains("any") || rightOptions.contains("any")) {
+            return 1d;
+        }
+        return overlapCollections(left.getLookingFor(), right.getLookingFor());
     }
 
     private double overlapCollections(List<String> left, List<String> right) {

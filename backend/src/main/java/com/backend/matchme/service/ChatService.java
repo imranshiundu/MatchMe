@@ -11,6 +11,7 @@ import com.backend.matchme.repository.ConnectionRepository;
 import com.backend.matchme.repository.MessageRepository;
 import com.backend.matchme.repository.ProfileRepository;
 import com.backend.matchme.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -52,11 +53,13 @@ public class ChatService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public List<ChatMsgDTO> getMessages(Long userId, Long chatId, int page, int size) {
         Chat chat = chatRepository.findById(chatId).orElseThrow();
         if (!owns(chat, userId)) {
             throw new RuntimeException("Chat not found");
         }
+        markMessagesAsRead(chat, userId);
         List<ChatMsgDTO> items = messageRepository.findByChatOrderByTimestampDesc(chat, PageRequest.of(page, size))
                 .stream()
                 .map(msg -> mapMessage(msg, other(chat, userId).getId()))
@@ -99,6 +102,16 @@ public class ChatService {
         }
         Chat chat = getOrCreateChat(sender, receiver);
         return new TypingEventDTO(chat.getId(), senderId, dto.typing());
+    }
+
+    private void markMessagesAsRead(Chat chat, Long userId) {
+        List<Message> unreadMessages = messageRepository.findByChatAndSenderIdNotAndIsReadFalse(chat, userId);
+        if (unreadMessages.isEmpty()) {
+            return;
+        }
+
+        unreadMessages.forEach(message -> message.setRead(true));
+        messageRepository.saveAll(unreadMessages);
     }
 
     private ChatItemDTO mapToChatItem(Chat chat, Long userId) {
