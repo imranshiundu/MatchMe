@@ -20,6 +20,9 @@ public class ChatController {
 
     @GetMapping
     public ResponseEntity<List<ChatItemDTO>> getChats(@AuthenticationPrincipal Long userId) {
+        if (userId == null) {
+            throw new RuntimeException("Unauthenticated");
+        }
         return ResponseEntity.ok(chatService.getChats(userId));
     }
 
@@ -28,8 +31,9 @@ public class ChatController {
             @AuthenticationPrincipal Long userId,
             @PathVariable Long id,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "true") boolean markAsRead
     ) {
-        return ResponseEntity.ok(chatService.getMessages(userId, id, page, size));
+        return ResponseEntity.ok(chatService.getMessages(userId, id, page, size, markAsRead));
     }
 }

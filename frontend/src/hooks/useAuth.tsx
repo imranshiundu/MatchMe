@@ -8,20 +8,19 @@ type JwtPayload = {
 
 export const useAuth = () => {
     const [token, setToken] = useState<string | null>(sessionStorage.getItem('token'));
-    const [userId, setUserId] = useState<number | null>(null);
+    const [userId, setUserId] = useState<number | null>(Number(sessionStorage.getItem('id')));
 
     const setAuthToken = useCallback((newToken: string | null) => {
         if (newToken) {
             const decoded = jwtDecode<JwtPayload>(newToken);
             sessionStorage.setItem('token', newToken);
             sessionStorage.setItem('id', String(decoded.userId));
-            setUserId(decoded.userId);
         } else {
             sessionStorage.removeItem('token');
             sessionStorage.removeItem('id');
-            setUserId(null);
         }
         setToken(newToken);
+        setUserId(Number(jwtDecode<JwtPayload>(newToken).userId))
     }, []);
 
     const logout = useCallback(() => {
