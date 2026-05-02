@@ -29,11 +29,13 @@ public class WsAuthInterceptor implements ChannelInterceptor {
             if (userId == null) {
                 throw new IllegalArgumentException("Invalid socket token");
             }
-            accessor.setUser(new UsernamePasswordAuthenticationToken(
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                     userId,
                     null,
                     Collections.emptyList()
-            ));
+            );
+            accessor.setUser(authToken);
+            accessor.getSessionAttributes().put("userId", userId);
         }
         return message;
     }

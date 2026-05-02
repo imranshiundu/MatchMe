@@ -48,18 +48,20 @@ public class ChatService {
 
     public List<ChatItemDTO> getChats(Long userId) {
         User user = userRepository.findById(userId).orElseThrow();
-        return chatRepository.findByUser1OrUser2OrderByLastActivityDesc(user, user).stream()
+        return chatRepository.findByUser1OrUser2OrderByLastActivityDesc(user).stream()
                 .map(chat -> mapToChatItem(chat, userId))
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public List<ChatMsgDTO> getMessages(Long userId, Long chatId, int page, int size) {
+    public List<ChatMsgDTO> getMessages(Long userId, Long chatId, int page, int size, boolean markAsRead) {
         Chat chat = chatRepository.findById(chatId).orElseThrow();
         if (!owns(chat, userId)) {
             throw new RuntimeException("Chat not found");
         }
-        markMessagesAsRead(chat, userId);
+        if (markAsRead) {
+            markMessagesAsRead(chat, userId);
+        }
         List<ChatMsgDTO> items = messageRepository.findByChatOrderByTimestampDesc(chat, PageRequest.of(page, size))
                 .stream()
                 .map(msg -> mapMessage(msg, other(chat, userId).getId()))
@@ -68,6 +70,7 @@ public class ChatService {
         return items;
     }
 
+    @Transactional
     public SendRes send(Long senderId, ChatSendDTO dto) {
         User sender = userRepository.findById(senderId).orElseThrow();
         User receiver = userRepository.findById(dto.getReceiverId()).orElseThrow();

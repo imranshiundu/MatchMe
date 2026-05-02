@@ -45,6 +45,7 @@ export const useFetchChatHistory = (
                 }
 
                 const data: ChatMsgDTO[] = await response.json();
+                console.log(data);
                 setMessages(data);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to fetch messages');

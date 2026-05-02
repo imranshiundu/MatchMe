@@ -37,6 +37,7 @@ class WebSocketService {
             webSocketFactory: () => new SockJS(socket_url),
             reconnectDelay: 5000,
             connectHeaders: { Authorization: `Bearer ${jwtToken}` },
+            binary: true,
             onConnect: () => {
                 this.isConnected = true;
                 console.log("WebSocket connected");
@@ -103,7 +104,7 @@ class WebSocketService {
     send(destination: string, body: object): void {
         if (this.client && this.client.connected) {
             this.client.publish({
-                destination: `/app${destination}`,
+                destination: `${destination}`,
                 body: JSON.stringify(body)
             });
         }
