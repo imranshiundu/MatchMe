@@ -90,10 +90,24 @@ function SuggestedUserCard({ userID, refresh }) {
         );
     }
 
-    //TODO dismiss user button once endpoint is ready
     const handleDismissSuggestion = async () => {
-        const dismissUser = await fetch()
-    }
+        try {
+            const response = await fetch(`http://localhost:8085/profile/${userID}/dismiss`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) throw new Error('Failed to dismiss');
+
+            console.log('User dismissed');
+            refresh(true);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     return (
         <div className="bg-[#1c1b1b] border-2 border-[#313030] rounded-2xl p-6 w-80 flex flex-col min-h-80">
@@ -127,7 +141,7 @@ function SuggestedUserCard({ userID, refresh }) {
 
             <section className={'flex grow gap-5'}>
                 <button
-                    onClick={() => {}}
+                    onClick={handleDismissSuggestion}
                     className="flex cursor-pointer grow mt-auto border-b-2 border-[#313030] hover:border-b-0 hover:border-t-2 hover:border-[#1C1B1B] bg-[#403d39] py-2 rounded-lg fill-[#C0FF00] hover:fill-[#608200] justify-center">
                     <Icon name={'ignore-icon'}/>
                 </button>
