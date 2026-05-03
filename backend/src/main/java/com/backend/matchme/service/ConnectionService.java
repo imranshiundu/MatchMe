@@ -99,7 +99,7 @@ public class ConnectionService {
 
     public List<ConnectionIdDTO> getConnectedIds(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        return connectionRepository.findByRequesterOrReceiverAndStatus(user, user, ConnectionStatus.ACCEPTED)
+        return connectionRepository.findByStatusAndRequesterOrStatusAndReceiver(ConnectionStatus.ACCEPTED, user, ConnectionStatus.ACCEPTED, user)
                 .stream()
                 .map(c -> new ConnectionIdDTO(c.getRequester().getId().equals(userId) ? c.getReceiver().getId() : c.getRequester().getId())).toList();
 
