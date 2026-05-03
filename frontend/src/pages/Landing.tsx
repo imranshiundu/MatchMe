@@ -1,7 +1,23 @@
 import {Link} from 'react-router-dom';
+import {useEffect} from 'react';
 import RegistrationForm from '../components/auth/RegistrationForm.tsx'
+import {websocketService} from "../services/websocketService";
+import  {useAuth} from '../hooks/useAuth.tsx'
 
 function Landing() {
+    const {logout} = useAuth();
+    useEffect(() => {
+        const closeSocket = async () => {
+            try {
+                await websocketService.disconnect()
+            }
+            finally {
+                logout();
+            }
+        }
+        void closeSocket();
+    }, []);
+
     return (
         <div>
             <header className={'bg-[#1C1B1B] py-2 md:py-3 px-3 md:px-3 flex justify-between rounded-b-xl'}>

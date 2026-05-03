@@ -12,6 +12,7 @@ function LoginForm() {
         });
 
     const [error, setError] = useState<string>('');
+    const [isReady, setIsReady] = useState<boolean>(false)
     const navigate = useNavigate();
 
     const handleChange = (e:React.ChangeEvent<HTMLInputElement>) => {
@@ -22,18 +23,34 @@ function LoginForm() {
         }));
     };
 
-    const { setAuthToken, token } = useAuth();
+    const { setAuthToken, token, logout } = useAuth();
+    useEffect(() => {
+        const closeSocket = async () => {
+            try {
+                await websocketService.disconnect();
+            }
+            finally {
+                logout();
+                setIsReady(true);
+            }
+        }
+        void closeSocket();
+    }, []);
 
     useEffect(() => {
-        if (token) {
-            websocketService.connect(
-                token,
-                () => console.log('WebSocket connected'),
-                () => console.log('WebSocket disconnected'),
-                (error) => console.error('WebSocket error:', error)
-            );
-        }
-    }, [token]);
+        if (!isReady || !token) return;
+        websocketService.connect(
+            token,
+            () => console.log('WebSocket connected'),
+            () => console.log('WebSocket disconnected'),
+            (error) => console.error('WebSocket error:', error)
+        );
+    }, [isReady, token]);
+
+    useEffect(() => {
+        if (!isReady || !token) return;
+        navigate('/match');
+    }, [isReady, token, navigate]);
 
     const handleLogin = async (e: SubmitEvent) => {
         e.preventDefault()
@@ -50,8 +67,8 @@ function LoginForm() {
                 const error = await response.json() as { message: string };
                 throw new Error(error.message || 'Auth failed');
             }
-            setAuthToken((await response.json() as serverAuthResponse).token);
-            navigate('/match');
+            const data = await response.json() as serverAuthResponse;
+            setAuthToken(data.token);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred.');
         }
