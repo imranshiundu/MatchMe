@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import Icon from "../Icon";
 
 function ViewProfile({
@@ -11,7 +12,7 @@ function ViewProfile({
     buttonHandler: (e: React.MouseEvent<HTMLButtonElement>) => void;
     buttonText: string;
     showAllDetails: boolean;
-    userID?: string | number; // Optional
+    userID: string | number;
 }) {
     console.log(user);
     return (
@@ -28,25 +29,35 @@ function ViewProfile({
 
                     {/* User Info */}
                     <div className="ml-8 mt-2">
-                        <h1 className="text-3xl font-bold text-[#C0FF00]">{user.nickname}</h1>
+                        <h1 className="text-3xl font-bold">{user.nickname}</h1>
                         {showAllDetails && (<div className="mt-2 text-[#adaaaa] capitalize">
                             {user.age} • {user.gender} • {user.location}
                         </div>)}
+                        <div className={'mt-4 flex items-center gap-2'}>
                         <button
                             onClick={buttonHandler}
-                            className={`mt-4 cursor-pointer px-4 py-2 text-[#121212] rounded-lg ${buttonText === "Remove" ? "border-b-3 border-[#E62721] bg-[#FF3B30] hover:border-b-0 hover:border-t-3 hover:border-[#1c1b1b] hover:bg-[#E62721]" : "border-b-3 border-[#8BBA00] bg-[#C0FF00] hover:border-b-0 hover:border-t-3 hover:border-[#1c1b1b] hover:bg-[#A2D800]"}`}
+                            className={`mt-4 cursor-pointer px-4 py-2 text-[#121212] rounded-lg ${buttonText === "Remove" ? "fill-[#FF3B30] border-b-3 border-[#313030] bg-[#403d39] hover:fill-[#D8402F] hover:border-b-0 hover:border-t-3 hover:border-[#1C1B1B] hover:bg-[#474646]" : "border-b-3 border-[#8BBA00] bg-[#C0FF00] hover:border-b-0 hover:border-t-3 hover:border-[#1c1b1b] hover:bg-[#A2D800]"}`}
                         >
                             {buttonText === "Edit Profile" && <Icon name={'edit-icon'}/>}
                             {buttonText === "Remove" && <Icon name={'remove-icon'}/>}
                             {buttonText === "Connect" && <Icon name={'connect-icon'}/>}
                         </button>
+                        {buttonText === "Remove" &&
+                            <Link
+                                to={`/connections/chat/${userID}`}
+                                className="cursor-pointer content-center rounded-lg mt-4 px-4 py-2 border-b-3 border-[#313030] bg-[#403d39] fill-[#C0FF00] hover:border-b-0 hover:border-t-3 hover:border-[#1C1B1B] hover:bg-[#474646] hover:fill-[#608200]"
+                            >
+                                <Icon name="message-icon" />
+                            </Link>
+                        }
+                        </div>
                     </div>
                 </div>
 
                 {/* Bio Section */}
                 <section className="bg-[#121212] p-5 rounded-xl mt-6">
                     <h2 className="text-[#C0FF00] text-xl font-semibold mb-3">//about_me</h2>
-                    <p className={'text-[#D8FF80]'}>{user.bio}</p>
+                    <p>{user.bio}</p>
                 </section>
 
                 {/* Tech Stack and Looking For Section */}
