@@ -19,7 +19,7 @@ Inside the `backend/` directory, create a file named `.env`.
 You can copy the template:
 
 ```
->cp .env.example .env
+cp .env.example .env
 ```
 
 ## .env.example
