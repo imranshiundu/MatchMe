@@ -22,15 +22,14 @@ class WebSocketService {
         });
     }
 
-    connect (
+    async connect (
         jwtToken:string,
         onConnect: () => void = () => {},
         onDisconnect: () => void = () => {},
         onError: (error:any) => void = () => {}
-        ): void {
-        if (this.client && this.client.connected) {
-            console.log("Already connected to STOMP client.");
-            return;
+        ): Promise<void> {
+        if (this.client) {
+            await this.disconnect();
         }
 
         this.client = new Client({
@@ -57,9 +56,13 @@ class WebSocketService {
         this.client.activate();
     }
 
-    disconnect(): void {
-        if (this.client) {
-            this.client.deactivate();
+    async disconnect(): Promise<void> {
+        if (!this.client) return;
+        try {
+            this.client.reconnectDelay = 0;
+            await this.client.deactivate();
+        }
+        finally {
             this.client = null;
             this.isConnected = false;
             this.subscriptions = [];

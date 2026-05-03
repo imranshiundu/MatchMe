@@ -37,9 +37,10 @@ function RegistrationForm() {
                 const error = await response.json() as { message: string };
                 throw new Error(error.message || 'Auth failed');
             }
-            setAuthToken((await response.json() as serverAuthResponse).token);
+            const data = await response.json() as serverAuthResponse;
+            setAuthToken(data.token);
             websocketService.connect(
-                token,
+                data.token,
                 () => console.log('WebSocket connected'),
                 () => console.log('WebSocket disconnected'),
                 (error) => console.error('WebSocket error:', error)
