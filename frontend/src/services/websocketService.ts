@@ -1,6 +1,7 @@
 import { Client, IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import * as wsTypes from '../types/websocketTypes.ts'
+import type {ChatMessageCallback, PresenceCallback, TypingCallback} from "../types/websocketTypes.ts";
 
 let stompClient: Client | null = null;
 const socket_url = "http://localhost:8085/ws-chat";
