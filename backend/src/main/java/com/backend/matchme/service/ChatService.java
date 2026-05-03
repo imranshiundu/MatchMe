@@ -79,6 +79,7 @@ public class ChatService {
         }
 
         Chat chat = getOrCreateChat(sender, receiver);
+
         Message saved = messageRepository.save(Message.builder()
                 .chat(chat)
                 .sender(sender)
@@ -165,6 +166,18 @@ public class ChatService {
 
     private User other(Chat chat, Long userId) {
         return chat.getUser1().getId().equals(userId) ? chat.getUser2() : chat.getUser1();
+    }
+
+    @Transactional
+    public Chat ensureChatExists(User u1, User u2) {
+        return getOrCreateChat(u1, u2);
+    }
+
+    @Transactional
+    public Chat ensureChatExists(Long user1Id, Long user2Id) {
+        User u1 = userRepository.findById(user1Id).orElseThrow();
+        User u2 = userRepository.findById(user2Id).orElseThrow();
+        return getOrCreateChat(u1, u2);
     }
 
     private Chat getOrCreateChat(User u1, User u2) {

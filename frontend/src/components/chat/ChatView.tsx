@@ -24,10 +24,11 @@ function ChatView({ chatId }: { chatId: number | null }) {
     const bottomRef = useRef<HTMLDivElement | null>(null);
     const shouldScrollToBottomRef = useRef(true);
 
+    const page_size: number = 20;
     useEffect(() => {
         setMessageHistory(messages ?? []);
         setPage(0);
-        setHasMore((messages?.length ?? 0) > 0);
+        setHasMore((messages?.length ?? 0) === page_size);
         shouldScrollToBottomRef.current = true;
     }, [messages, chatId]);
 
@@ -79,6 +80,9 @@ function ChatView({ chatId }: { chatId: number | null }) {
                 setHasMore(false);
                 return;
             }
+            if (olderMessages.length < page_size) {
+                setHasMore(false);
+            }
 
             shouldScrollToBottomRef.current = false;
             setMessageHistory((prev) => {
@@ -117,6 +121,8 @@ function ChatView({ chatId }: { chatId: number | null }) {
                     {loadingMore ? 'Loading...' : 'Load older messages'}
                 </button>
             )}
+
+            {messageHistory.length === 0 && <p className={'w-full text-center text-xl mt-5 text-[#D8FF80]'}>Say hello to get started!</p>}
 
             {formattedMessages.map((msg) => (
                 <ChatBubble
