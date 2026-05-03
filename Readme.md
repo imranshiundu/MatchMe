@@ -10,13 +10,18 @@ This is a Spring Boot backend application using environment variables for config
 
 ## Environment setup
 
->Create a file called .env in backend/ directory.
->OR
->Copy .env.example and rename it to .env.
+### 1. Create `.env` file
 
-Fill in values manually.
+Inside the `backend/` directory, create a file named `.env`.
 
+You can copy the template:
+```
+>cp .env.example .env
+```
 ## .env.example
+This file contains all required environment variables with placeholder values.
+
+It is safe to commit to Git and acts as a setup template.
 ```
 DB_URL=jdbc:postgresql://127.0.0.1:5433/matchme  
 DB_USERNAME=your_db_username  
@@ -33,7 +38,8 @@ FRONTEND_URL=http://localhost:5173
 ``` 
 ## How it works
 
-Spring Boot reads environment variables using ${VARIABLE_NAME} in application.properties.
+At startup, the .env file is loaded and injected into system properties.
+Spring Boot then resolves them via application.properties.
 
 Example mapping:
 ```
@@ -53,15 +59,17 @@ app.frontend.url=${FRONTEND_URL}
 ## Running
 
 Start PostgreSQL:
-docker compose up -d
+>docker compose up -d
 
 Run backend:
-mvn spring-boot:run
+>mvn spring-boot:run
 
-## Notes
+# Notes
 
-.env.example is a template  
-Missing variables will break startup
+### .env is required to run the application
+- Never commit .env to version control.
+- .env.example is only a template
+- Missing variables will cause startup failure
 
 
 
