@@ -29,15 +29,17 @@ public class ConnectionService {
     private final MatchService matchService;
     private final ProfileValidator profileValidator;
     private final ProfileRepository profileRepository;
+    private final ChatService chatService;
 
     public ConnectionService(ConnectionRepository connectionRepository,
                              UserRepository userRepository,
-                             MatchService matchService, ProfileValidator profileValidator, ProfileRepository profileRepository) {
+                             MatchService matchService, ProfileValidator profileValidator, ProfileRepository profileRepository, ChatService chatService) {
         this.connectionRepository = connectionRepository;
         this.userRepository = userRepository;
         this.matchService = matchService;
         this.profileValidator = profileValidator;
         this.profileRepository = profileRepository;
+        this.chatService = chatService;
     }
 
     public RecommendationsResponseDTO getRecommendations(Pageable pageable, Long userId) {
@@ -123,6 +125,9 @@ public class ConnectionService {
         connection.setStatus(ConnectionStatus.ACCEPTED);
         connection.setUpdatedAt(LocalDateTime.now());
         connectionRepository.save(connection);
+
+        User requester = connection.getRequester();
+        chatService.ensureChatExists(requester, receiver);
     }
 
     public void dismissRequest(Long userId, Long requestId) {
