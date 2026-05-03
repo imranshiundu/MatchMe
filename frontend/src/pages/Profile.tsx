@@ -109,6 +109,7 @@ function Profile({ isConnection }: { isConnection?: boolean }) {
                     buttonHandler={buttonHandler}
                     buttonText={buttonText}
                     showAllDetails={showAllDetails}
+                    userID={urlUserId}
                 />
             )}
         </>
