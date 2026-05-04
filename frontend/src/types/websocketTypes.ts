@@ -1,4 +1,4 @@
-import { Client, IMessage } from '@stomp/stompjs';
+import type { IMessage } from '@stomp/stompjs';
 
 export type MessageCallback = (message: IMessage) => void;
 export type PresenceCallback = (userId: number, isOnline: boolean) => void;

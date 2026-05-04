@@ -14,6 +14,7 @@ export interface ChatMsgDTO {
 
 export const useFetchChatHistory = (
     chatId: number | null,
+    refreshKey: number = 0,
     page: number = 0,
     size: number = 20
 ) => {
@@ -25,12 +26,15 @@ export const useFetchChatHistory = (
 
     useEffect(() => {
         if (!chatId || !token) {
+            setMessages([]);
+            setLoading(false);
             return;
-        };
+        }
 
         const fetchMessages = async () => {
             try {
                 setLoading(true);
+                setError(null);
                 const response = await fetch(
                     `http://localhost:8085/chats/${chatId}/messages?page=${page}&size=${size}`,
                     {
@@ -55,7 +59,7 @@ export const useFetchChatHistory = (
         };
 
         fetchMessages();
-    }, [chatId, page, size, token]);
+    }, [chatId, page, refreshKey, size, token]);
 
     return { messages, loading, error };
 };

@@ -9,6 +9,7 @@ import Layout from "./components/layout/Layout.tsx";
 import Connections from "./pages/Connections.tsx";
 import Auth from "./pages/Auth.tsx";
 import Chat from "./pages/Chat.tsx";
+import Messages from "./pages/Messages.tsx";
 import ProtectedRoute from "./components/auth/ProtectedRoute.tsx"
 
 // app
@@ -24,6 +25,7 @@ function App() {
                         <Route path="/me" element={<Profile/>}/>
                         <Route path="/match/:userId" element={<Profile isConnection={false}/>}/>
                         <Route path="/connections" element={<Connections/>}/>
+                        <Route path="/messages" element={<Messages/>}/>
                         <Route path="/connections/user/:userId" element={<Profile isConnection={true}/>}/>
                         <Route path="/connections/chat/:userId" element={<Chat/>}/>
                     </Route>

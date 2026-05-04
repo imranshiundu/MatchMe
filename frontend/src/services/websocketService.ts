@@ -1,9 +1,8 @@
-import { Client, IMessage } from '@stomp/stompjs';
+import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import * as wsTypes from '../types/websocketTypes.ts'
 import type {ChatMessageCallback, PresenceCallback, TypingCallback} from "../types/websocketTypes.ts";
 
-let stompClient: Client | null = null;
 const socket_url = "http://localhost:8085/ws-chat";
 
 
@@ -96,7 +95,7 @@ class WebSocketService {
     unsubscribe(destination: string): void {
         this.subscriptions = this.subscriptions.filter((sub) => {
             if (sub.destination === destination) {
-                if (this.client && this.client.connected) {
+                if (this.client && this.client.connected && sub.subscriptionId) {
                     this.client.unsubscribe(sub.subscriptionId);
                 }
                 return false;
@@ -119,7 +118,7 @@ class WebSocketService {
 
     subscribeToPresence(
         userId: number,
-        callback: PresenceCallback
+        callback: wsTypes.PresenceCallback
     ): void {
         this.subscribe(`/topic/presence/${userId}`, (message) => {
             const presenceUpdate = JSON.parse(message.body) as {
@@ -130,21 +129,21 @@ class WebSocketService {
         });
     }
 
-    subscribeToChat(chatId: number, callback: ChatMessageCallback): void {
+    subscribeToChat(chatId: number, callback: wsTypes.ChatMessageCallback): void {
         this.subscribe(`/topic/chat/${chatId}`, (message) => {
             const chatMessage = JSON.parse(message.body);
             callback(chatId, chatMessage);
         });
     }
 
-    subscribeToPrivateChats(callback: ChatMessageCallback): void {
+    subscribeToPrivateChats(callback: wsTypes.ChatMessageCallback): void {
         this.subscribe('/user/queue/chats', (message) => {
             const chatUpdate = JSON.parse(message.body);
             callback(chatUpdate.chatId, chatUpdate);
         });
     }
 
-    subscribeToTyping(callback: TypingCallback): void {
+    subscribeToTyping(callback: wsTypes.TypingCallback): void {
         this.subscribe('/user/queue/typing', (message) => {
             const typingEvent = JSON.parse(message.body) as {
                 userId: number;

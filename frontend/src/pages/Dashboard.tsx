@@ -7,14 +7,27 @@ function Dashboard() {
     const { token } = useAuth();
 
     const [viewSuggestions, setViewSuggestions] = useState(true);
-    const [recommendations, setRecommendations] = useState<any>(null);
+    const [recommendations, setRecommendations] = useState<{
+        ids: number[];
+        hasNext: boolean;
+        hasPrevious: boolean;
+    } | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     const [currentPage, setCurrentPage] = useState(0);
     const [loading, setLoading] = useState(true);
 
     async function getRecommendations(page: number = 0) {
+        if (!token) {
+            setRecommendations(null);
+            setError('Please log in again.');
+            setLoading(false);
+            return;
+        }
+
         try {
             setLoading(true);
+            setError(null);
 
             const recommendationsRequest = await fetch(
                 `http://localhost:8085/recommendations?page=${page}&size=10`,
@@ -26,10 +39,16 @@ function Dashboard() {
                 }
             );
 
+            if (!recommendationsRequest.ok) {
+                const errorResponse = await recommendationsRequest.json() as { message?: string };
+                throw new Error(errorResponse.message || 'Failed to fetch recommendations');
+            }
+
             const recommendationsResponse = await recommendationsRequest.json();
             setRecommendations(recommendationsResponse);
-
         } catch (error) {
+            setRecommendations(null);
+            setError(error instanceof Error ? error.message : 'Failed to fetch recommendations.');
             console.error("Failed to fetch recommendations:", error);
         } finally {
             setLoading(false);
@@ -61,18 +80,32 @@ function Dashboard() {
     }
 
     return (
-        <div className="grid place-items-center p-4">
+        <div className="flex flex-col items-center w-full min-h-screen">
+            {/* Top Toggle Bar */}
+            <div className="flex justify-center my-8 w-full px-4">
+                <div className="bg-[#1c1b1b] border-2 border-[#313030] rounded-xl flex overflow-hidden shadow-lg w-full max-w-sm">
+                    <button
+                        onClick={() => setViewSuggestions(true)}
+                        className={`flex-1 py-3 text-sm font-bold tracking-wider transition-all duration-200 cursor-pointer ${viewSuggestions ? 'bg-[#C0FF00] text-[#121212]' : 'text-[#adaaaa] hover:bg-[#313030] hover:text-[#D8FF80]'}`}
+                    >
+                        SUGGESTIONS
+                    </button>
+                    <button
+                        onClick={() => setViewSuggestions(false)}
+                        className={`flex-1 py-3 text-sm font-bold tracking-wider transition-all duration-200 cursor-pointer ${!viewSuggestions ? 'bg-[#C0FF00] text-[#121212]' : 'text-[#adaaaa] hover:bg-[#313030] hover:text-[#D8FF80]'}`}
+                    >
+                        REQUESTS
+                    </button>
+                </div>
+            </div>
 
             {viewSuggestions ? (
-                <>
-                    <h1 className="text-[#C0FF00] text-2xl mt-5 mb-5">
-                        Suggested Users
-                    </h1>
+                <div className="w-full flex flex-col items-center pb-20">
 
-                    {recommendations?.ids?.length > 0 ? (
+                    {recommendations && recommendations.ids.length > 0 ? (
                         <>
                             <div className="flex flex-wrap justify-center gap-6 mb-8">
-                                {recommendations.ids.map((userId) => (
+                                {recommendations.ids.map((userId: number) => (
                                     <SuggestedUserCard
                                         key={userId}
                                         userID={userId}
@@ -102,34 +135,16 @@ function Dashboard() {
                     ) : (
                         <div>
                             <p className="text-[#adaaaa] text-center text-lg">
-                                No recommendations available
+                                {error || 'No recommendations available'}
                             </p>
                             <p className="text-[#adaaaa] text-center text-lg">
-                                Maybe because you haven't completed your profile?
+                                {error ? 'Complete your profile on the profile page to unlock suggestions.' : "Maybe because you haven't completed your profile?"}
                             </p>
-                        </div>
                     )}
-                </>
+                </div>
             ) : (
                 <IncomingRequests />
             )}
-
-            <section className="flex h-10 w-full sm:w-150 justify-evenly items-center bg-[#313030] text-[#adaaaa] rounded-t-xl text-xl fixed bottom-0">
-                <button
-                    onClick={() => setViewSuggestions(true)}
-                    className={viewSuggestions ? 'bg-[#C0FF00] text-[#121212] px-4 rounded-xs' : 'px-4'}
-                >
-                    suggestions
-                </button>
-
-                <button
-                    onClick={() => setViewSuggestions(false)}
-                    className={!viewSuggestions ? 'bg-[#C0FF00] text-[#121212] px-4 rounded-xs' : 'px-4'}
-                >
-                    requests
-                </button>
-            </section>
-
         </div>
     );
 }

@@ -5,8 +5,19 @@ import { useFetchUserDetails } from '../hooks/useFetchUserDetails';
 import ViewProfile from '../components/profile/ViewProfile.tsx';
 import EditProfile from "../components/profile/EditProfile.tsx";
 
+type ProfileDetails = {
+    nickname: string;
+    interest: string[];
+    bio: string;
+    age: number | null;
+    gender: string;
+    lookingFor: string[];
+    location: string;
+    imageUrl: string;
+};
+
 function Profile({ isConnection }: { isConnection?: boolean }) {
-    const [userDetails, setUserDetails] = useState(null);
+    const [userDetails, setUserDetails] = useState<ProfileDetails | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [editView, setEditView] = useState<boolean>(false);
     const [needsRefresh, setNeedsRefresh] = useState<boolean>(true);
@@ -14,8 +25,8 @@ function Profile({ isConnection }: { isConnection?: boolean }) {
     const { userId: urlUserId } = useParams();
     const { userDetails: fetchedUserDetails, loading: isFetching, error: fetchError } = useFetchUserDetails(isConnection !== undefined && urlUserId ? Number(urlUserId) : null);
 
-    const changeView = (e: React.MouseEvent<HTMLButtonElement>) => {
-        setEditView(!editView);
+    const changeView = () => {
+        setEditView((current) => !current);
     };
 
     const handleRequestConnection = async () => {
@@ -102,7 +113,7 @@ function Profile({ isConnection }: { isConnection?: boolean }) {
     return (
         <>
             {editView ? (
-                <EditProfile userDetails={currentUserDetails} viewChange={changeView} needsRefresh={setNeedsRefresh} />
+                <EditProfile userDetails={currentUserDetails as ProfileDetails} viewChange={changeView} needsRefresh={setNeedsRefresh} />
             ) : (
                 <ViewProfile
                     user={currentUserDetails}
