@@ -1,34 +1,32 @@
-import {useState, useEffect} from 'react';
-import {useAuth} from "./useAuth";
+import { useState, useEffect } from 'react';
+import { useAuth } from './useAuth';
 
-interface UserData {
+export interface FullUserDetails {
+    id?: number;
+    email?: string;
     nickname: string;
     imageUrl: string;
-}
-
-interface UserProfileInterestDTO {
-    id: number;
-    interest: string[];
-}
-
-interface UserProfileBioDTO {
-    id: number;
-    bio: string;
-}
-
-interface UserDetails {
-    nickname: string;
-    imageUrl: string;
-    interest?: string[];
     bio?: string;
+    age?: number | null;
+    gender?: string;
+    location?: string;
+    latitude?: number | null;
+    longitude?: number | null;
+    radius?: number;
+    interest?: string[];
+    lookingFor?: string[];
+    prompt1?: string;
+    answer1?: string;
+    prompt2?: string;
+    answer2?: string;
+    prompt3?: string;
+    answer3?: string;
 }
-
 
 export function useFetchUserDetails(userId: number | null) {
-    const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
+    const [userDetails, setUserDetails] = useState<FullUserDetails | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-
     const { token } = useAuth();
 
     useEffect(() => {
@@ -40,43 +38,49 @@ export function useFetchUserDetails(userId: number | null) {
         }
 
         const fetchAllUserDetails = async () => {
+            setLoading(true);
+            setError(null);
             try {
-                if (!userId) throw new Error("User ID is missing.");
+                // Fetch full profile from the correct endpoint
+                const res = await fetch(`http://localhost:8085/profile/${userId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
 
-                // Fetch all endpoints in parallel
-                const [userResponse, profileResponse, bioResponse] = await Promise.all([
-                    fetch(`http://localhost:8085/users/${userId}`, {
-                        method: 'GET',
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    }),
-                    fetch(`http://localhost:8085/users/${userId}/profile`, {
-                        method: 'GET',
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    }),
-                    fetch(`http://localhost:8085/users/${userId}/bio`, {
-                        method: 'GET',
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    }),
-                ]);
-
-                if (!userResponse.ok || !profileResponse.ok || !bioResponse.ok) {
-                    throw new Error("Failed to fetch one or more user details.");
+                if (!res.ok) {
+                    if (res.status === 404) {
+                        // If profile not found, maybe fetch just user summary?
+                        // But for a social platform, profile should exist.
+                        throw new Error('Profile not found');
+                    }
+                    throw new Error(`Failed to load profile (${res.status})`);
                 }
 
-                const userData: UserData = await userResponse.json();
-                const profileData: UserProfileInterestDTO = await profileResponse.json();
-                const bioData: UserProfileBioDTO = await bioResponse.json();
+                const profileData = await res.json();
 
-                const mergedDetails: UserDetails = {
-                    nickname: userData.nickname,
-                    imageUrl: userData.imageUrl,
-                    interest: profileData.interest,
-                    bio: bioData.bio
-                };
-
-                setUserDetails(mergedDetails);
+                // Map ProfileResponseDTO to our FullUserDetails interface
+                setUserDetails({
+                    id: profileData.id,
+                    email: profileData.email,
+                    nickname: profileData.nickname || '',
+                    imageUrl: profileData.imageUrl || '/favicon.svg',
+                    bio: profileData.bio || '',
+                    age: profileData.age,
+                    gender: profileData.gender,
+                    location: profileData.location || '',
+                    latitude: profileData.latitude,
+                    longitude: profileData.longitude,
+                    radius: profileData.radius || 50,
+                    interest: profileData.interest || [],
+                    lookingFor: profileData.lookingFor || [],
+                    prompt1: profileData.prompt1,
+                    answer1: profileData.answer1,
+                    prompt2: profileData.prompt2,
+                    answer2: profileData.answer2,
+                    prompt3: profileData.prompt3,
+                    answer3: profileData.answer3,
+                });
             } catch (err) {
-                setError(err instanceof Error ? err.message : "Failed to fetch user details");
+                setError(err instanceof Error ? err.message : 'Failed to fetch user details');
             } finally {
                 setLoading(false);
             }
