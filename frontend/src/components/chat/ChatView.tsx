@@ -14,21 +14,24 @@ type Message = {
     isRead: boolean;
 };
 
-function ChatView({ chatId }: { chatId: number | null }) {
+function ChatView({ chatId, receiverId }: { chatId: number | null, receiverId: number }) {
     const { userId, token } = useAuth();
     const { messages, loading, error } = useFetchChatHistory(chatId);
     const [messageHistory, setMessageHistory] = useState<Message[]>([]);
+    const [isTyping, setIsTyping] = useState(false);
     const [page, setPage] = useState(0);
     const [loadingMore, setLoadingMore] = useState(false);
     const [hasMore, setHasMore] = useState(true);
+    const scrollContainerRef = useRef<HTMLDivElement | null>(null);
     const bottomRef = useRef<HTMLDivElement | null>(null);
     const shouldScrollToBottomRef = useRef(true);
 
-    const page_size: number = 20;
+    const PAGE_SIZE = 20;
+
     useEffect(() => {
         setMessageHistory(messages ?? []);
         setPage(0);
-        setHasMore((messages?.length ?? 0) === page_size);
+        setHasMore((messages?.length ?? 0) === PAGE_SIZE);
         shouldScrollToBottomRef.current = true;
     }, [messages, chatId]);
 
@@ -49,10 +52,22 @@ function ChatView({ chatId }: { chatId: number | null }) {
     }, [chatId]);
 
     useEffect(() => {
+        websocketService.subscribeToTyping((typingUserId, typingStatus) => {
+            if (Number(typingUserId) === Number(receiverId)) {
+                setIsTyping(typingStatus);
+            }
+        });
+
+        return () => {
+            websocketService.unsubscribe('/user/queue/typing');
+        };
+    }, [receiverId]);
+
+    useEffect(() => {
         if (shouldScrollToBottomRef.current) {
             bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
         }
-    }, [messageHistory]);
+    }, [messageHistory, isTyping]);
 
     const loadOlderMessages = async () => {
         if (!chatId || !token || loadingMore || !hasMore) return;
@@ -62,7 +77,7 @@ function ChatView({ chatId }: { chatId: number | null }) {
             const nextPage = page + 1;
 
             const response = await fetch(
-                `http://localhost:8085/chats/${chatId}/messages?page=${nextPage}&size=20&markAsRead=false`,
+                `http://localhost:8085/chats/${chatId}/messages?page=${nextPage}&size=${PAGE_SIZE}&markAsRead=false`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -70,9 +85,7 @@ function ChatView({ chatId }: { chatId: number | null }) {
                 }
             );
 
-            if (!response.ok) {
-                throw new Error('Failed to load older messages');
-            }
+            if (!response.ok) throw new Error('Failed to load older messages');
 
             const olderMessages: Message[] = await response.json();
 
@@ -80,9 +93,13 @@ function ChatView({ chatId }: { chatId: number | null }) {
                 setHasMore(false);
                 return;
             }
-            if (olderMessages.length < page_size) {
+            if (olderMessages.length < PAGE_SIZE) {
                 setHasMore(false);
             }
+
+            // Save current scroll height to maintain position
+            const container = scrollContainerRef.current;
+            const scrollHeightBefore = container?.scrollHeight ?? 0;
 
             shouldScrollToBottomRef.current = false;
             setMessageHistory((prev) => {
@@ -91,6 +108,13 @@ function ChatView({ chatId }: { chatId: number | null }) {
                 return [...uniqueOlder, ...prev];
             });
             setPage(nextPage);
+
+            // Maintain scroll position after update
+            setTimeout(() => {
+                if (container) {
+                    container.scrollTop = container.scrollHeight - scrollHeightBefore;
+                }
+            }, 0);
         } catch (err) {
             console.error(err);
         } finally {
@@ -107,33 +131,71 @@ function ChatView({ chatId }: { chatId: number | null }) {
         [messageHistory, userId]
     );
 
-    if (loading) return <div>Loading messages...</div>;
-    if (error) return <div>Error: {error}</div>;
+    if (loading) {
+        return (
+            <div className="h-full flex items-center justify-center">
+                <div className="w-6 h-6 border-2 border-[#C0FF00] border-t-transparent rounded-full animate-spin" />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="h-full flex items-center justify-center p-6 text-center">
+                <p className="text-[#ff7351] text-sm font-mono">ERR: {error}</p>
+            </div>
+        );
+    }
 
     return (
-        <div className="flex flex-col">
+        <div ref={scrollContainerRef} className="h-full overflow-y-auto pt-6 pb-2 scrollbar-thin scrollbar-thumb-[#313030] scrollbar-track-transparent">
             {hasMore && (
-                <button
-                    onClick={loadOlderMessages}
-                    disabled={loadingMore}
-                    className="mx-auto my-3 px-4 py-2 rounded-lg bg-[#403D39] text-sm hover:bg-[#4a4642] disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    {loadingMore ? 'Loading...' : 'Load older messages'}
-                </button>
+                <div className="flex justify-center mb-6">
+                    <button
+                        onClick={loadOlderMessages}
+                        disabled={loadingMore}
+                        className="px-4 py-1.5 rounded-full bg-[#313030] text-[10px] font-black uppercase tracking-widest text-[#adaaaa] hover:text-white hover:bg-[#403d39] transition-all disabled:opacity-50"
+                    >
+                        {loadingMore ? 'Loading History...' : 'Load Older Messages'}
+                    </button>
+                </div>
             )}
 
-            {messageHistory.length === 0 && <p className={'w-full text-center text-xl mt-5 text-[#D8FF80]'}>Say hello to get started!</p>}
+            {messageHistory.length === 0 && !isTyping && (
+                <div className="h-full flex flex-col items-center justify-center px-10 text-center opacity-40">
+                    <div className="w-16 h-16 bg-[#252422] rounded-3xl mb-4 flex items-center justify-center">
+                        <svg className="w-8 h-8 text-[#C0FF00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                    </div>
+                    <p className="text-[#C0FF00] font-black uppercase tracking-widest text-[10px] mb-1">Encrypted Channel Active</p>
+                    <p className="text-white text-xs">Say hello to start the conversation</p>
+                </div>
+            )}
 
-            {formattedMessages.map((msg) => (
-                <ChatBubble
-                    key={msg.id}
-                    message={msg.content}
-                    fromSender={msg.fromSender}
-                    timestamp={msg.timestamp}
-                />
-            ))}
+            <div className="flex flex-col">
+                {formattedMessages.map((msg) => (
+                    <ChatBubble
+                        key={msg.id}
+                        message={msg.content}
+                        fromSender={msg.fromSender}
+                        timestamp={msg.timestamp}
+                    />
+                ))}
+            </div>
 
-            <div ref={bottomRef} />
+            {isTyping && (
+                <div className="flex items-center gap-2 px-6 py-2">
+                    <div className="flex gap-1">
+                        <div className="w-1.5 h-1.5 bg-[#C0FF00] rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                        <div className="w-1.5 h-1.5 bg-[#C0FF00] rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                        <div className="w-1.5 h-1.5 bg-[#C0FF00] rounded-full animate-bounce"></div>
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#C0FF00]">Typing</span>
+                </div>
+            )}
+
+            <div ref={bottomRef} className="h-2" />
         </div>
     );
 }

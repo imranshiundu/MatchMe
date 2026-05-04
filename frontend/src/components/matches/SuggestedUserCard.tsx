@@ -3,13 +3,23 @@ import { Link } from 'react-router-dom';
 import { useAuth } from "../../hooks/useAuth";
 import Icon from '../Icon.tsx'
 
-function SuggestedUserCard({ userID, refresh }) {
+interface UserDetails {
+    nickname: string;
+    interest: string[];
+    imageUrl: string;
+    bio: string;
+    prompt1?: string;
+    answer1?: string;
+}
+
+function SuggestedUserCard({ userID, refresh }: { userID: number, refresh: (val: boolean) => void }) {
     const { token } = useAuth();
 
-    const [userDetails, setUserDetails] = useState<object>({
+    const [userDetails, setUserDetails] = useState<UserDetails>({
         nickname: '',
         interest: [],
-        imageUrl: null
+        imageUrl: '',
+        bio: ''
     });
 
     const [loading, setLoading] = useState(true);
@@ -18,15 +28,6 @@ function SuggestedUserCard({ userID, refresh }) {
         async function getUserDetails(userID) {
             try {
                 setLoading(true);
-
-                const userRes = await fetch(`http://localhost:8085/users/${userID}`, {
-                    method: 'GET',
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-
-                const user = await userRes.json();
 
                 const profileRes = await fetch(`http://localhost:8085/users/${userID}/profile`, {
                     method: 'GET',
@@ -38,9 +39,12 @@ function SuggestedUserCard({ userID, refresh }) {
                 const profile = await profileRes.json();
 
                 setUserDetails({
-                    nickname: user.nickname,
-                    imageUrl: user.imageUrl,
-                    interest: profile.interest
+                    nickname: profile.nickname,
+                    imageUrl: profile.imageUrl,
+                    interest: profile.interest,
+                    bio: profile.bio,
+                    prompt1: profile.prompt1,
+                    answer1: profile.answer1
                 });
 
             } catch (error) {
@@ -72,24 +76,6 @@ function SuggestedUserCard({ userID, refresh }) {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="bg-[#252422] rounded-2xl p-6 w-80 h-80 animate-pulse flex flex-col">
-                <div className="flex items-center space-x-4 mb-4">
-                    <div className="h-20 w-20 bg-[#3a3a3a] rounded-xl"></div>
-                    <div className="h-5 w-32 bg-[#3a3a3a] rounded"></div>
-                </div>
-
-                <div className="flex-1 space-y-2">
-                    <div className="h-4 w-40 bg-[#3a3a3a] rounded"></div>
-                    <div className="h-4 w-32 bg-[#3a3a3a] rounded"></div>
-                </div>
-
-                <div className="h-10 w-full bg-[#3a3a3a] rounded-lg mt-auto"></div>
-            </div>
-        );
-    }
-
     const handleDismissSuggestion = async () => {
         try {
             const response = await fetch(`http://localhost:8085/profile/${userID}/dismiss`, {
@@ -109,53 +95,98 @@ function SuggestedUserCard({ userID, refresh }) {
         }
     };
 
-    return (
-        <div className="bg-[#1c1b1b] border-2 border-[#313030] rounded-2xl p-6 w-80 flex flex-col min-h-80">
-
-            <div className="flex items-center space-x-4 mb-4">
-                <img
-                    className="h-20 w-20 rounded-xl object-cover"
-                    src={userDetails.imageUrl}
-                    alt="Profile"
-                />
-                <h2 className="text-2xl break-words">
-                    {userDetails.nickname}
-                </h2>
+    if (loading) {
+        return (
+            <div className="bg-[#1c1b1b] border-2 border-[#313030] rounded-2xl p-6 w-full max-w-sm h-[400px] animate-pulse flex flex-col">
+                <div className="flex items-center space-x-4 mb-4">
+                    <div className="h-16 w-16 bg-[#313030] rounded-xl"></div>
+                    <div className="flex-1 space-y-2">
+                        <div className="h-5 w-32 bg-[#313030] rounded"></div>
+                        <div className="h-3 w-20 bg-[#313030] rounded"></div>
+                    </div>
+                </div>
+                <div className="space-y-2 mb-4">
+                    <div className="h-3 w-full bg-[#313030] rounded"></div>
+                    <div className="h-3 w-5/6 bg-[#313030] rounded"></div>
+                </div>
+                <div className="h-10 w-full bg-[#313030] rounded-lg mt-auto"></div>
             </div>
-            <div className="flex-1">
-                <h3 className="text-[#D8FF80] text-sm mb-2">
-                    //common interests
-                </h3>
+        );
+    }
 
-                <div className="flex flex-wrap gap-2">
-                    {userDetails.interest?.map((interest) => (
+    return (
+        <div className="bg-[#1c1b1b] border-2 border-[#313030] rounded-2xl p-6 w-full max-w-sm flex flex-col min-h-[400px] group hover:border-[#C0FF00]/50 transition-all duration-300">
+            <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center space-x-4">
+                    <img
+                        className="h-16 w-16 rounded-xl object-cover border-2 border-[#313030] group-hover:border-[#C0FF00] transition-colors"
+                        src={userDetails.imageUrl}
+                        alt="Profile"
+                    />
+                    <div>
+                        <h2 className="text-xl font-bold text-white group-hover:text-[#C0FF00] transition-colors">
+                            {userDetails.nickname}
+                        </h2>
+                        <p className="text-[#adaaaa] text-xs font-mono uppercase tracking-widest mt-0.5">Developer</p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex-1 space-y-4">
+                {/* Bio Snippet */}
+                {userDetails.bio && (
+                    <p className="text-sm text-[#adaaaa] line-clamp-3 italic leading-relaxed">
+                        "{userDetails.bio}"
+                    </p>
+                )}
+
+                {/* Prompt Snippet */}
+                {userDetails.prompt1 && userDetails.answer1 && (
+                    <div className="bg-[#252422] p-3 rounded-xl border border-[#313030]">
+                        <p className="text-[10px] font-bold text-[#C0FF00] uppercase tracking-tighter mb-1">{userDetails.prompt1}</p>
+                        <p className="text-white text-xs line-clamp-2">{userDetails.answer1}</p>
+                    </div>
+                )}
+
+                {/* Interests */}
+                <div className="flex flex-wrap gap-1.5 pt-2">
+                    {userDetails.interest?.slice(0, 4).map((interest) => (
                         <span
                             key={interest}
-                            className="px-3 py-1 bg-[#252422] rounded-full text-xs text-[#d8ff80]"
+                            className="px-2 py-0.5 bg-[#313030] rounded-md text-[10px] font-bold text-[#D8FF80] uppercase tracking-wider"
                         >
                             {interest}
                         </span>
                     ))}
+                    {userDetails.interest?.length > 4 && (
+                        <span className="text-[10px] text-[#5a6a6a] font-bold self-center">+{userDetails.interest.length - 4} more</span>
+                    )}
                 </div>
             </div>
 
-            <section className={'flex grow gap-5'}>
+            <div className="mt-6 flex gap-3">
                 <button
                     onClick={handleDismissSuggestion}
-                    className="flex cursor-pointer grow mt-auto border-b-2 border-[#313030] hover:border-b-0 hover:border-t-2 hover:border-[#1C1B1B] bg-[#403d39] py-2 rounded-lg fill-[#C0FF00] hover:fill-[#608200] justify-center">
-                    <Icon name={'ignore-icon'}/>
+                    className="flex-1 flex items-center justify-center p-2 rounded-xl bg-[#313030] fill-[#adaaaa] hover:bg-[#3a1f1f] hover:fill-[#ff7351] transition-all duration-200"
+                    title="Dismiss"
+                >
+                    <Icon name={'ignore-icon'} size={20}/>
                 </button>
                 <Link
                     to={`./${userID}`}
-                    className="flex grow mt-auto border-b-2 border-[#313030] hover:border-b-0 hover:border-t-2 hover:border-[#1C1B1B] bg-[#403d39] py-2 rounded-lg fill-[#C0FF00] hover:fill-[#608200] justify-center">
-                    <Icon name={'view-profile-icon'}/>
+                    className="flex-1 flex items-center justify-center p-2 rounded-xl bg-[#313030] fill-[#adaaaa] hover:bg-[#252422] hover:fill-[#C0FF00] transition-all duration-200"
+                    title="View Profile"
+                >
+                    <Icon name={'view-profile-icon'} size={20}/>
                 </Link>
                 <button
                     onClick={handleRequestConnection}
-                    className="flex cursor-pointer grow mt-auto border-b-2 border-[#313030] hover:border-b-0 hover:border-t-2 hover:border-[#1C1B1B] bg-[#403d39] py-2 rounded-lg fill-[#C0FF00] hover:fill-[#608200] justify-center">
-                        <Icon name={'connect-icon'}/>
+                    className="flex-[2] flex items-center justify-center gap-2 p-2 rounded-xl bg-[#C0FF00] text-[#121212] fill-[#121212] font-bold text-sm hover:bg-[#D8FF80] transition-all duration-200"
+                >
+                    <Icon name={'connect-icon'} size={18}/>
+                    <span>Connect</span>
                 </button>
-            </section>
+            </div>
         </div>
     );
 }

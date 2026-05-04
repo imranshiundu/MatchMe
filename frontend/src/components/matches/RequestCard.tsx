@@ -1,6 +1,6 @@
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import {useAuth} from "../../hooks/useAuth";
+import { useAuth } from "../../hooks/useAuth";
 import Icon from "../Icon";
 
 type RequestCardProps = {
@@ -9,111 +9,105 @@ type RequestCardProps = {
     onActionResult: (requestID: number, action: 'accepted' | 'rejected', success: boolean, errorMessage?: string) => void;
 };
 
-function RequestCard({requestID, userID, onActionResult}: RequestCardProps) {
+function RequestCard({ requestID, userID, onActionResult }: RequestCardProps) {
     const { token } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [userDetails, setUserDetails] = useState({
         nickname: '',
-        imageUrl: null as string | null
+        imageUrl: null as string | null,
+        bio: ''
     });
+
     useEffect(() => {
         async function getUserDetails(id: number) {
             try {
-                const fetchedUserNameAndPicture = await fetch(`http://localhost:8085/users/${id}`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                const res = await fetch(`http://localhost:8085/users/${id}/profile`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
-                const userNameAndPicture = await fetchedUserNameAndPicture.json();
-                setUserDetails(userNameAndPicture);
-            }
-            catch (error) {
+                const data = await res.json();
+                setUserDetails({
+                    nickname: data.nickname,
+                    imageUrl: data.imageUrl,
+                    bio: data.bio
+                });
+            } catch (error) {
                 console.error("Failed to fetch profile:", error);
             }
         }
         getUserDetails(userID);
     }, [token, userID]);
 
-
-    const handleAccept = async () => {
+    const handleAction = async (action: 'accept' | 'dismiss') => {
         setIsSubmitting(true);
+        const endpoint = action === 'accept' ? 'accept' : 'dismiss';
         try {
-            const response = await fetch(`http://localhost:8085/connection-requests/${requestID}/accept`, {
+            const response = await fetch(`http://localhost:8085/connection-requests/${requestID}/${endpoint}`, {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                headers: { 'Authorization': `Bearer ${token}` }
             });
 
             if (!response.ok) {
-                onActionResult(requestID, 'accepted', false, 'Failed to accept connection request');
+                onActionResult(requestID, action === 'accept' ? 'accepted' : 'rejected', false, `Failed to ${action} request`);
                 return;
             }
-            onActionResult(requestID, 'accepted', true);
+            onActionResult(requestID, action === 'accept' ? 'accepted' : 'rejected', true);
         } catch (error) {
-            console.error('Error accepting connection request:', error);
-            const message = error instanceof Error ? error.message : 'Failed to accept connection request';
-            onActionResult(requestID, 'accepted', false, message);
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    const handleReject = async () => {
-        setIsSubmitting(true);
-        try {
-            const response = await fetch(`http://localhost:8085/connection-requests/${requestID}/dismiss`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) {
-                onActionResult(requestID, 'rejected', false, 'Failed to reject connection request');
-                return;
-            }
-            onActionResult(requestID, 'rejected', true);
-        } catch (error) {
-            console.error('Error rejecting connection request:', error);
-            const message = error instanceof Error ? error.message : 'Failed to reject connection request';
-            onActionResult(requestID, 'rejected', false, message);
+            onActionResult(requestID, action === 'accept' ? 'accepted' : 'rejected', false, 'Server error');
         } finally {
             setIsSubmitting(false);
         }
     };
 
     return (
-        <div className={'border-2 border-[#313030] bg-[#1c1b1b] rounded-lg flex items-center p-3 gap-2'}>
-            <div className={'h-12 w-12 rounded-lg inline-block'}>
+        <div className="bg-[#1C1B1B] border-2 border-[#313030] rounded-2xl p-4 sm:p-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 hover:border-[#C0FF00]/30 transition-all group">
+            {/* Avatar */}
+            <div className="relative flex-shrink-0">
                 <img
-                    className={'h-full w-full rounded-lg object-cover'}
-                        src={userDetails.imageUrl ?? '/favicon.svg'}
-                    alt="Profile"
+                    className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl object-cover border-2 border-[#313030] group-hover:border-[#C0FF00] transition-colors shadow-xl"
+                    src={userDetails.imageUrl ?? '/favicon.svg'}
+                    alt={userDetails.nickname}
                 />
             </div>
-            <p className={'mx-3 flex-1 cursor-auto text-lg text-[#FFFCF2]'}>{userDetails.nickname}</p>
-            <Link
-                to={`./${userID}`}
-                className="cursor-pointer content-center rounded-lg my-2 px-3 py-2 border-b-2 border-[#313030] bg-[#403d39] fill-[#C0FF00] hover:border-b-0 hover:border-t-2 hover:border-[#1C1B1B] hover:bg-[#474646] hover:fill-[#608200]">
-                <Icon name={'view-profile-icon'}/>
-            </Link>
-            <button
-                onClick={() => handleReject()}
-                disabled={isSubmitting}
-                className="cursor-pointer content-center rounded-lg my-2 px-3 py-2 border-b-2 border-[#313030] bg-[#403d39] fill-[#C0FF00] hover:border-b-0 hover:border-t-2 hover:border-[#1C1B1B] hover:bg-[#474646] hover:fill-[#608200]">
-                <Icon name={'reject-icon'}/>
-            </button>
-            <button
-                onClick={() => handleAccept()}
-                disabled={isSubmitting}
-                className="cursor-pointer content-center rounded-lg my-2 px-3 py-2 border-b-2 border-[#313030] bg-[#403d39] fill-[#C0FF00] hover:border-b-0 hover:border-t-2 hover:border-[#1C1B1B] hover:bg-[#474646] hover:fill-[#608200]">
-                <Icon name={'accept-icon'}/>
-            </button>
+
+            {/* Info */}
+            <div className="flex-1 text-center sm:text-left min-w-0">
+                <h3 className="text-xl font-bold text-white group-hover:text-[#C0FF00] transition-colors mb-1 truncate">
+                    {userDetails.nickname || 'Developer'}
+                </h3>
+                {userDetails.bio && (
+                    <p className="text-sm text-[#adaaaa] line-clamp-2 italic mb-2">
+                        "{userDetails.bio}"
+                    </p>
+                )}
+                <Link 
+                    to={`/match/${userID}`} 
+                    className="text-[10px] font-black uppercase tracking-widest text-[#5a6a6a] hover:text-[#C0FF00] transition-colors"
+                >
+                    View Full Profile →
+                </Link>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+                <button
+                    onClick={() => handleAction('dismiss')}
+                    disabled={isSubmitting}
+                    className="flex-1 sm:flex-none flex items-center justify-center w-12 h-12 rounded-xl bg-[#313030] fill-[#adaaaa] hover:bg-[#3a1f1f] hover:fill-[#ff7351] transition-all disabled:opacity-50"
+                    title="Reject"
+                >
+                    <Icon name="reject-icon" size={20} />
+                </button>
+                <button
+                    onClick={() => handleAction('accept')}
+                    disabled={isSubmitting}
+                    className="flex-[2] sm:flex-none flex items-center justify-center gap-2 h-12 px-6 rounded-xl bg-[#C0FF00] text-[#121212] fill-[#121212] font-bold text-sm hover:bg-[#D8FF80] transition-all active:scale-95 disabled:opacity-50"
+                >
+                    <Icon name="accept-icon" size={18} />
+                    <span>Accept</span>
+                </button>
+            </div>
         </div>
     );
 }
-
 
 export default RequestCard;

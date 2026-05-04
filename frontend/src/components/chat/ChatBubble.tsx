@@ -1,31 +1,28 @@
-function ChatBubble({message, fromSender, timestamp}) {
-    const date = new Date(timestamp)
-    const formattedDate = new Intl.DateTimeFormat('en-GB',{
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit"
-    }).format(date);
-    const formattedTime = Intl.DateTimeFormat('en-GB',{
+function ChatBubble({ message, fromSender, timestamp }: { message: string; fromSender: boolean; timestamp: string }) {
+    const date = new Date(timestamp);
+    const formattedTime = new Intl.DateTimeFormat('en-GB', {
         hour: "2-digit",
         minute: "2-digit"
     }).format(date);
 
     return (
-        <div className={`mt-4 flex flex-col ${fromSender ? 'items-end pr-4' : 'items-start pl-4'}`}>
-            <div
-                className={`
-        max-w-[70%] px-4 py-2 rounded-xl shadow-sm break-words
-        ${fromSender
-                    ? 'bg-[#D8FF80] text-[#1c1b1b] rounded-br-sm'
-                    : 'bg-[#313030] text-[#D8FF80] rounded-bl-sm'}
-      `}
-            >
-                {message}
+        <div className={`flex w-full mb-4 px-4 ${fromSender ? 'justify-end' : 'justify-start'}`}>
+            <div className={`flex flex-col ${fromSender ? 'items-end' : 'items-start'} max-w-[85%] sm:max-w-[70%]`}>
+                <div
+                    className={`
+                        px-4 py-2.5 rounded-2xl text-sm leading-relaxed shadow-sm break-words
+                        ${fromSender
+                            ? 'bg-[#C0FF00] text-[#121212] rounded-tr-none font-medium'
+                            : 'bg-[#252422] text-white border border-[#313030] rounded-tl-none'}
+                    `}
+                >
+                    {message}
+                </div>
+                
+                <span className="mt-1.5 px-1 text-[10px] font-mono text-[#5a6a6a] uppercase tracking-tighter">
+                    {formattedTime}
+                </span>
             </div>
-
-            <p className={`mt-1 text-xs text-[#787776] ${fromSender ? 'text-right' : 'text-left'}`}>
-                {fromSender ? <>{formattedTime} {formattedDate}</> : <>{formattedDate} {formattedTime}</>}
-            </p>
         </div>
     );
 }
