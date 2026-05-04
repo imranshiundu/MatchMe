@@ -36,7 +36,7 @@ public class MatchService {
         return profileRepository.findAll().stream()
                 .filter(candidate -> !candidate.getId().equals(userId))
                 .filter(this::ready)
-                .filter(candidate -> sameLocation(me, candidate))
+                .filter(candidate -> withinRadius(me, candidate))
                 .filter(candidate -> compatibleLookingFor(me, candidate))
                 .filter(candidate -> !isDismissed(user, candidate.getId()))
                 .filter(candidate -> !hasConnection(userId, candidate.getId()))
@@ -46,9 +46,32 @@ public class MatchService {
                 .collect(Collectors.toList());
     }
 
-    private boolean sameLocation(Profile me, Profile other) {
-        if (me.getUser().getLocation() == null || other.getUser().getLocation() == null) return false;
-        return me.getUser().getLocation().equalsIgnoreCase(other.getUser().getLocation());
+    private boolean withinRadius(Profile me, Profile other) {
+        User myUser = me.getUser();
+        User otherUser = other.getUser();
+
+        if (myUser.getLatitude() == null || myUser.getLongitude() == null ||
+            otherUser.getLatitude() == null || otherUser.getLongitude() == null) {
+            // Fallback to string matching if coordinates are missing
+            if (myUser.getLocation() == null || otherUser.getLocation() == null) return false;
+            return myUser.getLocation().equalsIgnoreCase(otherUser.getLocation());
+        }
+
+        double distance = calculateDistance(myUser.getLatitude(), myUser.getLongitude(),
+                                           otherUser.getLatitude(), otherUser.getLongitude());
+        
+        return distance <= myUser.getRadius();
+    }
+
+    private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+        double R = 6371; // Earth's radius in km
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                   Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                   Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
     }
 
     private boolean isDismissed(User user, Long candidateId) {
@@ -57,11 +80,7 @@ public class MatchService {
 
     private boolean ready(Profile profile) {
         return profile.getNickname() != null && !profile.getNickname().isBlank()
-                && profile.getBio() != null && !profile.getBio().isBlank()
-                && profile.getGender() != null && !profile.getGender().isBlank()
-                && profile.getLookingFor() != null && !profile.getLookingFor().isEmpty()
-                && profile.getInterest() != null && !profile.getInterest().isEmpty()
-                && profile.getAge() != null;
+                && profile.getBio() != null && !profile.getBio().isBlank();
     }
 
     private boolean hasConnection(Long leftId, Long rightId) {
