@@ -28,4 +28,13 @@ public class GetAuthPrinciple {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id: " + userId + " not found."));
     }
+
+    public Long getUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || auth.getPrincipal() == null
+                || auth.getPrincipal().equals("anonymousUser")) {
+            return null;
+        }
+        return (Long) auth.getPrincipal();
+    }
 }

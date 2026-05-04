@@ -3,18 +3,12 @@ package com.backend.matchme.dto.post;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostResponseDTO {
-    private Long id;
+public class CreatePostDTO {
     private String content;
     private String type;
     private String codeLanguage;
-    private LocalDateTime createdAt;
-    private Long authorId;
-    private String authorNickname;
-    private String authorImageUrl;
 }
