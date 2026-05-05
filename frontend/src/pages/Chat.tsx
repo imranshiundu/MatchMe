@@ -1,20 +1,20 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.tsx';
 import { websocketService } from '../services/websocketService.ts';
 import ChatView from '../components/chat/ChatView.tsx';
-import Icon from '../components/Icon.tsx';
 
 function Chat() {
     const { userId: receiverId } = useParams<{ userId: string }>();
-    const { token, userEmail } = useAuth();
+    const { token, userId: currentUserId } = useAuth();
     const [message, setMessage] = useState('');
     const [chatId, setChatId] = useState<number | null>(null);
     const [userDetails, setUserDetails] = useState<any>({});
     const [isOnline, setIsOnline] = useState(false);
+    const addMessageToView = useRef<((msg: any) => void) | null>(null);
     
     // Typing state logic
-    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [isTypingLocal, setIsTypingLocal] = useState(false);
 
     useEffect(() => {
@@ -65,6 +65,17 @@ function Chat() {
 
     const handleSendMessage = () => {
         if (!message.trim() || !chatId) return;
+        
+        // Optimistic update - show message immediately
+        if (addMessageToView.current && currentUserId) {
+            addMessageToView.current({
+                id: Date.now(), // temp id, server echo will be deduped if id matches
+                chatId,
+                senderId: currentUserId,
+                content: message.trim(),
+                timestamp: new Date().toISOString()
+            });
+        }
         
         websocketService.sendMessage(chatId, message.trim());
         setMessage('');
@@ -125,7 +136,12 @@ function Chat() {
 
             {/* Chat Messages Area */}
             <div className="flex-1 overflow-hidden relative bg-[#121212]">
-                <ChatView chatId={chatId} receiverId={receiverId} />
+                <ChatView 
+                    chatId={chatId} 
+                    receiverId={receiverId!} 
+                    currentUserId={currentUserId ?? undefined}
+                    onAddMessage={(addFn) => { addMessageToView.current = addFn; }}
+                />
             </div>
 
             {/* Chat Input */}
@@ -148,9 +164,12 @@ function Chat() {
                     <button
                         onClick={handleSendMessage}
                         disabled={!message.trim()}
-                        className="bg-[#C0FF00] text-[#121212] p-4 rounded-2xl disabled:opacity-20 hover:bg-[#A5DB00] transition-all shadow-[0_0_20px_rgba(192,255,0,0.2)] active:scale-95 group"
+                        className="bg-[#C0FF00] text-[#121212] p-4 rounded-2xl disabled:opacity-20 hover:bg-[#A5DB00] transition-all shadow-[0_0_20px_rgba(192,255,0,0.2)] active:scale-95 flex-shrink-0"
                     >
-                        <Icon name="connect-icon" size={24} className="group-hover:translate-x-0.5 transition-transform" />
+                        {/* Send arrow icon */}
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
                     </button>
                 </div>
             </footer>

@@ -11,7 +11,12 @@ interface Message {
     timestamp: string;
 }
 
-function ChatView({ chatId, receiverId }: { chatId: number, receiverId: string | number }) {
+function ChatView({ chatId, receiverId, currentUserId, onAddMessage }: { 
+    chatId: number, 
+    receiverId: string | number,
+    currentUserId?: number,
+    onAddMessage?: (addFn: (msg: Message) => void) => void
+}) {
     const { token } = useAuth();
     const [messages, setMessages] = useState<Message[]>([]);
     const [isTyping, setIsTyping] = useState(false);
@@ -42,11 +47,28 @@ function ChatView({ chatId, receiverId }: { chatId: number, receiverId: string |
         if (token && chatId) fetchHistory();
     }, [token, chatId]);
 
+    // Expose addMessage to parent via callback so optimistic updates work
+    useEffect(() => {
+        if (onAddMessage) {
+            onAddMessage((msg: Message) => {
+                setMessages((prev) => {
+                    // Avoid duplicates (server may echo back the same message)
+                    if (prev.some((m) => m.id === msg.id)) return prev;
+                    return [...prev, msg];
+                });
+            });
+        }
+    }, [onAddMessage]);
+
     useEffect(() => {
         if (!chatId) return;
 
         const unsubscribeMessage = websocketService.subscribeToMessages(chatId, (msg) => {
-            setMessages((prev) => [...prev, msg]);
+            setMessages((prev) => {
+                // Avoid duplicates from optimistic + server echo
+                if (prev.some((m) => m.id === msg.id)) return prev;
+                return [...prev, msg];
+            });
         });
 
         const unsubscribeTyping = websocketService.subscribeToTyping((typingData) => {
