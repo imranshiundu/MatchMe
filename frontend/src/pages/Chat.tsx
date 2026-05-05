@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.tsx';
 import { websocketService } from '../services/websocketService.ts';
 import ChatView from '../components/chat/ChatView.tsx';
+import Icon from '../components/Icon.tsx';
 
 function Chat() {
     const { userId: receiverId } = useParams<{ userId: string }>();
