@@ -12,6 +12,7 @@ interface ChatPreview {
     lastMessage: string;
     lastMessageTime: string;
     participantOnline: boolean;
+    participantBio: string;
 }
 
 function Messages() {
@@ -82,7 +83,7 @@ function Messages() {
                                     </span>
                                 </div>
                                 <p className="text-[#adaaaa] text-sm truncate font-medium">
-                                    {chat.lastMessage || 'Start a conversation...'}
+                                    {chat.lastMessage || chat.participantBio || 'Start a conversation...'}
                                 </p>
                             </div>
                             <div className="flex-shrink-0 ml-4 opacity-0 group-hover:opacity-100 transition-opacity">

@@ -127,6 +127,7 @@ public class ChatService {
         dto.setParticipantId(other.getId());
         dto.setParticipantName(resolveParticipantName(other, otherProfile));
         dto.setParticipantPicture(otherProfile != null ? otherProfile.getImageUrl() : null);
+        dto.setParticipantBio(otherProfile != null ? otherProfile.getBio() : null);
         dto.setParticipantOnline(presenceService.isOnline(other.getId()));
         if (chat.getMessages() != null && !chat.getMessages().isEmpty()) {
             dto.setLastMessage(chat.getMessages().get(0).getContent());

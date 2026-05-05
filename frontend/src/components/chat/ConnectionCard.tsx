@@ -16,9 +16,10 @@ type Props = {
     nickname: string;
     imageUrl: string;
     latestMessage: ChatMsgDTO | null;
+    bio?: string;
 };
 
-function ConnectionCard({ userId, nickname, imageUrl, latestMessage }: Props) {
+function ConnectionCard({ userId, nickname, imageUrl, latestMessage, bio }: Props) {
     const isNew = !latestMessage?.read && latestMessage?.senderId === Number(userId);
 
     return (
@@ -57,7 +58,7 @@ function ConnectionCard({ userId, nickname, imageUrl, latestMessage }: Props) {
                             New message: {latestMessage?.content}
                         </span>
                     ) : (
-                        latestMessage?.content ?? 'No messages yet'
+                        latestMessage?.content ?? (bio || 'Digital Nomad / Developer')
                     )}
                 </p>
             </div>

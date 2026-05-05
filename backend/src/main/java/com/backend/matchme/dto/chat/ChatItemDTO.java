@@ -8,6 +8,7 @@ public class ChatItemDTO {
     private Long participantId;
     private String participantName;
     private String participantPicture;
+    private String participantBio;
     private boolean participantOnline;
     private String lastMessage;
     private LocalDateTime lastActivity;

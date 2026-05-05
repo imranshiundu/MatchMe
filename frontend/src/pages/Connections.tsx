@@ -106,6 +106,7 @@ function Connections() {
                                     userId={user.id}
                                     nickname={user.nickname}
                                     imageUrl={user.imageUrl}
+                                    bio={user.bio}
                                     latestMessage={null}
                                 />
                             ))}
