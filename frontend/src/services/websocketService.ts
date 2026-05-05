@@ -141,14 +141,28 @@ class WebSocketService {
         });
     }
 
-    subscribeToTyping(callback: wsTypes.TypingCallback): void {
-        this.subscribe('/user/queue/typing', (message) => {
-            const typingEvent = JSON.parse(message.body) as {
-                userId: number;
-                isTyping: boolean;
-            };
-            callback(typingEvent.userId, typingEvent.isTyping);
+    subscribeToMessages(chatId: number, callback: (msg: any) => void): () => void {
+        const destination = `/topic/chat/${chatId}`;
+        this.subscribe(destination, (message) => {
+            callback(JSON.parse(message.body));
         });
+        return () => this.unsubscribe(destination);
+    }
+
+    subscribeToTyping(callback: (data: { chatId: number; userId: number; isTyping: boolean }) => void): () => void {
+        const destination = '/user/queue/typing';
+        this.subscribe(destination, (message) => {
+            callback(JSON.parse(message.body));
+        });
+        return () => this.unsubscribe(destination);
+    }
+
+    sendTyping(chatId: number, isTyping: boolean): void {
+        this.send('/app/chat.typing', { chatId, isTyping });
+    }
+
+    sendMessage(chatId: number, content: string): void {
+        this.send('/app/chat.send', { chatId, content });
     }
 
     isConnectedToSocket(): boolean {

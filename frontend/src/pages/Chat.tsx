@@ -6,7 +6,7 @@ import ChatView from '../components/chat/ChatView.tsx';
 import Icon from '../components/Icon.tsx';
 
 function Chat() {
-    const { receiverId } = useParams<{ receiverId: string }>();
+    const { userId: receiverId } = useParams<{ userId: string }>();
     const { token, userEmail } = useAuth();
     const [message, setMessage] = useState('');
     const [chatId, setChatId] = useState<number | null>(null);

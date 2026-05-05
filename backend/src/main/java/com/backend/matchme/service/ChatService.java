@@ -73,12 +73,11 @@ public class ChatService {
     @Transactional
     public SendRes send(Long senderId, ChatSendDTO dto) {
         User sender = userRepository.findById(senderId).orElseThrow();
-        User receiver = userRepository.findById(dto.getReceiverId()).orElseThrow();
-        if (!isConnected(sender, receiver)) {
-            throw new RuntimeException("Users are not connected");
+        Chat chat = chatRepository.findById(dto.getChatId()).orElseThrow();
+        if (!owns(chat, senderId)) {
+            throw new RuntimeException("Unauthorized");
         }
-
-        Chat chat = getOrCreateChat(sender, receiver);
+        User receiver = other(chat, senderId);
 
         Message saved = messageRepository.save(Message.builder()
                 .chat(chat)
@@ -99,13 +98,12 @@ public class ChatService {
     }
 
     public TypingEventDTO typing(Long senderId, TypingDTO dto) {
-        User sender = userRepository.findById(senderId).orElseThrow();
-        User receiver = userRepository.findById(dto.toId()).orElseThrow();
-        if (!isConnected(sender, receiver)) {
-            throw new RuntimeException("Users are not connected");
+        Chat chat = chatRepository.findById(dto.chatId()).orElseThrow();
+        if (!owns(chat, senderId)) {
+            throw new RuntimeException("Unauthorized");
         }
-        Chat chat = getOrCreateChat(sender, receiver);
-        return new TypingEventDTO(chat.getId(), senderId, dto.typing());
+        User receiver = other(chat, senderId);
+        return new TypingEventDTO(chat.getId(), senderId, dto.isTyping());
     }
 
     private void markMessagesAsRead(Chat chat, Long userId) {
@@ -200,6 +198,11 @@ public class ChatService {
                 .user2(second)
                 .lastActivity(LocalDateTime.now())
                 .build()));
+    }
+
+    public Long getOtherParticipantId(Long userId, Long chatId) {
+        Chat chat = chatRepository.findById(chatId).orElseThrow();
+        return other(chat, userId).getId();
     }
 
     public record SendRes(ChatMsgDTO msg, ChatItemDTO mine, ChatItemDTO theirs) {
