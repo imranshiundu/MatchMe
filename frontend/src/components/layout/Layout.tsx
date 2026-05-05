@@ -4,10 +4,17 @@ import { Outlet, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../hooks/useAuth.tsx';
 import Icon from '../Icon.tsx';
+import { websocketService } from '../../services/websocketService.ts';
 
 function Layout() {
     const { token } = useAuth();
     const [notifications, setNotifications] = useState<any[]>([]);
+
+    useEffect(() => {
+        if (token && !websocketService.isConnectedToSocket()) {
+            websocketService.connect(token);
+        }
+    }, [token]);
 
     useEffect(() => {
         if (!token) return;

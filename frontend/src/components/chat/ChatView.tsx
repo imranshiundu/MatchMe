@@ -65,9 +65,12 @@ function ChatView({ chatId, receiverId }: { chatId: number, receiverId: string |
         <div className="h-full overflow-y-auto px-4 md:px-8 py-8 no-scrollbar flex flex-col gap-1">
             <div className="flex flex-col gap-1.5 flex-1 min-h-0">
                 {messages.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 text-center opacity-20 select-none">
-                        <div className="text-[10px] font-black uppercase tracking-[0.5em] mb-4">Encryption Initialized</div>
-                        <div className="text-[8px] font-mono max-w-[200px]">Secure channel established between nodes. End-to-end data transfer active.</div>
+                    <div className="flex flex-col items-center justify-center py-20 text-center select-none">
+                        <div className="w-20 h-20 bg-[#1C1B1B] border border-[#313030]/30 rounded-full flex items-center justify-center mb-6 shadow-2xl">
+                            <span className="text-[#C0FF00] text-2xl font-black">!</span>
+                        </div>
+                        <h3 className="text-white text-xl font-black mb-2">Say Hello</h3>
+                        <p className="text-[#5a6a6a] text-sm font-medium max-w-[250px]">Send the first message to start the conversation.</p>
                     </div>
                 ) : (
                     messages.map((msg) => (
@@ -87,7 +90,7 @@ function ChatView({ chatId, receiverId }: { chatId: number, receiverId: string |
                             <div className="w-1.5 h-1.5 bg-[#C0FF00] rounded-full animate-bounce [animation-delay:-0.15s]"></div>
                             <div className="w-1.5 h-1.5 bg-[#C0FF00] rounded-full animate-bounce"></div>
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-[#5a6a6a]">Syncing...</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-[#5a6a6a]">Typing...</span>
                     </div>
                 )}
                 <div ref={messagesEndRef} />

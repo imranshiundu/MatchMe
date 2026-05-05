@@ -72,7 +72,7 @@ function ViewProfile({
                             {buttonText === 'Connect' ? 'Follow' : buttonText}
                         </button>
                         
-                        {buttonText === 'Remove' && (
+                        {!showAllDetails && (
                             <Link
                                 to={`/connections/chat/${userID}`}
                                 className="flex items-center gap-3 px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest bg-[#C0FF00] text-[#121212] hover:bg-[#A5DB00] transition-all shadow-xl active:scale-95"

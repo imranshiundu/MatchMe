@@ -29,7 +29,8 @@ function Chat() {
                     setChatId(data.chatId);
                     setUserDetails({
                         nickname: data.participantName,
-                        imageUrl: data.participantPicture
+                        imageUrl: data.participantPicture,
+                        lastActivity: data.lastActivity
                     });
                     setIsOnline(data.participantOnline);
                 }
@@ -84,7 +85,7 @@ function Chat() {
     }
 
     return (
-        <div className="flex flex-col h-[calc(100vh-64px)] md:h-[calc(100vh-64px)] w-full bg-[#121212] md:border-x border-[#313030] overflow-hidden animate-fade-in">
+        <div className="flex flex-col h-[calc(100vh-160px)] md:h-[calc(100vh-140px)] w-full bg-[#121212] border border-[#313030]/50 md:rounded-[32px] overflow-hidden animate-fade-in relative z-10 shadow-2xl">
             {/* Chat Header */}
             <header className="flex items-center gap-4 px-6 py-4 bg-[#1C1B1B]/80 backdrop-blur-md border-b border-[#313030] z-10 flex-shrink-0">
                 <Link to="/messages" className="p-2 -ml-2 text-[#5a6a6a] hover:text-[#C0FF00] transition-colors">
@@ -110,7 +111,7 @@ function Chat() {
                     </Link>
                     <div className="flex items-center gap-3 mt-0.5">
                         <span className={`text-[9px] font-black uppercase tracking-[0.2em] ${isOnline ? 'text-[#C0FF00]' : 'text-[#5a6a6a]'}`}>
-                            {isOnline ? 'Direct Link' : 'Standby'}
+                            {isOnline ? 'Online' : userDetails.lastActivity ? 'Offline' : 'Standby'}
                         </span>
                     </div>
                 </div>
