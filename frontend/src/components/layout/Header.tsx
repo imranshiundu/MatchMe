@@ -4,7 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 import Icon from '../Icon';
 
 function Header() {
-    const { userEmail } = useAuth();
+    const { userEmail, token } = useAuth();
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
@@ -21,7 +21,9 @@ function Header() {
 
         setIsSearching(true);
         try {
-            const res = await fetch(`http://localhost:8085/profiles/search?q=${query}`);
+            const res = await fetch(`http://localhost:8085/profiles/search?q=${query}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             if (res.ok) {
                 const data = await res.json();
                 setSearchResults(data);
