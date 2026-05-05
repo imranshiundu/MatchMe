@@ -180,6 +180,16 @@ public class ChatService {
         return getOrCreateChat(u1, u2);
     }
 
+    public ChatItemDTO initiateChat(Long userId, Long receiverId) {
+        User sender = userRepository.findById(userId).orElseThrow();
+        User receiver = userRepository.findById(receiverId).orElseThrow();
+        if (!isConnected(sender, receiver)) {
+            throw new RuntimeException("Users are not connected");
+        }
+        Chat chat = getOrCreateChat(sender, receiver);
+        return mapToChatItem(chat, userId);
+    }
+
     private Chat getOrCreateChat(User u1, User u2) {
         User first = u1.getId().compareTo(u2.getId()) < 0 ? u1 : u2;
         User second = first == u1 ? u2 : u1;

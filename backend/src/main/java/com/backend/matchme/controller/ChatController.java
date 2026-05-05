@@ -36,4 +36,9 @@ public class ChatController {
     ) {
         return ResponseEntity.ok(chatService.getMessages(userId, id, page, size, markAsRead));
     }
+
+    @PostMapping("/initiate/{receiverId}")
+    public ResponseEntity<ChatItemDTO> initiateChat(@AuthenticationPrincipal Long userId, @PathVariable Long receiverId) {
+        return ResponseEntity.ok(chatService.initiateChat(userId, receiverId));
+    }
 }

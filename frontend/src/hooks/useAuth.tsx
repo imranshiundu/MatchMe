@@ -54,8 +54,8 @@ export const useAuth = () => {
 
     const getUserEmail = () => {
         const stored = sessionStorage.getItem('email');
-        if (stored) return stored;
-        if (token) {
+        if (stored && stored !== 'undefined') return stored;
+        if (token && token !== 'undefined') {
             try {
                 return jwtDecode<JwtPayload>(token).sub;
             } catch {
