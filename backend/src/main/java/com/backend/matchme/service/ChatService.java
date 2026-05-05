@@ -190,7 +190,7 @@ public class ChatService {
     private Chat getOrCreateChat(User u1, User u2) {
         User first = u1.getId().compareTo(u2.getId()) < 0 ? u1 : u2;
         User second = first == u1 ? u2 : u1;
-        Optional<Chat> chat = chatRepository.findByUser1AndUser2(first, second);
+        Optional<Chat> chat = chatRepository.findFirstByUser1AndUser2(first, second);
         return chat.orElseGet(() -> chatRepository.save(Chat.builder()
                 .user1(first)
                 .user2(second)
