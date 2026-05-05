@@ -57,7 +57,7 @@ function Layout() {
                 <Sidebar />
                 
                 {/* Main Content Area */}
-                <main className="flex-1 overflow-y-auto bg-[#121212] relative no-scrollbar">
+                <main className="flex-1 overflow-y-auto bg-[#121212] relative no-scrollbar pb-24 md:pb-0">
                     <div className="max-w-5xl mx-auto w-full min-h-full px-4 md:px-10 py-8">
                         <Outlet />
                     </div>

@@ -79,12 +79,12 @@ public class ConnectionService {
 
         Connection outbound = connectionRepository.findByRequesterAndReceiver(requester, receiver).orElse(null);
         if (outbound != null) {
-            throw new ConnectionStateException("You already sent a request to this user");
+            return; // Idempotent: already sent
         }
 
         Connection inbound = connectionRepository.findByRequesterAndReceiver(receiver, requester).orElse(null);
         if (inbound != null) {
-            throw new ConnectionStateException("This user already has a request/connection with you");
+            return; // Idempotent: already connected or pending from them
         }
 
         Connection conn = Connection.builder()
