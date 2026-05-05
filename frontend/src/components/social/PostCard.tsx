@@ -1,4 +1,8 @@
 import { formatDistanceToNow } from 'date-fns';
+import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useAuth } from '../../hooks/useAuth';
+import Icon from '../Icon';
 
 interface PostProps {
     id: number;
@@ -6,55 +10,130 @@ interface PostProps {
     type: string;
     codeLanguage?: string;
     createdAt: string;
+    authorId: number;
     authorNickname: string;
     authorImageUrl: string;
+    likesCount: number;
 }
 
 function PostCard({ post }: { post: PostProps }) {
+    const { token, userId } = useAuth();
+    const [followed, setFollowed] = useState(false);
+    const [isFollowing, setIsFollowing] = useState(false);
+    const [liked, setLiked] = useState(false);
+    const [likesCount, setLikesCount] = useState(post.likesCount || 0);
+
+    const handleFollow = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        if (isFollowing || followed) return;
+        
+        setIsFollowing(true);
+        try {
+            const response = await fetch(`http://localhost:8085/${post.authorId}/request`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (response.ok || response.status === 409) {
+                setFollowed(true);
+            }
+        } catch (error) {
+            console.error("Follow failed:", error);
+        } finally {
+            setIsFollowing(false);
+        }
+    };
+
+    const handleLike = async () => {
+        setLiked(!liked);
+        setLikesCount(prev => liked ? prev - 1 : prev + 1);
+        // Mock API call - should be implemented in backend
+        try {
+            await fetch(`http://localhost:8085/posts/${post.id}/like`, {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${token}` }
+            });
+        } catch (e) {
+            console.error("Like failed", e);
+        }
+    };
+
+    const isOwnPost = userId === post.authorId;
+    const avatarUrl = post.authorImageUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.authorNickname || post.id}&backgroundColor=121212`;
+    const authorName = post.authorNickname || `User ${post.authorId}`;
+
     return (
-        <div className="bg-[#1C1B1B] border-2 border-[#313030] rounded-2xl p-6 hover:border-[#C0FF00]/30 transition-all group">
-            <div className="flex items-center gap-4 mb-4">
-                <img
-                    className="h-12 w-12 rounded-xl object-cover border-2 border-[#313030] group-hover:border-[#C0FF00] transition-colors"
-                    src={post.authorImageUrl || '/favicon.svg'}
-                    alt={post.authorNickname}
-                />
-                <div>
-                    <h3 className="text-lg font-bold text-white group-hover:text-[#C0FF00] transition-colors">
-                        {post.authorNickname}
-                    </h3>
-                    <p className="text-[#5a6a6a] text-xs font-mono uppercase tracking-tighter">
-                        {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
-                    </p>
+        <div className="bg-transparent border-b border-[#313030]/40 p-6 md:p-8 hover:bg-[#1C1B1B]/30 transition-all duration-300 group animate-fade-in relative">
+            <div className="flex items-start justify-between mb-6">
+                <div className="flex items-center gap-5">
+                    <Link to={`/match/${post.authorId}`} className="relative flex-shrink-0">
+                        <img
+                            className="h-14 w-14 rounded-full object-cover border-2 border-[#313030] group-hover:border-[#C0FF00] transition-all shadow-xl"
+                            src={avatarUrl}
+                            alt={authorName}
+                        />
+                    </Link>
+                    <div>
+                        <Link to={`/match/${post.authorId}`} className="text-base font-bold text-white hover:text-[#C0FF00] transition-colors block">
+                            {authorName}
+                        </Link>
+                        <p className="text-[#5a6a6a] text-[11px] font-medium mt-1.5 opacity-60">
+                            {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
+                        </p>
+                    </div>
                 </div>
+
+                {!isOwnPost && (
+                    <button 
+                        onClick={handleFollow}
+                        disabled={followed || isFollowing}
+                        className={`px-6 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 ${
+                            followed 
+                            ? 'bg-[#1C1B1B] text-[#5a6a6a] border border-[#313030]' 
+                            : 'bg-[#C0FF00] text-[#121212] hover:bg-[#A5DB00] shadow-lg'
+                        }`}
+                    >
+                        {isFollowing ? (
+                            <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                            <Icon name={followed ? "search-icon" : "connect-icon"} size={12} />
+                        )}
+                        {followed ? 'Pending' : 'Follow'}
+                    </button>
+                )}
             </div>
 
-            <div className="text-white text-sm leading-relaxed whitespace-pre-wrap mb-4">
+            <div className="text-white/95 text-[16px] leading-relaxed whitespace-pre-wrap mb-6 px-1">
                 {post.content}
             </div>
 
             {post.type === 'code' && post.codeLanguage && (
-                <div className="bg-[#121212] border border-[#313030] rounded-xl p-4 font-mono text-xs text-[#C0FF00] overflow-x-auto mb-4">
-                    <div className="flex justify-between items-center mb-2 border-b border-[#313030] pb-2">
-                        <span className="uppercase tracking-widest text-[10px] font-black">{post.codeLanguage}</span>
+                <div className="bg-[#121212] border border-[#313030] rounded-2xl p-6 font-mono text-[13px] text-[#C0FF00] overflow-x-auto mb-6 shadow-inner">
+                    <div className="flex justify-between items-center mb-4 opacity-40">
+                        <span className="uppercase text-[10px] font-bold tracking-widest">{post.codeLanguage} snippet</span>
                     </div>
-                    <code>{post.content}</code>
+                    <code className="block leading-relaxed">{post.content}</code>
                 </div>
             )}
 
-            <div className="flex items-center gap-6 pt-4 border-t border-[#313030]">
-                <button className="flex items-center gap-2 text-[#adaaaa] hover:text-[#C0FF00] transition-colors text-xs font-bold uppercase tracking-widest">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                    Like
+            <div className="flex items-center gap-10 pt-4">
+                <button 
+                    onClick={handleLike}
+                    className={`flex items-center gap-2.5 transition-all text-sm font-bold group/btn ${liked ? 'text-[#C0FF00]' : 'text-[#5a6a6a] hover:text-[#C0FF00]'}`}
+                >
+                    <Icon name="heart-icon" size={18} className={`${liked ? 'scale-110' : 'group-hover/btn:scale-110'} transition-transform`} />
+                    {likesCount > 0 ? likesCount : 'Like'}
                 </button>
-                <button className="flex items-center gap-2 text-[#adaaaa] hover:text-[#C0FF00] transition-colors text-xs font-bold uppercase tracking-widest">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                    Comment
+                <button className="flex items-center gap-2.5 text-[#5a6a6a] hover:text-white transition-all text-sm font-bold group/btn">
+                    <Icon name="logout-icon" size={18} className="group-hover/btn:scale-110 transition-transform -rotate-90" />
+                    Share
                 </button>
+                <Link to={`/match/${post.authorId}`} className="ml-auto flex items-center gap-2.5 text-[#5a6a6a] hover:text-white transition-all text-sm font-bold">
+                    <Icon name="view-profile-icon" size={18} />
+                    View Profile
+                </Link>
             </div>
         </div>
     );

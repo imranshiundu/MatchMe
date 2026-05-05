@@ -1,7 +1,6 @@
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import * as wsTypes from '../types/websocketTypes.ts'
-import type {ChatMessageCallback, PresenceCallback, TypingCallback} from "../types/websocketTypes.ts";
 
 const socket_url = "http://localhost:8085/ws-chat";
 
@@ -36,7 +35,6 @@ class WebSocketService {
             webSocketFactory: () => new SockJS(socket_url),
             reconnectDelay: 5000,
             connectHeaders: { Authorization: `Bearer ${jwtToken}` },
-            binary: true,
             onConnect: () => {
                 this.isConnected = true;
                 console.log("WebSocket connected");

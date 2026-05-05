@@ -48,6 +48,14 @@ public class Profile {
     @Column(name = "looking_for")
     private List<String> lookingFor = new ArrayList<>();
 
+
+    private String prompt1;
+    private String answer1;
+    private String prompt2;
+    private String answer2;
+    private String prompt3;
+    private String answer3;
+
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "user_id")

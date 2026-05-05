@@ -26,6 +26,10 @@ public class User {
     private String password;
 
     private String location;
+    private Double latitude;
+    private Double longitude;
+    private Double radius = 50.0; // Default radius in km
+
 
     @OneToOne(mappedBy = "user")
     private Profile profile;

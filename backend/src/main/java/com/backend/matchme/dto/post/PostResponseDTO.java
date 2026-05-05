@@ -5,16 +5,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class PostResponseDTO {
-    private Long id;
-    private String content;
-    private String type;
-    private String codeLanguage;
-    private LocalDateTime createdAt;
-    private Long authorId;
-    private String authorNickname;
-    private String authorImageUrl;
-}
+public record PostResponseDTO(
+        Long id,
+        String content,
+        String type,
+        String codeLanguage,
+        LocalDateTime createdAt,
+        Long authorId,
+        String authorNickname,
+        String authorImageUrl,
+        Integer likesCount
+) {}

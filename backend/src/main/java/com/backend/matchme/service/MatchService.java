@@ -33,7 +33,7 @@ public class MatchService {
         Profile me = profileRepository.findById(userId).orElseThrow();
         User user = userRepository.findById(userId).orElseThrow();
 
-        return profileRepository.findAll().stream()
+        List<Long> recommendations = profileRepository.findAll().stream()
                 .filter(candidate -> !candidate.getId().equals(userId))
                 .filter(this::ready)
                 .filter(candidate -> withinRadius(me, candidate))
@@ -44,6 +44,20 @@ public class MatchService {
                 .sorted(Comparator.comparingDouble(MatchScore::score).reversed())
                 .map(MatchScore::userId)
                 .collect(Collectors.toList());
+
+        if (recommendations.isEmpty()) {
+            // Fallback: show any active users
+            return profileRepository.findAll().stream()
+                    .filter(candidate -> !candidate.getId().equals(userId))
+                    .filter(candidate -> candidate.getNickname() != null && !candidate.getNickname().isBlank())
+                    .filter(candidate -> !isDismissed(user, candidate.getId()))
+                    .filter(candidate -> !hasConnection(userId, candidate.getId()))
+                    .limit(20)
+                    .map(Profile::getId)
+                    .collect(Collectors.toList());
+        }
+
+        return recommendations;
     }
 
     private boolean withinRadius(Profile me, Profile other) {

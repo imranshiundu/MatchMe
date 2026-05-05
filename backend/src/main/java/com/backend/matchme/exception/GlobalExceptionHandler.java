@@ -30,6 +30,12 @@ public class GlobalExceptionHandler {
         return createErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    @ExceptionHandler(java.util.NoSuchElementException.class)
+    public ResponseEntity<ErrorResponseDTO> handleNoSuchElement(java.util.NoSuchElementException ex) {
+        log.info("Element not found: {}", ex.getMessage());
+        return createErrorResponse(HttpStatus.NOT_FOUND, "The requested resource was not found.");
+    }
+
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<ErrorResponseDTO> handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
         log.info("Email conflict: {}", ex.getMessage());

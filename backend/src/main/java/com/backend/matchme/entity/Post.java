@@ -27,7 +27,11 @@ public class Post {
 
     private LocalDateTime createdAt;
 
+    @Builder.Default
+    @Column(nullable = false)
+    private Integer likesCount = 0;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "author_id", nullable = false)
     private User author;
 }

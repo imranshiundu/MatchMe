@@ -152,6 +152,18 @@ public class ConnectionService {
         connectionRepository.delete(connection);
     }
 
+    public String getConnectionStatus(Long userId, Long targetId) {
+        if (userId.equals(targetId)) return "SELF";
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User target = userRepository.findById(targetId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        return connectionRepository.findByRequesterAndReceiver(user, target)
+                .map(c -> c.getStatus().name())
+                .orElseGet(() -> connectionRepository.findByRequesterAndReceiver(target, user)
+                        .map(c -> c.getStatus().name())
+                        .orElse("NONE"));
+    }
+
     private void ensureProfileComplete(Long userId) {
         Profile requesterProfile = profileRepository.findById(userId).orElseThrow(() -> new ProfileIncompleteException("Complete your profile before using recommendations or connections"));
         if (!profileValidator.isProfileComplete(requesterProfile)) {

@@ -63,7 +63,16 @@ public class PostService {
                 post.getCreatedAt(),
                 author.getId(),
                 nickname,
-                imageUrl
+                imageUrl,
+                post.getLikesCount()
         );
+    }
+
+    @Transactional
+    public void likePost(Long postId) {
+        postRepository.findById(postId).ifPresent(post -> {
+            post.setLikesCount((post.getLikesCount() == null ? 0 : post.getLikesCount()) + 1);
+            postRepository.save(post);
+        });
     }
 }

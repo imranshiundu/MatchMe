@@ -38,4 +38,10 @@ public class PostController {
     public ResponseEntity<List<PostResponseDTO>> getUserPosts(@PathVariable Long userId) {
         return ResponseEntity.ok(postService.getUserPosts(userId));
     }
+
+    @PostMapping("/{id}/like")
+    public ResponseEntity<Void> likePost(@PathVariable Long id) {
+        postService.likePost(id);
+        return ResponseEntity.ok().build();
+    }
 }

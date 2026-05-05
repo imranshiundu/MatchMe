@@ -1,6 +1,7 @@
 import { useState } from "react";
 import LoginForm from "../components/auth/LoginForm.tsx";
 import RegistrationForm from "../components/auth/RegistrationForm.tsx";
+import Icon from "../components/Icon.tsx";
 
 function Auth() {
     const [login, setLogin] = useState<boolean>(true);
@@ -10,62 +11,74 @@ function Auth() {
     };
 
     return (
-        <div 
-            className="flex min-h-screen w-full flex-col lg:flex-row text-white font-mono selection:bg-[#C0FF00] selection:text-[#121212]"
-            style={{
-                backgroundColor: "#121212",
-                backgroundImage: "radial-gradient(circle, #313030 1px, transparent 1px)",
-                backgroundSize: "32px 32px"
-            }}
-        >
-            {/* Header / Logo */}
-            <div className="absolute top-6 left-6 lg:left-12 lg:top-8 flex items-center gap-2 z-50">
-                <span className="text-2xl font-bold tracking-tight">
-                    <span className="text-[#C0FF00] italic">meet</span>space
-                </span>
-            </div>
+        <div className="flex min-h-screen w-full bg-[#121212] selection:bg-[#C0FF00] selection:text-[#121212] overflow-hidden relative">
+            {/* Professional Grid Background */}
+            <div className="absolute inset-0 z-0 opacity-20" style={{ 
+                backgroundImage: 'radial-gradient(#313030 1px, transparent 1px)', 
+                backgroundSize: '32px 32px' 
+            }}></div>
 
             {/* Content Container */}
-            <div className="relative flex-1 flex flex-col lg:flex-row w-full max-w-7xl mx-auto z-10">
-                {/* Left Side - Typography & Copy */}
-                <div className="flex-1 flex flex-col justify-center px-8 pt-32 pb-16 lg:px-12 lg:py-24">
-                    <div className="max-w-xl">
-                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-8 tracking-tight">
-                            <span className="text-white block">Find your stack.</span>
-                            <span className="text-[#C0FF00] block">Find your people.</span>
+            <div className="relative flex-1 flex flex-col lg:flex-row w-full max-w-7xl mx-auto z-10 px-6 py-12 lg:px-12">
+                
+                {/* Left Side - Brand & Copy */}
+                <div className="flex-1 flex flex-col justify-center lg:pr-16 mb-16 lg:mb-0 animate-fade-in">
+                    <div className="mb-12">
+                        <h1 className="text-xl md:text-2xl font-black tracking-tighter text-white mb-8">
+                            MatchMe<span className="text-[#C0FF00]">.</span>
                         </h1>
+                        <h2 className="text-5xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tighter text-white">
+                            Compile your <br />
+                            <span className="text-[#C0FF00]">Social Stack.</span>
+                        </h2>
+                    </div>
+                    
+                    <div className="max-w-lg">
+                        <p className="text-[#adaaaa] text-xl font-medium leading-relaxed mb-12">
+                            The definitive professional network engineered for the modern technical community.
+                        </p>
                         
-                        <div className="space-y-4 text-[#adaaaa] text-lg leading-relaxed max-w-md font-sans">
-                            <p>
-                                The professional network built exclusively for developers.
-                            </p>
-                            <ul className="space-y-3 mt-8">
-                                <li className="flex items-center gap-3">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-[#C0FF00]"></div>
-                                    <span>Connect based on shared tech stacks</span>
-                                </li>
-                                <li className="flex items-center gap-3">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-[#C0FF00]"></div>
-                                    <span>Find collaborators for side projects</span>
-                                </li>
-                                <li className="flex items-center gap-3">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-[#C0FF00]"></div>
-                                    <span>Build meaningful professional relationships</span>
-                                </li>
-                            </ul>
+                        <div className="flex flex-col gap-10">
+                            <div className="flex items-start gap-6 group">
+                                <div className="mt-1 text-[#C0FF00]">
+                                    <Icon name="search-icon" size={28} />
+                                </div>
+                                <div>
+                                    <h4 className="font-black text-white text-sm uppercase tracking-widest mb-2">Algorithm Match</h4>
+                                    <p className="text-[#5a6a6a] text-sm font-medium leading-relaxed max-w-xs">Engineered discovery based on tech stacks and professional synergy.</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-6 group">
+                                <div className="mt-1 text-[#C0FF00]">
+                                    <Icon name="message-icon" size={28} />
+                                </div>
+                                <div>
+                                    <h4 className="font-black text-white text-sm uppercase tracking-widest mb-2">Secure Link</h4>
+                                    <p className="text-[#5a6a6a] text-sm font-medium leading-relaxed max-w-xs">Real-time encrypted communication for rapid professional scaling.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Right Side - Auth Form Area */}
-                <div className="w-full lg:w-[450px] flex flex-col justify-center px-8 py-16 lg:px-12">
-                    <div className="w-full max-w-sm mx-auto lg:ml-auto">
+                {/* Right Side - Auth Form Card (De-boxed) */}
+                <div className="w-full lg:w-[450px] flex flex-col justify-center items-center lg:items-end">
+                    <div className="w-full max-w-md animate-fade-in [animation-delay:0.2s] py-10">
+                        <div className="text-center lg:text-left mb-12">
+                            <h2 className="text-4xl font-black text-white tracking-tighter mb-4">{login ? 'Login' : 'Register'}</h2>
+                            <p className="text-[#5a6a6a] text-xs font-bold uppercase tracking-[0.2em]">{login ? 'Enter your credentials to continue' : 'Join our professional network'}</p>
+                        </div>
+                        
                         {login ? (
                             <LoginForm switchAuth={switchAuth} />
                         ) : (
                             <RegistrationForm switchAuth={switchAuth} />
                         )}
                     </div>
+                    
+                    <p className="mt-16 text-center text-[#5a6a6a] text-[10px] font-black uppercase tracking-[0.5em] px-12 lg:text-left lg:px-0 opacity-40 w-full max-w-md">
+                        MATCHME SYSTEM // VERSION 2.0.4 // © 2026
+                    </p>
                 </div>
             </div>
         </div>

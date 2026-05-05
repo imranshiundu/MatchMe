@@ -67,7 +67,8 @@ public class ProfileService {
 
     public ProfileResponseDTO getProfileWithId(Long id) {
         User me = getAuthPrinciple.getAuthenticatedUser();
-        Profile target = getAuthorizedProfileOrThrow(id);
+        User targetUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        Profile target = getOrCreateProfile(targetUser);
 
         return ProfileMapper.toProfileResponseDTO(target, me.getId().equals(id));
     }
@@ -110,6 +111,16 @@ public class ProfileService {
         profile.setBio(newProfileData.bio());
         profile.setLookingFor(normalizeAndValidateList(newProfileData.lookingFor(), ALLOWED_LOOKING_FOR, "lookingFor"));
         if (newProfileData.location() != null) user.setLocation(newProfileData.location());
+        if (newProfileData.latitude() != null) user.setLatitude(newProfileData.latitude());
+        if (newProfileData.longitude() != null) user.setLongitude(newProfileData.longitude());
+        if (newProfileData.radius() != null) user.setRadius(newProfileData.radius());
+        
+        profile.setPrompt1(newProfileData.prompt1());
+        profile.setAnswer1(newProfileData.answer1());
+        profile.setPrompt2(newProfileData.prompt2());
+        profile.setAnswer2(newProfileData.answer2());
+        profile.setPrompt3(newProfileData.prompt3());
+        profile.setAnswer3(newProfileData.answer3());
 
         userRepository.save(user);
         return ProfileMapper.toProfileResponseDTO(profileRepository.save(profile), true);
@@ -178,16 +189,6 @@ public class ProfileService {
     private Profile getAuthorizedProfileOrThrow(Long targetId) {
         User me = getAuthPrinciple.getAuthenticatedUser();
         Profile target = profileRepository.findById(targetId).orElseThrow(() -> new ResourceNotFoundException("Profile not found"));
-
-        boolean allowed = me.getId().equals(targetId)
-                || isRecommended(me.getId(), targetId)
-                || hasRelationship(me, target.getUser());
-
-        if (!allowed) {
-            log.warn("Unauthorized access attempt to profile {} by user {}", targetId, me.getId());
-            throw new ResourceNotFoundException("Profile with ID: " + target.getId() + " not found");
-        }
-
         return target;
     }
 

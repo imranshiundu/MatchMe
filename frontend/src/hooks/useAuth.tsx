@@ -3,6 +3,7 @@ import {jwtDecode} from 'jwt-decode';
 
 type JwtPayload = {
     userId: number;
+    sub: string;
     exp: number;
 };
 
@@ -14,6 +15,7 @@ export const useAuth = () => {
         if (!newToken) {
             sessionStorage.removeItem('token');
             sessionStorage.removeItem('id');
+            sessionStorage.removeItem('email');
             setToken(null);
             setUserId(null);
             return;
@@ -23,8 +25,9 @@ export const useAuth = () => {
             const decoded = jwtDecode<JwtPayload>(newToken);
             sessionStorage.setItem('token', newToken);
             sessionStorage.setItem('id', String(decoded.userId));
+            sessionStorage.setItem('email', decoded.sub);
             setToken(newToken);
-            setUserId(Number(jwtDecode<JwtPayload>(newToken).userId))
+            setUserId(decoded.userId);
         }
         catch (err) {
             console.error('Invalid JWT token: ', error);
@@ -52,6 +55,7 @@ export const useAuth = () => {
     return {
         token,
         userId,
+        userEmail: sessionStorage.getItem('email'),
         setAuthToken,
         logout,
         isAuthenticated

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { loginFormData, serverAuthResponse } from "../../types/loginFormData.ts";
 import { websocketService } from '../../services/websocketService.ts';
 import { useAuth } from '../../hooks/useAuth.tsx';
+import Icon from "../Icon.tsx";
 
 function LoginForm({ switchAuth }: { switchAuth: () => void }) {
     const [loginDetails, setLoginDetails] = useState<loginFormData>({
@@ -13,6 +14,7 @@ function LoginForm({ switchAuth }: { switchAuth: () => void }) {
     const [error, setError] = useState<string>('');
     const [isReady, setIsReady] = useState<boolean>(false);
     const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const navigate = useNavigate();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,6 +56,8 @@ function LoginForm({ switchAuth }: { switchAuth: () => void }) {
 
     const handleLogin = async (e: SubmitEvent) => {
         e.preventDefault();
+        setIsSubmitting(true);
+        setError('');
         try {
             const response = await fetch('http://localhost:8085/login', {
                 method: 'POST',
@@ -63,33 +67,39 @@ function LoginForm({ switchAuth }: { switchAuth: () => void }) {
                 }
             });
             if (!response.ok) {
-                const error = await response.json() as { message: string };
-                throw new Error(error.message || 'Auth failed');
+                const errorData = await response.json() as { message: string };
+                throw new Error(errorData.message || 'Authentication failed');
             }
             const data = await response.json() as serverAuthResponse;
             setAuthToken(data.token);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred.');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     return (
-        <form onSubmit={handleLogin} className="flex flex-col w-full gap-5 font-mono">
+        <form onSubmit={handleLogin} className="flex flex-col w-full gap-6">
             <div className="flex flex-col gap-2">
-                <label className="text-sm font-semibold text-[#8a9a9a]">Email address</label>
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="imranshiundu@gmail.com"
-                    value={loginDetails.email}
-                    onChange={handleChange}
-                    className="w-full bg-[#f0f4ff] border-none text-[#1a2318] placeholder-gray-400 px-4 py-3 rounded-lg outline-none font-sans"
-                    required
-                />
+                <label className="text-[10px] font-black text-[#5a6a6a] uppercase tracking-[0.3em] ml-2">Email</label>
+                <div className="relative">
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="developer@matchme.tech"
+                        value={loginDetails.email}
+                        onChange={handleChange}
+                        className="w-full bg-[#1C1B1B] border border-[#313030] text-white placeholder-[#313030] px-4 py-3.5 rounded-[5px] outline-none focus:border-[#C0FF00] transition-all text-sm font-medium"
+                        required
+                    />
+                </div>
             </div>
 
             <div className="flex flex-col gap-2">
-                <label className="text-sm font-semibold text-[#8a9a9a]">Password</label>
+                <div className="flex justify-between items-center ml-2">
+                    <label className="text-[10px] font-black text-[#5a6a6a] uppercase tracking-[0.3em]">Password</label>
+                </div>
                 <div className="relative">
                     <input
                         type={showPassword ? "text" : "password"}
@@ -97,48 +107,41 @@ function LoginForm({ switchAuth }: { switchAuth: () => void }) {
                         placeholder="••••••••••••"
                         value={loginDetails.password}
                         onChange={handleChange}
-                        className="w-full bg-[#f0f4ff] border-none text-[#1a2318] placeholder-gray-400 px-4 py-3 rounded-lg outline-none font-sans pr-12"
+                        className="w-full bg-[#1C1B1B] border border-[#313030] text-white placeholder-[#313030] px-4 py-3.5 rounded-[5px] outline-none focus:border-[#C0FF00] transition-all text-sm font-medium pr-14"
                         required
                     />
                     <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1 cursor-pointer"
-                        aria-label={showPassword ? "Hide password" : "Show password"}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-[#5a6a6a] hover:text-[#C0FF00] transition-colors p-1"
                     >
-                        {showPassword ? (
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
-                            </svg>
-                        ) : (
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                            </svg>
-                        )}
+                        <Icon name={showPassword ? "ignore-icon" : "view-profile-icon"} size={20} />
                     </button>
                 </div>
             </div>
 
             <button 
                 type="submit" 
-                className="w-full bg-[#C0FF00] text-[#121212] font-bold text-lg py-3 rounded-lg hover:bg-[#a5db00] active:scale-[0.98] transition-all shadow-[0_0_15px_rgba(192,255,0,0.3)] hover:shadow-[0_0_25px_rgba(192,255,0,0.5)] mt-4 cursor-pointer"
+                disabled={isSubmitting}
+                className="w-full bg-[#C0FF00] text-[#121212] font-black text-xs uppercase tracking-[0.4em] py-4 rounded-[5px] hover:bg-[#A5DB00] active:scale-[0.98] transition-all shadow-[0_10px_30px_rgba(192,255,0,0.2)] mt-4 flex items-center justify-center gap-3"
             >
+                {isSubmitting && <div className="w-4 h-4 border-2 border-[#121212] border-t-transparent rounded-full animate-spin"></div>}
                 Login
             </button>
 
-            <div className="text-center mt-2">
+            <div className="text-center mt-4">
                 <button 
                     type="button"
                     onClick={switchAuth} 
-                    className="text-[#adaaaa] hover:text-[#C0FF00] text-sm transition-colors cursor-pointer"
+                    className="text-[#5a6a6a] hover:text-[#C0FF00] text-[10px] font-black uppercase tracking-[0.2em] transition-all"
                 >
-                    Don't have an account? Sign up
+                    Don't have an account? <span className="text-[#C0FF00] underline">Register</span>
                 </button>
             </div>
 
             {error && (
-                <div className="bg-[#1C1B1B] text-[#ff7351] border border-[#313030] p-3 rounded-lg text-sm mt-2">
+                <div className="bg-[#1C1B1B] text-[#ff7351] border border-[#ff7351]/20 p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest mt-4 animate-fade-in flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-[#ff7351] animate-pulse"></div>
                     {error}
                 </div>
             )}

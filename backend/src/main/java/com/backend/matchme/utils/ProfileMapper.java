@@ -16,7 +16,16 @@ public class ProfileMapper {
                 profile.getLookingFor(),
                 profile.getImageUrl(),
                 profile.getPublicId(),
-                profile.getUser() != null ? profile.getUser().getLocation() : null
+                profile.getUser() != null ? profile.getUser().getLocation() : null,
+                profile.getUser() != null ? profile.getUser().getLatitude() : null,
+                profile.getUser() != null ? profile.getUser().getLongitude() : null,
+                profile.getUser() != null && profile.getUser().getRadius() != null ? profile.getUser().getRadius() : 50.0,
+                profile.getPrompt1(),
+                profile.getAnswer1(),
+                profile.getPrompt2(),
+                profile.getAnswer2(),
+                profile.getPrompt3(),
+                profile.getAnswer3()
         );
     }
 }

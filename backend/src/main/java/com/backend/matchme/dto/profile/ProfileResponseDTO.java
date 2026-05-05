@@ -12,5 +12,14 @@ public record ProfileResponseDTO(Long id,
                                  List<String> lookingFor,
                                  String imageUrl,
                                  String publicId,
-                                 String location) {
+                                 String location,
+                                 Double latitude,
+                                 Double longitude,
+                                 Double radius,
+                                 String prompt1,
+                                 String answer1,
+                                 String prompt2,
+                                 String answer2,
+                                 String prompt3,
+                                 String answer3) {
 }

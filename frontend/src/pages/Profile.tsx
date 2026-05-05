@@ -22,15 +22,22 @@ function Profile({ isConnection }: { isConnection?: boolean }) {
         isConnection !== undefined && urlUserId ? Number(urlUserId) : (myProfile?.id ?? null)
     );
 
+    const [requestSent, setRequestSent] = useState(false);
+    
     const changeView = () => setEditView(current => !current);
 
     const handleRequestConnection = async () => {
+        // Handle connection request with 409 (already exists) as success
         try {
             const response = await fetch(`http://localhost:8085/${urlUserId}/request`, {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
             });
-            if (!response.ok) throw new Error('Failed to send connection request');
+            if (response.ok || response.status === 409) {
+                setRequestSent(true);
+            } else {
+                throw new Error('Failed to send connection request');
+            }
         } catch (error) {
             console.error(error);
         }
@@ -43,6 +50,8 @@ function Profile({ isConnection }: { isConnection?: boolean }) {
                 headers: { Authorization: `Bearer ${token}` },
             });
             if (!response.ok) throw new Error('Failed to remove connection');
+            // Normally we would navigate away or refresh here
+            window.location.href = '/connections';
         } catch (error) {
             console.error(error);
         }
@@ -70,7 +79,25 @@ function Profile({ isConnection }: { isConnection?: boolean }) {
         };
 
         fetchProfile();
-    }, [isConnection, needsRefresh, token]);
+
+        // Fetch connection status if viewing someone else
+        if (isConnection !== undefined && urlUserId) {
+            const fetchStatus = async () => {
+                try {
+                    const res = await fetch(`http://localhost:8085/${urlUserId}/status`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    if (res.ok) {
+                        const status = await res.text();
+                        if (status === 'PENDING') setRequestSent(true);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch connection status", error);
+                }
+            };
+            fetchStatus();
+        }
+    }, [isConnection, needsRefresh, token, urlUserId]);
 
     const currentUserDetails = isConnection === undefined ? myProfile : fetchedUserDetails;
 
@@ -81,7 +108,7 @@ function Profile({ isConnection }: { isConnection?: boolean }) {
     switch (isConnection) {
         case false:
             buttonHandler = handleRequestConnection;
-            buttonText = 'Connect';
+            buttonText = requestSent ? 'Pending' : 'Connect';
             showAllDetails = false;
             break;
         case true:

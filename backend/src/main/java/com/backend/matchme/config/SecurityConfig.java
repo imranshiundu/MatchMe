@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth.
-                                requestMatchers("/login", "/register", "/users", "/ws-chat/**")
+                                requestMatchers("/login", "/register", "/ws-chat/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated());

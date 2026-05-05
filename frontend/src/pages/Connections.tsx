@@ -1,218 +1,144 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import ConnectionCard from '../components/chat/ConnectionCard.tsx';
+import SuggestedUserCard from '../components/matches/SuggestedUserCard.tsx';
 import { useAuth } from '../hooks/useAuth';
-import { useFetchChatDetails } from '../hooks/useFetchChatDetails.tsx';
-import { websocketService } from '../services/websocketService';
-
-type Connection = {
-    id: number;
-};
-
-type UserDetails = {
-    nickname: string;
-    imageUrl: string;
-};
-
-type ChatMsgDTO = {
-    id: number;
-    chatId: number;
-    senderId: number;
-    receiverId: number;
-    content: string;
-    timestamp: string;
-    read: boolean;
-};
-
-type ConnectionItem = {
-    userId: number;
-    userDetails: UserDetails;
-    chatId: number | null;
-    latestMessage: ChatMsgDTO | null;
-};
+import Icon from '../components/Icon.tsx';
 
 function Connections() {
     const { token } = useAuth();
-    const { chats, loading: chatsLoading, error: chatsError } = useFetchChatDetails();
-
-    const chatsByParticipant = useMemo(
-        () => Object.fromEntries(chats.map((chat) => [chat.participantId, chat])),
-        [chats]
-    );
-
-    const [items, setItems] = useState<ConnectionItem[]>([]);
+    const [activeTab, setActiveTab] = useState<'following' | 'recommended'>('following');
+    const [following, setFollowing] = useState<any[]>([]);
+    const [recommendedIds, setRecommendedIds] = useState<number[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
+    const loadConnections = useCallback(async () => {
         if (!token) return;
-        if (chatsLoading) return;
-        if (chatsError) {
-            setError(chatsError);
-            return;
-        }
-
-        async function loadConnections() {
-            try {
-                setLoading(true);
-                setError(null);
-
-                const connectionsRes = await fetch('http://localhost:8085/connections', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-
-                if (!connectionsRes.ok) {
-                    throw new Error('Failed to fetch connections');
-                }
-
-                const connections: Connection[] = await connectionsRes.json();
-
+        setLoading(true);
+        try {
+            const connectionsRes = await fetch('http://localhost:8085/connections', {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (connectionsRes.ok) {
+                const connections = await connectionsRes.json();
+                
+                // Fetch full details for connections
                 const enriched = await Promise.all(
-                    connections.map(async (connection) => {
-                        const userId = connection.id;
-
-                        const userRes = await fetch(`http://localhost:8085/users/${userId}`, {
+                    connections.map(async (conn: any) => {
+                        const userRes = await fetch(`http://localhost:8085/users/${conn.id}`, {
                             headers: { Authorization: `Bearer ${token}` },
                         });
-
-                        if (!userRes.ok) {
-                            throw new Error(`Failed to fetch user ${userId}`);
-                        }
-
-                        const userDetails: UserDetails = await userRes.json();
-
-                        const chat = chatsByParticipant[userId];
-                        const chatId = chat?.chatId ?? null;
-
-                        let latestMessage: ChatMsgDTO | null = null;
-
-                        if (chatId) {
-                            const msgRes = await fetch(
-                                `http://localhost:8085/chats/${chatId}/messages?page=0&size=1&markAsRead=false`,
-                                {
-                                    headers: { Authorization: `Bearer ${token}` },
-                                }
-                            );
-
-                            if (msgRes.ok) {
-                                const messages: ChatMsgDTO[] = await msgRes.json();
-                                latestMessage = messages[0] ?? null;
-                            }
-                        }
-
-                        return {
-                            userId,
-                            userDetails,
-                            chatId,
-                            latestMessage,
-                        };
+                        return userRes.ok ? await userRes.json() : null;
                     })
                 );
-
-                setItems(enriched);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : 'Failed to load connections');
-            } finally {
-                setLoading(false);
+                setFollowing(enriched.filter(Boolean));
             }
+        } catch (error) {
+            console.error("Failed to load connections", error);
+        } finally {
+            setLoading(false);
         }
+    }, [token]);
 
-        loadConnections();
-    }, [token, chatsByParticipant, chatsLoading, chatsError]);
+    const loadRecommendations = useCallback(async () => {
+        if (!token) return;
+        setLoading(true);
+        try {
+            const res = await fetch(`http://localhost:8085/recommendations?page=0&size=10`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setRecommendedIds(data.ids || []);
+            }
+        } catch (error) {
+            console.error("Failed to fetch recommendations:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [token]);
 
     useEffect(() => {
-        items.forEach((item) => {
-            if (!item.chatId) return;
-
-            websocketService.subscribeToChat(item.chatId, (_chatId, message) => {
-                setItems((prev) =>
-                    prev.map((x) =>
-                        x.chatId === item.chatId
-                            ? { ...x, latestMessage: message }
-                            : x
-                    )
-                );
-            });
-        });
-
-        return () => {
-            items.forEach((item) => {
-                if (item.chatId) {
-                    websocketService.unsubscribe(`/topic/chat/${item.chatId}`);
-                }
-            });
-        };
-    }, [items]);
-
-    const sortedItems = useMemo(() => {
-        return [...items].sort((a, b) => {
-            const aTime = a.latestMessage?.timestamp ?? '';
-            const bTime = b.latestMessage?.timestamp ?? '';
-            return bTime.localeCompare(aTime);
-        });
-    }, [items]);
-
-    if (loading || chatsLoading) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-                <div className="w-8 h-8 border-4 border-[#C0FF00] border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-[#adaaaa] animate-pulse">Syncing connections...</p>
-            </div>
-        );
-    }
-
-    if (error || chatsError) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] p-8 text-center">
-                <div className="bg-[#3a1f1f] p-4 rounded-full mb-4">
-                    <span className="text-3xl">⚠️</span>
-                </div>
-                <p className="text-[#ff7351] text-xl font-bold mb-2">Sync Error</p>
-                <p className="text-[#adaaaa] max-w-md">{error || chatsError}</p>
-            </div>
-        );
-    }
+        if (activeTab === 'following') {
+            loadConnections();
+        } else {
+            loadRecommendations();
+        }
+    }, [activeTab, loadConnections, loadRecommendations]);
 
     return (
-        <div className="max-w-3xl mx-auto w-full py-6 md:py-10">
-            <div className="flex flex-col gap-6">
-                <div className="flex items-end justify-between px-4 sm:px-0">
-                    <div>
-                        <h1 className="text-[#C0FF00] text-3xl font-black uppercase tracking-tighter">Connections</h1>
-                        <p className="text-[#adaaaa] text-sm mt-1 font-mono">// {items.length} developers in your network</p>
-                    </div>
-                </div>
+        <div className="max-w-4xl mx-auto w-full px-4 py-8 animate-fade-in">
+            <div className="mb-10">
+                <h1 className="text-white text-4xl font-black tracking-tighter">Network</h1>
+                <p className="text-[#5a6a6a] text-sm font-medium mt-3">Manage your professional connections and discover new talent.</p>
+            </div>
 
-                <div className="bg-[#1C1B1B] border-2 border-[#313030] rounded-2xl overflow-hidden shadow-2xl">
-                    {sortedItems.length > 0 ? (
-                        <div className="flex flex-col divide-y divide-[#313030]">
-                            {sortedItems.map((item) => (
+            <div className="mb-8 border-b border-[#313030]/50">
+                <div className="flex gap-10">
+                    <button
+                        onClick={() => setActiveTab('following')}
+                        className={`pb-4 text-sm font-bold transition-all relative ${activeTab === 'following' ? 'text-[#C0FF00]' : 'text-[#5a6a6a] hover:text-white'}`}
+                    >
+                        Following
+                        <span className="ml-2 px-2 py-0.5 rounded-full bg-[#1C1B1B] text-[10px]">{following.length}</span>
+                        {activeTab === 'following' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#C0FF00] shadow-[0_0_10px_#C0FF00]"></div>}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('recommended')}
+                        className={`pb-4 text-sm font-bold transition-all relative ${activeTab === 'recommended' ? 'text-[#C0FF00]' : 'text-[#5a6a6a] hover:text-white'}`}
+                    >
+                        Recommended for You
+                        {activeTab === 'recommended' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#C0FF00] shadow-[0_0_10px_#C0FF00]"></div>}
+                    </button>
+                </div>
+            </div>
+
+            {loading ? (
+                <div className="flex justify-center py-20">
+                    <div className="w-8 h-8 border-4 border-[#C0FF00] border-t-transparent rounded-full animate-spin"></div>
+                </div>
+            ) : activeTab === 'following' ? (
+                <div className="bg-[#1C1B1B]/40 border border-[#313030]/30 rounded-[32px] overflow-hidden">
+                    {following.length > 0 ? (
+                        <div className="flex flex-col divide-y divide-[#313030]/30">
+                            {following.map((user) => (
                                 <ConnectionCard
-                                    key={item.userId}
-                                    userId={item.userId}
-                                    nickname={item.userDetails.nickname}
-                                    imageUrl={item.userDetails.imageUrl}
-                                    latestMessage={item.latestMessage}
+                                    key={user.id}
+                                    userId={user.id}
+                                    nickname={user.nickname}
+                                    imageUrl={user.imageUrl}
+                                    latestMessage={null}
                                 />
                             ))}
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center justify-center py-20 px-8 text-center">
-                            <div className="bg-[#252422] p-6 rounded-3xl mb-6">
-                                <svg className="w-12 h-12 text-[#adaaaa]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                </svg>
+                        <div className="flex flex-col items-center justify-center py-24 text-center px-8">
+                            <div className="w-20 h-20 bg-[#121212] border border-[#313030] rounded-full flex items-center justify-center mb-6">
+                                <Icon name="connect-icon" size={32} className="text-[#5a6a6a]" />
                             </div>
-                            <h3 className="text-white text-xl font-bold mb-2">No connections yet</h3>
-                            <p className="text-[#adaaaa] max-w-xs mb-8 text-sm">Start exploring the discover page to find developers and build your network.</p>
-                            <a href="/match" className="px-6 py-3 bg-[#C0FF00] text-[#121212] rounded-xl font-bold hover:bg-[#D8FF80] transition-all active:scale-95">
-                                Start Discovering
-                            </a>
+                            <h3 className="text-white text-xl font-bold mb-2">You aren't following anyone</h3>
+                            <p className="text-[#5a6a6a] max-w-xs text-sm mb-8">Follow developers to see their updates in your feed and connect.</p>
+                            <button 
+                                onClick={() => setActiveTab('recommended')}
+                                className="px-8 py-3 bg-[#C0FF00] text-[#121212] rounded-full font-black text-xs uppercase tracking-widest hover:bg-[#A5DB00] transition-all"
+                            >
+                                Find People
+                            </button>
                         </div>
                     )}
                 </div>
-            </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {recommendedIds.length > 0 ? (
+                        recommendedIds.map((id) => (
+                            <SuggestedUserCard key={id} userID={id} refresh={loadRecommendations} />
+                        ))
+                    ) : (
+                        <div className="col-span-1 md:col-span-2 py-24 text-center">
+                            <p className="text-[#5a6a6a]">No recommendations found at the moment.</p>
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

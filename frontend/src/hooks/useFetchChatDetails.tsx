@@ -1,5 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from './useAuth.tsx'
+export type ChatItemDTO = {
+    chatId: number;
+    participantId: number;
+    participantName: string;
+    participantPicture: string;
+    participantOnline: boolean;
+    lastMessage: string;
+    lastActivity: string;
+    unreadCount: number;
+};
+
 
 export const useFetchChatDetails = () => {
     const [chats, setChats] = useState<ChatItemDTO[]>([]);

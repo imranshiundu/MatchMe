@@ -64,4 +64,9 @@ public class ConnectionController {
         connectionService.deleteConnection(userId, id);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/{id}/status")
+    public ResponseEntity<String> getStatus(@AuthenticationPrincipal Long userId, @PathVariable Long id) {
+        return ResponseEntity.ok(connectionService.getConnectionStatus(userId, id));
+    }
 }
