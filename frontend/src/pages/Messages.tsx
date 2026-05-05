@@ -10,7 +10,7 @@ interface ChatPreview {
     participantName: string;
     participantPicture: string;
     lastMessage: string;
-    lastMessageTime: string;
+    lastActivity: string;
     participantOnline: boolean;
     participantBio: string;
 }
@@ -79,7 +79,7 @@ function Messages() {
                                         {chat.participantName}
                                     </h3>
                                     <span className="text-[10px] font-bold text-[#5a6a6a] uppercase tracking-widest mt-1">
-                                        {formatDistanceToNow(new Date(chat.lastMessageTime), { addSuffix: true })}
+                                        {chat.lastActivity ? formatDistanceToNow(new Date(chat.lastActivity), { addSuffix: true }) : ''}
                                     </span>
                                 </div>
                                 <p className="text-[#adaaaa] text-sm truncate font-medium">
