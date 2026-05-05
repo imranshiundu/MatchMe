@@ -6,10 +6,26 @@ It allows users to:
 - Connect with other users
 - Chat with connections
 ## Quick links:
+- [Automated Setup](#automated-setup-one-click)
 - [Setup](#backend-setup)
 - [Starting](#running-the-application)
 - [Usage](#frontend-usage)
 - [Contributors](#contributors)
+
+# Automated Setup (One-Click)
+
+For a quick and automated setup on all platforms, use the provided installation scripts. These scripts check for dependencies, start the database, build the backend, and launch the frontend.
+
+### Linux & macOS
+```bash
+chmod +x install.sh
+./install.sh
+```
+
+### Windows
+Run the `install.bat` file from your terminal or by double-clicking it in File Explorer.
+
+---
 # Backend Setup
 
 This is a Spring Boot backend application using environment variables for configuration. Sensitive data is not stored in
