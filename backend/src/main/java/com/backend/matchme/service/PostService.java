@@ -45,6 +45,10 @@ public class PostService {
         return postRepository.findAllByOrderByCreatedAtDesc(pageable).map(this::mapToDTO);
     }
 
+    public Page<PostResponseDTO> getDiscoveryFeed(Pageable pageable) {
+        return postRepository.findAllRandom(pageable).map(this::mapToDTO);
+    }
+
     public List<PostResponseDTO> getUserPosts(Long userId) {
         User author = userRepository.findById(userId).orElseThrow();
         return postRepository.findByAuthorOrderByCreatedAtDesc(author).stream().map(this::mapToDTO).collect(Collectors.toList());

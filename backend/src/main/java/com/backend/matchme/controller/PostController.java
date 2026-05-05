@@ -30,7 +30,11 @@ public class PostController {
     @GetMapping
     public ResponseEntity<Page<PostResponseDTO>> getPosts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "false") boolean discover) {
+        if (discover) {
+            return ResponseEntity.ok(postService.getDiscoveryFeed(PageRequest.of(page, size)));
+        }
         return ResponseEntity.ok(postService.getAllPosts(PageRequest.of(page, size)));
     }
 

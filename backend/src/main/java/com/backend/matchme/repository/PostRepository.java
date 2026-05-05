@@ -13,4 +13,7 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);
     List<Post> findByAuthorOrderByCreatedAtDesc(User author);
+
+    @org.springframework.data.jpa.repository.Query(value = "SELECT * FROM posts ORDER BY random()", nativeQuery = true)
+    Page<Post> findAllRandom(Pageable pageable);
 }

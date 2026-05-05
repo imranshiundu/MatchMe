@@ -43,7 +43,7 @@ function Dashboard() {
         if (!token) return;
         try {
             setLoading(true);
-            const res = await fetch(`http://localhost:8085/posts?page=${page}&size=10`, {
+            const res = await fetch(`http://localhost:8085/posts?page=${page}&size=15&discover=true`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (res.ok) {

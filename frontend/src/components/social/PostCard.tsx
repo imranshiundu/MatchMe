@@ -65,7 +65,8 @@ function PostCard({ post }: { post: PostProps }) {
     const authorName = post.authorNickname || `User ${post.authorId}`;
 
     return (
-        <div className="bg-transparent border-b border-[#313030]/40 p-6 md:p-8 hover:bg-[#1C1B1B]/30 transition-all duration-300 group animate-fade-in relative">
+        <div className="bg-[#1C1B1B]/40 backdrop-blur-sm border border-[#313030]/30 rounded-[32px] p-6 md:p-8 hover:bg-[#1C1B1B]/60 hover:border-[#C0FF00]/30 transition-all duration-500 group animate-scale-in relative overflow-hidden mb-6">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#C0FF00]/5 blur-[60px] rounded-full -mr-16 -mt-16 group-hover:bg-[#C0FF00]/10 transition-all duration-700" />
             <div className="flex items-start justify-between mb-6">
                 <div className="flex items-center gap-5">
                     <Link to={`/match/${post.authorId}`} className="relative flex-shrink-0">
