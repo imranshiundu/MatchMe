@@ -15,6 +15,14 @@ interface ChatPreview {
     participantBio: string;
 }
 
+const parseDate = (date: any) => {
+    if (!date) return null;
+    if (Array.isArray(date)) {
+        return new Date(date[0], date[1] - 1, date[2], date[3] || 0, date[4] || 0, date[5] || 0);
+    }
+    return new Date(date);
+};
+
 function Messages() {
     const { token } = useAuth();
     const [chats, setChats] = useState<ChatPreview[]>([]);
@@ -79,7 +87,7 @@ function Messages() {
                                         {chat.participantName}
                                     </h3>
                                     <span className="text-[10px] font-bold text-[#5a6a6a] uppercase tracking-widest mt-1">
-                                        {chat.lastActivity ? formatDistanceToNow(new Date(chat.lastActivity), { addSuffix: true }) : ''}
+                                        {chat.lastActivity && parseDate(chat.lastActivity) ? formatDistanceToNow(parseDate(chat.lastActivity)!, { addSuffix: true }) : ''}
                                     </span>
                                 </div>
                                 <p className="text-[#adaaaa] text-sm truncate font-medium">
