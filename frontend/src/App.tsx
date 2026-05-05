@@ -6,6 +6,7 @@ import Landing from "./pages/Landing.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import Profile from "./pages/Profile.tsx";
 import Layout from "./components/layout/Layout.tsx";
+import ChatLayout from "./components/layout/ChatLayout.tsx";
 import Connections from "./pages/Connections.tsx";
 import Auth from "./pages/Auth.tsx";
 import Chat from "./pages/Chat.tsx";
@@ -27,6 +28,8 @@ function App() {
                         <Route path="/connections" element={<Connections/>}/>
                         <Route path="/messages" element={<Messages/>}/>
                         <Route path="/connections/user/:userId" element={<Profile isConnection={true}/>}/>
+                    </Route>
+                    <Route element={<ChatLayout/>}>
                         <Route path="/connections/chat/:userId" element={<Chat/>}/>
                     </Route>
                 </Route>

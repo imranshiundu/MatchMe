@@ -77,15 +77,15 @@ function Chat() {
 
     if (!chatId) {
         return (
-            <div className="flex flex-col items-center justify-center h-[calc(100vh-64px)] w-full bg-[#121212]">
+            <div className="flex flex-col items-center justify-center h-full w-full bg-[#121212]">
                 <div className="w-12 h-12 border-2 border-[#C0FF00] border-t-transparent rounded-full animate-spin mb-6" />
-                <p className="text-[#5a6a6a] text-[10px] font-black uppercase tracking-[0.3em]">Initializing Channel...</p>
+                <p className="text-[#5a6a6a] text-[10px] font-black uppercase tracking-[0.3em]">Opening Chat...</p>
             </div>
         );
     }
 
     return (
-        <div className="flex flex-col h-[calc(100vh-160px)] md:h-[calc(100vh-140px)] w-full bg-[#121212] border border-[#313030]/50 md:rounded-[32px] overflow-hidden animate-fade-in relative z-10 shadow-2xl">
+        <div className="flex flex-col h-full w-full bg-[#121212] overflow-hidden animate-fade-in">
             {/* Chat Header */}
             <header className="flex items-center gap-4 px-6 py-4 bg-[#1C1B1B]/80 backdrop-blur-md border-b border-[#313030] z-10 flex-shrink-0">
                 <Link to="/messages" className="p-2 -ml-2 text-[#5a6a6a] hover:text-[#C0FF00] transition-colors">
@@ -141,8 +141,8 @@ function Chat() {
                                     handleSendMessage();
                                 }
                             }}
-                            placeholder="Input command or message..."
-                            className="w-full bg-[#121212] border border-[#313030] rounded-2xl px-6 py-4 text-white text-sm outline-none focus:border-[#C0FF00] focus:ring-1 focus:ring-[#C0FF00] transition-all resize-none max-h-32 min-h-[56px] placeholder-[#5a6a6a] font-medium"
+                            placeholder="Message..."
+                            className="w-full bg-[#1a1a1a] border border-[#313030] rounded-2xl px-5 py-4 text-white text-sm outline-none focus:border-[#C0FF00] focus:ring-1 focus:ring-[#C0FF00] transition-all resize-none max-h-32 min-h-[52px] placeholder-[#5a6a6a] font-medium leading-tight"
                         />
                     </div>
                     <button
