@@ -8,7 +8,9 @@ const socket_url = "http://localhost:8085/ws-chat";
 class WebSocketService {
     private client: Client | null = null;
     private isConnected: boolean = false;
+    private isConnecting: boolean = false;
     private subscriptions: wsTypes.Subscription[] = [];
+
     private resubscribe(): void {
         this.subscriptions.forEach((sub)=> {
             if (this.client && this.client.connected) {
@@ -27,6 +29,9 @@ class WebSocketService {
         onDisconnect: () => void = () => {},
         onError: (error:any) => void = () => {}
         ): Promise<void> {
+        if (this.isConnected || this.isConnecting) return;
+        this.isConnecting = true;
+
         if (this.client) {
             await this.disconnect();
         }
@@ -37,16 +42,19 @@ class WebSocketService {
             connectHeaders: { Authorization: `Bearer ${jwtToken}` },
             onConnect: () => {
                 this.isConnected = true;
+                this.isConnecting = false;
                 console.log("WebSocket connected");
                 onConnect();
                 this.resubscribe();
             },
             onDisconnect: () => {
                 this.isConnected = false;
+                this.isConnecting = false;
                 console.log("WebSocket disconnected");
                 onDisconnect();
             },
             onStompError: (error) => {
+                this.isConnecting = false;
                 console.error(`WebSocket error: `, error);
                 onError(error)
             }
