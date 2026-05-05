@@ -52,10 +52,23 @@ export const useAuth = () => {
         }
     }
 
+    const getUserEmail = () => {
+        const stored = sessionStorage.getItem('email');
+        if (stored) return stored;
+        if (token) {
+            try {
+                return jwtDecode<JwtPayload>(token).sub;
+            } catch {
+                return null;
+            }
+        }
+        return null;
+    };
+
     return {
         token,
         userId,
-        userEmail: sessionStorage.getItem('email'),
+        userEmail: getUserEmail(),
         setAuthToken,
         logout,
         isAuthenticated

@@ -21,7 +21,7 @@ function RequestCard({ requestID, userID, onActionResult }: RequestCardProps) {
     useEffect(() => {
         async function getUserDetails(id: number) {
             try {
-                const res = await fetch(`http://localhost:8085/users/${id}/profile`, {
+                const res = await fetch(`http://localhost:8085/profile/${id}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await res.json();

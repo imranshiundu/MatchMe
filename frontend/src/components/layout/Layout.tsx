@@ -21,7 +21,7 @@ function Layout() {
                     
                     const enriched = await Promise.all(
                         data.map(async (req: any) => {
-                            const userRes = await fetch(`http://localhost:8085/users/${req.userA}`, {
+                            const userRes = await fetch(`http://localhost:8085/profile/${req.userA}`, {
                                 headers: { Authorization: `Bearer ${token}` }
                             });
                             const userDetails = userRes.ok ? await userRes.json() : null;
@@ -82,11 +82,7 @@ function Layout() {
                                             {notif.imageUrl ? (
                                                 <img src={notif.imageUrl} alt={notif.user} className="w-full h-full object-cover" />
                                             ) : (
-                                                <>
-                                                    {notif.type === 'follow' && <Icon name="connect-icon" size={16} />}
-                                                    {notif.type === 'like' && <Icon name="search-icon" size={16} />}
-                                                    {notif.type === 'comment' && <Icon name="message-icon" size={16} />}
-                                                </>
+                                                <img src="/favicon.svg" alt="Avatar" className="w-6 h-6 object-contain opacity-80" />
                                             )}
                                         </div>
                                         <div className="flex-1">
